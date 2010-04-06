@@ -1,0 +1,9 @@
+Usage of lizard-fewsunblobbed
+=============================================
+
+
+Usage:
+
+    >>> import lizard_fewsunblobbed
+
+Show how to import the main classes and how to use them.
