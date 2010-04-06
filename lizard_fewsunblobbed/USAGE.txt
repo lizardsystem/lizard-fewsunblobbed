@@ -1,25 +1,25 @@
 Usage of lizard-fewsunblobbed
-=============================================
+=============================
 
 
 Making a sqlite database with data
 ----------------------------------
 
-how to make a sqlite fews-unblobbed database
+How to make a sqlite fews-unblobbed database::
 
-# sqlite3 filename.db
-SQLite version 3.6.16
-Enter ".help" for instructions
-Enter SQL statements terminated with a ";"
-sqlite> .read import.sql
-SQL error near line 11: no such table: filter
-SQL error near line 12: no such table: location
-SQL error near line 13: no such table: parameter
-SQL error near line 14: no such table: timeserie
-SQL error near line 15: no such table: timeseriedata
-sqlite> 
+    # sqlite3 filename.db
+    SQLite version 3.6.16
+    Enter ".help" for instructions
+    Enter SQL statements terminated with a ";"
+    sqlite> .read import.sql
+    SQL error near line 11: no such table: filter
+    SQL error near line 12: no such table: location
+    SQL error near line 13: no such table: parameter
+    SQL error near line 14: no such table: timeserie
+    SQL error near line 15: no such table: timeseriedata
+    sqlite>
 
-(finished! - it gives the errors because if you have existing tables,
+(Finished! - it gives the errors because if you have existing tables,
 the script will remove the tables first)
 
 
@@ -30,6 +30,7 @@ Usage:
 Show how to import the main classes and how to use them.
 
 Smoketest
+
     >>> from lizard_fewsunblobbed.models import *
     >>> from lizard_fewsunblobbed import views
 
@@ -50,7 +51,7 @@ Smoketest
 
 If you're using multiple databases, you can use the 'using' thingy
 
-#    >>> Filter.objects.using('fews-waternet').all()
+    >>> Filter.objects.using('fews-unblobbed').all()
     []
 
 However it's better to create a django router if there's only one fews
