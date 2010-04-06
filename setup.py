@@ -14,6 +14,7 @@ long_description = '\n\n'.join([
 install_requires = [
     'Django',
     'django-staticfiles',
+    'django-compositepk',
     ],
 
 tests_require = [

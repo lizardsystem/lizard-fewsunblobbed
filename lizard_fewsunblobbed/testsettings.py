@@ -1,7 +1,17 @@
 DEBUG = True
 TEMPLATE_DEBUG = True
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = 'test.db'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'test.db'
+        },
+    'fews-unblobbed': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'test.db'
+        }
+    }
+
 SITE_ID = 1
 INSTALLED_APPS = [
     'lizard_fewsunblobbed',
