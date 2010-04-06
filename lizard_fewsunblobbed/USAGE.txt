@@ -50,7 +50,7 @@ Smoketest
 
 If you're using multiple databases, you can use the 'using' thingy
 
-    >>> Filter.objects.using('fews-waternet').all()
+#    >>> Filter.objects.using('fews-waternet').all()
     []
 
 However it's better to create a django router if there's only one fews
