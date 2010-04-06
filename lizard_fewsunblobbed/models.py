@@ -41,6 +41,9 @@ class Location(models.Model):
     class Meta:
         db_table = u'location'
 
+    def __unicode__(self):
+        return '%d %s (%s)'%(self.lkey, self.id, self.name)
+
 class Parameter(models.Model):
     pkey = models.IntegerField(primary_key=True)
     id = models.TextField(unique=True) # This field type is a guess.
@@ -52,15 +55,21 @@ class Parameter(models.Model):
     class Meta:
         db_table = u'parameter'
 
+    def __unicode__(self):
+        return '%d %s (%s)'%(self.pkey, self.id, self.name)
+
 class Timeserie(models.Model):
     tkey = models.IntegerField(primary_key=True)
     moduleinstanceid = models.TextField() # This field type is a guess.
     timestep = models.TextField() # This field type is a guess.
-    filterkey = models.ForeignKey(Filter)
-    locationkey = models.ForeignKey(Location)
-    parameterkey = models.ForeignKey(Parameter)
+    filterkey = models.ForeignKey(Filter, db_column='filterkey')
+    locationkey = models.ForeignKey(Location, db_column='locationkey')
+    parameterkey = models.ForeignKey(Parameter, db_column='parameterkey')
     class Meta:
         db_table = u'timeserie'
+
+    def __unicode__(self):
+        return '%s (%s::%s::%s)'%(self.moduleinstanceid, self.filterkey, self.locationkey, self.parameterkey)
 
 class Timeseriedata(composite.CompositePKModel):
     tkey = models.ForeignKey(Timeserie, primary_key=True, db_column='tkey')
@@ -71,4 +80,8 @@ class Timeseriedata(composite.CompositePKModel):
     tsd_comments = models.TextField(blank=True) # This field type is a guess.
     class Meta:
         db_table = u'timeseriedata'
+
+    def __unicode__(self):
+        return '%s %s %s'%(self.tkey, self.tsd_time, self.tsd_value)
+
 
