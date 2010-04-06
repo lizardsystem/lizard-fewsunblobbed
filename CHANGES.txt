@@ -2,7 +2,8 @@ Changelog of lizard-fewsunblobbed
 ===================================================
 
 
-0.1 (unreleased)
+0.1 (2010-04-06)
 ----------------
 
-- Initial library skeleton created by thaskel.  [your name]
+- First working version: added models.py
+- Initial library skeleton created by nensskel.  [jack]
