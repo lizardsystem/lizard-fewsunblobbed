@@ -8,7 +8,7 @@ DATABASES = {
         },
     'fews-unblobbed': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'test.db'
+        'NAME': 'testunblobbed.db'
         }
     }
 
@@ -36,6 +36,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # {{ STATIC_URL }}myapp/my.css in your templates.
     'staticfiles.context_processors.static_url',
     )
+
+DATABASE_ROUTERS = ['lizard_fewsunblobbed.routers.FewsUnblobbedRouter', ]
 
 
 try:

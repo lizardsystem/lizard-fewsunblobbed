@@ -28,6 +28,11 @@ class FewsUnblobbedRouter(object):
         create one, therefore we need to allow syncdb.
 
         """
+        if model._meta.app_label == 'contenttypes':
+            # Temp hack, fixes http://code.djangoproject.com/ticket/12999
+            # until django 1.2 beta 2 comes out.
+            if db == 'fews-unblobbed':
+                return True
         if model._meta.app_label == 'lizard_fewsunblobbed':
             if db == 'fews-unblobbed':
                 return True
