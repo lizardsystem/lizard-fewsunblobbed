@@ -15,6 +15,7 @@ install_requires = [
     'Django',
     'django-staticfiles',
     'django-compositepk',
+    'django-treebeard',
     ],
 
 tests_require = [
