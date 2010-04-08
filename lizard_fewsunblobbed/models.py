@@ -1,14 +1,17 @@
 from django.db import models
 from composite_pk import composite
+from treebeard.al_tree import AL_Node
 
-class Filter(models.Model):
+class Filter(AL_Node):
     fkey = models.IntegerField(primary_key=True)
     id = models.TextField(unique=True) 
     name = models.TextField(blank=True) 
     description = models.TextField(blank=True) 
     issubfilter = models.BooleanField()
-    parentfkey = models.ForeignKey('Filter', null=True, blank=True, db_column='parentfkey')
+    parent = models.ForeignKey('Filter', null=True, blank=True, db_column='parentfkey')
     isendnode = models.BooleanField()
+    node_order_by = ['name']
+
 
     class Meta:
         db_table = u'filter'
