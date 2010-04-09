@@ -118,12 +118,15 @@ class Timeserie(models.Model):
         db_table = u'timeserie'
 
     def __unicode__(self):
-        return '%s (%s::%s::%s)' % (self.moduleinstanceid, self.filterkey,
-                                    self.locationkey, self.parameterkey)
+        return '%s (for %s)' % (self.moduleinstanceid,
+                                self.locationkey.name)
 
 
 class Timeseriedata(composite.CompositePKModel):
-    tkey = models.ForeignKey(Timeserie, primary_key=True, db_column='tkey')
+    tkey = models.ForeignKey(Timeserie,
+                             primary_key=True,
+                             db_column='tkey',
+                             related_name='timeseriedata')
     tsd_time = models.DateTimeField(primary_key=True, db_column='tsd_time')
     tsd_value = models.FloatField(blank=True)
     tsd_flag = models.IntegerField(blank=True)
