@@ -6,7 +6,7 @@ from treebeard.al_tree import AL_Node
 
 class Filter(AL_Node):
     # use 'id' and not fkey as treebeard needs this name (is hardcoded)
-    id  = models.IntegerField(primary_key=True, db_column='fkey') 
+    id  = models.IntegerField(primary_key=True, db_column='fkey')
     # since 'id' is already used us another name
     fews_id = models.TextField(unique=True, db_column='id')
     name = models.TextField(blank=True)
@@ -22,12 +22,12 @@ class Filter(AL_Node):
         db_table = u'filter'
 
     def __unicode__(self):
-        return '%d %s (%s)' % (self.fkey, self.id, self.name)
+        return '%s (%s)' % (self.name, self.fews_id)
 
     # This method is overriden from the class AL_Node in al_tree.py
     # from the django-treebeard application
     # The method fixes checks first if the field sib_order exist before deleting,
-    # which the original version doesn't do (which causes a bug). 
+    # which the original version doesn't do (which causes a bug).
     @classmethod
     def dump_bulk(cls, parent=None, keep_ids=True):
         """
