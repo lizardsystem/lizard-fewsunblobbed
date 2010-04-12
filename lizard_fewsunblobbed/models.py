@@ -118,15 +118,15 @@ class Timeserie(models.Model):
         db_table = u'timeserie'
 
     def __unicode__(self):
-        return u'%s for %s (tkey=%s)' % (self.moduleinstanceid,
+        return u'%s for %s (tkey=%s)' % (self.parameterkey.name,
                                          self.locationkey.name,
                                          self.tkey)
 
     @property
     def name(self):
         """Return name for use in graph legends"""
-        return u'%s for %s' % (self.moduleinstanceid,
-                               self.locationkey.name)
+        return u'%s (%s)' % (self.parameterkey.name,
+                             self.locationkey.name)
 
 
 class Timeseriedata(composite.CompositePKModel):
