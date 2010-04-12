@@ -22,7 +22,7 @@ class Filter(AL_Node):
         db_table = u'filter'
 
     def __unicode__(self):
-        return '%s (id=%s)' % (self.name, self.fews_id)
+        return u'%s (id=%s)' % (self.name, self.fews_id)
 
     # This method is overriden from the class AL_Node in al_tree.py
     # from the django-treebeard application
@@ -87,7 +87,7 @@ class Location(models.Model):
         db_table = u'location'
 
     def __unicode__(self):
-        return '%s (lkey=%s)' % (self.name, self.lkey)
+        return u'%s (lkey=%s)' % (self.name, self.lkey)
 
 
 class Parameter(models.Model):
@@ -103,7 +103,7 @@ class Parameter(models.Model):
         db_table = u'parameter'
 
     def __unicode__(self):
-        return '%s (pkey=%s)' % (self.name, self.pkey)
+        return u'%s (pkey=%s)' % (self.name, self.pkey)
 
 
 class Timeserie(models.Model):
@@ -118,9 +118,15 @@ class Timeserie(models.Model):
         db_table = u'timeserie'
 
     def __unicode__(self):
-        return '%s for %s (tkey=%s)' % (self.moduleinstanceid,
-                                        self.locationkey.name,
-                                        self.tkey)
+        return u'%s for %s (tkey=%s)' % (self.moduleinstanceid,
+                                         self.locationkey.name,
+                                         self.tkey)
+
+    @property
+    def name(self):
+        """Return name for use in graph legends"""
+        return u'%s for %s' % (self.moduleinstanceid,
+                               self.locationkey.name)
 
 
 class Timeseriedata(composite.CompositePKModel):
@@ -140,4 +146,4 @@ class Timeseriedata(composite.CompositePKModel):
         db_table = u'timeseriedata'
 
     def __unicode__(self):
-        return 'Data for %s: %s = %s' % (self.tkey, self.tsd_time, self.tsd_value)
+        return u'Data for %s: %s = %s' % (self.tkey, self.tsd_time, self.tsd_value)
