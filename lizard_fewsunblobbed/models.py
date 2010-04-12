@@ -22,7 +22,7 @@ class Filter(AL_Node):
         db_table = u'filter'
 
     def __unicode__(self):
-        return '%s (%s)' % (self.name, self.fews_id)
+        return '%s (id=%s)' % (self.name, self.fews_id)
 
     # This method is overriden from the class AL_Node in al_tree.py
     # from the django-treebeard application
@@ -87,7 +87,7 @@ class Location(models.Model):
         db_table = u'location'
 
     def __unicode__(self):
-        return '%d %s (%s)' % (self.lkey, self.id, self.name)
+        return '%s (lkey=%s)' % (self.name, self.lkey)
 
 
 class Parameter(models.Model):
@@ -103,7 +103,7 @@ class Parameter(models.Model):
         db_table = u'parameter'
 
     def __unicode__(self):
-        return '%d %s (%s)' % (self.pkey, self.id, self.name)
+        return '%s (pkey=%s)' % (self.name, self.pkey)
 
 
 class Timeserie(models.Model):
@@ -118,8 +118,9 @@ class Timeserie(models.Model):
         db_table = u'timeserie'
 
     def __unicode__(self):
-        return '%s (for %s)' % (self.moduleinstanceid,
-                                self.locationkey.name)
+        return '%s for %s (tkey=%s)' % (self.moduleinstanceid,
+                                        self.locationkey.name,
+                                        self.tkey)
 
 
 class Timeseriedata(composite.CompositePKModel):
@@ -127,6 +128,8 @@ class Timeseriedata(composite.CompositePKModel):
                              primary_key=True,
                              db_column='tkey',
                              related_name='timeseriedata')
+    # ^^^ TODO: this is mighty slow in the django admin.  It grabs all the
+    # timeserie names/ids.
     tsd_time = models.DateTimeField(primary_key=True, db_column='tsd_time')
     tsd_value = models.FloatField(blank=True)
     tsd_flag = models.IntegerField(blank=True)
@@ -137,4 +140,4 @@ class Timeseriedata(composite.CompositePKModel):
         db_table = u'timeseriedata'
 
     def __unicode__(self):
-        return '%s %s %s' % (self.tkey, self.tsd_time, self.tsd_value)
+        return 'Data for %s: %s = %s' % (self.tkey, self.tsd_time, self.tsd_value)

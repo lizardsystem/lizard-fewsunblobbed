@@ -7,8 +7,8 @@ Basic instantiation and printing:
 
     >>> filter_ = models.Filter()
     >>> filter_
-    <Filter:  ()>
+    <Filter:  (id=)>
     >>> filter_.name = 'Sample filter'
     >>> filter_.fews_id = '1234'
     >>> filter_
-    <Filter: Sample filter (1234)>
+    <Filter: Sample filter (id=1234)>
