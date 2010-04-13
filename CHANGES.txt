@@ -5,7 +5,11 @@ Changelog of lizard-fewsunblobbed
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added utility methods for legend names and so.
+
+- Adjusted __unicode__ string representations.
+
+- Fixed generated field types (not everything is a text area).
 
 
 0.1 (2010-04-06)
