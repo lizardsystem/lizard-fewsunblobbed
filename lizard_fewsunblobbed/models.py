@@ -128,6 +128,9 @@ class Timeserie(models.Model):
         return u'%s (%s)' % (self.parameterkey.name,
                              self.locationkey.name)
 
+    def data_count(self):
+        return self.timeseriedata.all().count()
+
 
 class Timeseriedata(composite.CompositePKModel):
     tkey = models.ForeignKey(Timeserie,
