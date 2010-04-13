@@ -1,0 +1,53 @@
+<HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+{% load recursive_tag %}
+
+<html>
+  <head>
+    <title>
+      Lizard filter tree
+    </title>
+  </head>
+  <body>
+    <ul>
+      {% for node in tree %}
+           <li>{{node.data.name}}</li>
+           {% if  not node.isendnode %}      
+           <ul>
+             {% for child in node.children %}
+             <li>{{child.data.name}}</li>
+             {% if not child.isendnode %}
+             <ul>
+               {% for child2 in child.children %}
+               <li>{{child2.data.name}}</li>
+               {% if not child2.isendnode %}
+               <ul>
+                 {% for child3 in child2.children %}
+                 <li>{{child3.data.name}}</li>
+                 {% if not child3.isendnode %}
+                 <ul>
+                   {% for child4 in child3.children %}
+                   <li>{{child4.data.name}}</li>
+                   {% if not child4.isendnode %}
+                   <ul>
+                     {% for child5 in child4.children %}                     
+                     <li>{{child5.data.name}}</li>
+                     {% endfor %}
+                   </ul>
+                   {% endif %}
+                   {% endfor %}
+                 </ul>
+                 {% endif  %}
+                 {% endfor %}
+               </ul>
+               {% endif %}                   
+               {% endfor %}
+             </ul>
+             {% endif %}
+             {% endfor %}
+           </ul>
+          {% endif %}
+      {% endfor %}
+    </ul>
+  </body>
+</html>
+
