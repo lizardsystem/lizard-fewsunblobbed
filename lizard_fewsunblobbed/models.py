@@ -125,8 +125,9 @@ class Timeserie(models.Model):
     @property
     def name(self):
         """Return name for use in graph legends"""
-        return u'%s (%s)' % (self.parameterkey.name,
-                             self.locationkey.name)
+        return u'%s (%s): %s' % (self.parameterkey.name,
+                                self.parameterkey.unit,
+                                self.locationkey.name)
 
     def data_count(self):
         return self.timeseriedata.all().count()
