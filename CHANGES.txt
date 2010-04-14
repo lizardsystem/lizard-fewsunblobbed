@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 ===================================================
 
 
-0.3 (unreleased)
+0.3 (2010-04-14)
 ----------------
 
 - Tree fixes.
