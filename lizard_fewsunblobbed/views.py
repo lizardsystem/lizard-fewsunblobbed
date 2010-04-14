@@ -14,7 +14,8 @@ def fews_parameter_tree(request, filterkey=90, locationkey=37551, template='liza
     filtered_timeseries = Timeserie.objects.filter(filterkey=filterkey, locationkey=locationkey)
     parameters = [ts.parameterkey for ts in filtered_timeseries]
     return render_to_response(template,
-                             {"parameters": parameters})
+                             {"parameters": parameters},
+                              context_instance=RequestContext(request))
 
 
     
