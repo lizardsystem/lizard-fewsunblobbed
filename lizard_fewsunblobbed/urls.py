@@ -7,12 +7,13 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    (r'^admin/', include(admin.site.urls)),
     )
 
 
 if settings.DEBUG:
     # Add this also to the projects that use this application
-    urlpatterns += patterns('',
+    urlpatterns += patterns(
+        '',
         (r'', include('staticfiles.urls')),
+        (r'^admin/', include(admin.site.urls)),
     )

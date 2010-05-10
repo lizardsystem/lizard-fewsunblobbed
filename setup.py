@@ -43,5 +43,9 @@ setup(name='lizard-fewsunblobbed',
       extras_require = {'test': tests_require},
       entry_points={
           'console_scripts': [
-          ]},
+          ],
+          'lizard_map.layer_method': [
+            'fews_points_layer = lizard_fewsunblobbed.layers:fews_points_layer',
+            ]
+          },
       )

@@ -1,0 +1,47 @@
+#import os
+
+import pkg_resources
+import mapnik
+#from django.conf import settings
+
+from lizard_fewsunblobbed.models import Location
+from lizard_fewsunblobbed.models import Timeserie
+
+PLUS_ICON = pkg_resources.resource_filename('lizard_fewsunblobbed', 'add.png')
+
+
+def fews_points_layer(filter_id=None, parameter_id=None):
+    """Return layer and styles that render points.
+
+    Registered as ``fews_points_layer``
+    """
+    layers = []
+    styles = {}
+    layer = mapnik.Layer(
+        "FEWS points layer",
+        ("+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 "
+         "+k=0.999908 +x_0=155000 +y_0=463000 +ellps=bessel "
+         "+towgs84=565.237,50.0087,465.658,-0.406857,0.350733,-1.87035,4.0812 "
+         "+units=m +no_defs"))
+    # TODO: ^^^ translation!
+    layer.datasource = mapnik.PointDatasource()
+    if filter_id is None and parameter_id is None:
+        # Grab the first 1000 locations
+        locations = Location.objects.all()[:1000]
+    else:
+        locations = [timeserie.locationkey for timeserie in
+                     Timeserie.objects.filter(filterkey=filter_id,
+                                              parameterkey=parameter_id)]
+    for location in locations:
+        layer.datasource.add_point(location.x, location.y, 'Name', str(location.name))
+
+    point_looks = mapnik.PointSymbolizer(PLUS_ICON, 'png', 32, 32)
+    point_looks.allow_overlap = True
+    layout_rule = mapnik.Rule()
+    layout_rule.symbols.append(point_looks)
+    point_style = mapnik.Style()
+    point_style.rules.append(layout_rule)
+    styles['Point style'] = point_style
+    layer.styles.append('Point style')
+    layers = [layer]
+    return layers, styles
