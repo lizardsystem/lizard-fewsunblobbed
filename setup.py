@@ -16,6 +16,7 @@ install_requires = [
     'django-staticfiles',
     'django-compositepk',
     'django-treebeard',
+    'lizard-map',
     ],
 
 tests_require = [

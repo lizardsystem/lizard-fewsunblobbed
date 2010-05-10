@@ -15,6 +15,8 @@ DATABASES = {
 SITE_ID = 1
 INSTALLED_APPS = [
     'lizard_fewsunblobbed',
+    'lizard_map',
+    'lizard_ui',
     'staticfiles',
     'django.contrib.admin',
     'django.contrib.auth',
