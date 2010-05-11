@@ -10,7 +10,7 @@ from lizard_fewsunblobbed.models import Timeserie
 PLUS_ICON = pkg_resources.resource_filename('lizard_fewsunblobbed', 'add.png')
 
 
-def fews_points_layer(filter_id=None, parameter_id=None):
+def fews_points_layer(filterkey=None, parameterkey=None):
     """Return layer and styles that render points.
 
     Registered as ``fews_points_layer``
@@ -25,13 +25,13 @@ def fews_points_layer(filter_id=None, parameter_id=None):
          "+units=m +no_defs"))
     # TODO: ^^^ translation!
     layer.datasource = mapnik.PointDatasource()
-    if filter_id is None and parameter_id is None:
+    if filterkey is None and parameterkey is None:
         # Grab the first 1000 locations
         locations = Location.objects.all()[:1000]
     else:
         locations = [timeserie.locationkey for timeserie in
-                     Timeserie.objects.filter(filterkey=filter_id,
-                                              parameterkey=parameter_id)]
+                     Timeserie.objects.filter(filterkey=filterkey,
+                                              parameterkey=parameterkey)]
     for location in locations:
         layer.datasource.add_point(location.x, location.y, 'Name', str(location.name))
 
