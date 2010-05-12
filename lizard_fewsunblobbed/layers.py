@@ -1,16 +1,36 @@
+import os
 from math import sqrt
 
 import pkg_resources
 import mapnik
-#from django.conf import settings
+from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Timeserie
+from lizard_fewsunblobbed.models import Filter
+
+from lizard_map.symbol_manager import SymbolManager
+from lizard_map.views import ICON_ORIGINALS
 
 PLUS_ICON = pkg_resources.resource_filename('lizard_fewsunblobbed', 'add.png')
 
+# maps filter ids to icons
+LAYER_STYLES = {
+    "default": {'icon': 'meetpuntPeil.png', 'mask': ('meetpuntPeil_mask.png', ), 'color': (1,1,1,0)},
+    "boezem_waterstanden": {'icon': 'meetpuntPeil.png', 'mask': ('meetpuntPeil_mask.png', ), 'color': (0,0.5,1,0)},
+    "boezem_meetpunt": {'icon': 'meetpuntPeil.png', 'mask': ('meetpuntPeil_mask.png', ), 'color': (0,1,0,0)},
+    "boezem_poldergemaal": {'icon': 'gemaal.png', 'mask': ('gemaal_mask.png', ), 'color': (0,1,0,0)},
+    "west_opvoergemaal": {'icon': 'gemaal.png', 'mask': ('gemaal_mask.png', ), 'color': (1,0,1,0), 'size': (16,16)},
+    "west_stuw_(hand)": {'icon': 'stuw.png', 'mask': ('stuw_mask.png', ), 'color': (0,1,0,0)},
+    "west_stuw_(auto)": {'icon': 'stuw.png', 'mask': ('stuw_mask.png', ), 'color': (1,0,0,0)},
+    "oost_stuw_(hand)": {'icon': 'stuw.png', 'mask': ('stuw_mask.png', ), 'color': (0,1,0,0)},
+    "oost_stuw_(auto)": {'icon': 'stuw.png', 'mask': ('stuw_mask.png', ), 'color': (1,0,0,0)},
+    "west_hevel": {'icon': 'hevel.png', 'mask': ('hevel_mask.png', ), 'color': (1,1,0,0)},
+}
 
-def fews_points_layer(filterkey=None, parameterkey=None):
+
+def fews_points_layer(filterkey=None, parameterkey=None, webcolor=None):
     """Return layer and styles that render points.
 
     Registered as ``fews_points_layer``
@@ -35,14 +55,32 @@ def fews_points_layer(filterkey=None, parameterkey=None):
     for location in locations:
         layer.datasource.add_point(location.x, location.y, 'Name', str(location.name))
 
-    point_looks = mapnik.PointSymbolizer(PLUS_ICON, 'png', 32, 32)
+    # determine icon layout by looking at filter.id
+    filter = get_object_or_404(Filter, pk=filterkey)
+    if str(filter.fews_id) in LAYER_STYLES:
+        icon_style = LAYER_STYLES[str(filter.fews_id)]
+    else:
+        icon_style = LAYER_STYLES['default']
+
+    # apply icon layout using symbol manager
+    symbol_manager = SymbolManager(ICON_ORIGINALS, os.path.join(settings.MEDIA_ROOT, 'generated_icons'))
+    output_filename = symbol_manager.get_symbol_transformed(icon_style['icon'], **icon_style)
+    output_filename_abs = os.path.join(settings.MEDIA_ROOT, 'generated_icons', output_filename)
+
+    # use filename in mapnik pointsymbolizer
+    point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 32, 32)
+
+
     point_looks.allow_overlap = True
     layout_rule = mapnik.Rule()
     layout_rule.symbols.append(point_looks)
     point_style = mapnik.Style()
     point_style.rules.append(layout_rule)
-    styles['Point style'] = point_style
-    layer.styles.append('Point style')
+
+    # generate "unique" point style name and append to layer
+    style_name = "Point style %s::%s" % (filterkey, parameterkey)
+    styles[style_name] = point_style
+    layer.styles.append(style_name)
     layers = [layer]
     return layers, styles
 
