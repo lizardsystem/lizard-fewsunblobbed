@@ -1,4 +1,4 @@
-#import os
+from math import sqrt
 
 import pkg_resources
 import mapnik
@@ -45,3 +45,22 @@ def fews_points_layer(filterkey=None, parameterkey=None):
     layer.styles.append('Point style')
     layers = [layer]
     return layers, styles
+
+
+def fews_points_layer_search(x, y, radius=None,
+                             filterkey=None, parameterkey=None):
+    """Return fews points that match x, y, radius."""
+    if filterkey is None and parameterkey is None:
+        # Grab the first 1000 locations
+        locations = Location.objects.all()[:1000]
+    else:
+        locations = [timeserie.locationkey for timeserie in
+                     Timeserie.objects.filter(filterkey=filterkey,
+                                              parameterkey=parameterkey)]
+
+    distances = [(location,
+                  sqrt((location.x - x) ** 2 + (location.y - y) ** 2))
+                 for location in locations]
+    distances.sort(key=lambda item: item[1])
+    # For the time being: return the closest one.
+    return [distances[0][0]]

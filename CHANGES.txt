@@ -5,7 +5,11 @@ Changelog of lizard-fewsunblobbed
 0.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added basic point search function.
+
+- Added mapnik layer rendering function.
+
+- Added dependency on lizard-map.
 
 
 0.3 (2010-04-14)
