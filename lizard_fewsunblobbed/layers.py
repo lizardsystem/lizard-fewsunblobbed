@@ -51,17 +51,12 @@ def fews_points_layer_search(x, y, radius=None,
                              filterkey=None, parameterkey=None):
     """Return fews points that match x, y, radius."""
     # TODO: x, y isn't in the correct projection, I think.  [reinout]
-    if filterkey is None and parameterkey is None:
-        # Grab the first 1000 locations
-        locations = Location.objects.all()[:1000]
-    else:
-        locations = [timeserie.locationkey for timeserie in
-                     Timeserie.objects.filter(filterkey=filterkey,
-                                              parameterkey=parameterkey)]
-
-    distances = [(location,
-                  sqrt((location.x - x) ** 2 + (location.y - y) ** 2))
-                 for location in locations]
+    distances = [(timeserie,
+                  sqrt((timeserie.locationkey.x - x) ** 2 +
+                       (timeserie.locationkey.y - y) ** 2))
+                 for timeserie in
+                 Timeserie.objects.filter(filterkey=filterkey,
+                                          parameterkey=parameterkey)]
     distances.sort(key=lambda item: item[1])
     # For the time being: return the closest one.
-    return [distances[0][0]]
+    return [distances[0]]
