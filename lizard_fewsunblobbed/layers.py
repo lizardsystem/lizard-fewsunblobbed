@@ -50,6 +50,7 @@ def fews_points_layer(filterkey=None, parameterkey=None):
 def fews_points_layer_search(x, y, radius=None,
                              filterkey=None, parameterkey=None):
     """Return fews points that match x, y, radius."""
+    # TODO: x, y isn't in the correct projection, I think.  [reinout]
     if filterkey is None and parameterkey is None:
         # Grab the first 1000 locations
         locations = Location.objects.all()[:1000]
