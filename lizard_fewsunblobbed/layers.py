@@ -16,18 +16,38 @@ from lizard_map.views import ICON_ORIGINALS
 PLUS_ICON = pkg_resources.resource_filename('lizard_fewsunblobbed', 'add.png')
 
 # maps filter ids to icons
+# TODO: remove from this file to a generic place
 LAYER_STYLES = {
     "default": {'icon': 'meetpuntPeil.png', 'mask': ('meetpuntPeil_mask.png', ), 'color': (1,1,1,0)},
     "boezem_waterstanden": {'icon': 'meetpuntPeil.png', 'mask': ('meetpuntPeil_mask.png', ), 'color': (0,0.5,1,0)},
     "boezem_meetpunt": {'icon': 'meetpuntPeil.png', 'mask': ('meetpuntPeil_mask.png', ), 'color': (0,1,0,0)},
     "boezem_poldergemaal": {'icon': 'gemaal.png', 'mask': ('gemaal_mask.png', ), 'color': (0,1,0,0)},
-    "west_opvoergemaal": {'icon': 'gemaal.png', 'mask': ('gemaal_mask.png', ), 'color': (1,0,1,0), 'size': (16,16)},
+    "west_opvoergemaal": {'icon': 'gemaal.png', 'mask': ('gemaal_mask.png', ), 'color': (1,0,1,0)},
     "west_stuw_(hand)": {'icon': 'stuw.png', 'mask': ('stuw_mask.png', ), 'color': (0,1,0,0)},
     "west_stuw_(auto)": {'icon': 'stuw.png', 'mask': ('stuw_mask.png', ), 'color': (1,0,0,0)},
     "oost_stuw_(hand)": {'icon': 'stuw.png', 'mask': ('stuw_mask.png', ), 'color': (0,1,0,0)},
     "oost_stuw_(auto)": {'icon': 'stuw.png', 'mask': ('stuw_mask.png', ), 'color': (1,0,0,0)},
     "west_hevel": {'icon': 'hevel.png', 'mask': ('hevel_mask.png', ), 'color': (1,1,0,0)},
+    "waterketen_rioolgemalen": {'icon': 'gemaal.png', 'mask': ('gemaal_mask.png', ), 'color': (0.7,0.5,0,0)},
+    "waterketen_overstorten": {'icon': 'overstort.png', 'mask': ('overstort_mask.png', ), 'color': (1,1,1,0)},
 }
+
+
+def fews_symbol_name(filterkey):
+    """Find fews symbol name"""
+
+    # determine icon layout by looking at filter.id
+    filter = get_object_or_404(Filter, pk=filterkey)
+    if str(filter.fews_id) in LAYER_STYLES:
+        icon_style = LAYER_STYLES[str(filter.fews_id)]
+    else:
+        icon_style = LAYER_STYLES['default']
+
+    # apply icon layout using symbol manager
+    symbol_manager = SymbolManager(ICON_ORIGINALS, os.path.join(settings.MEDIA_ROOT, 'generated_icons'))
+    output_filename = symbol_manager.get_symbol_transformed(icon_style['icon'], **icon_style)
+
+    return output_filename
 
 
 def fews_points_layer(filterkey=None, parameterkey=None, webcolor=None):
@@ -55,16 +75,7 @@ def fews_points_layer(filterkey=None, parameterkey=None, webcolor=None):
     for location in locations:
         layer.datasource.add_point(location.x, location.y, 'Name', str(location.name))
 
-    # determine icon layout by looking at filter.id
-    filter = get_object_or_404(Filter, pk=filterkey)
-    if str(filter.fews_id) in LAYER_STYLES:
-        icon_style = LAYER_STYLES[str(filter.fews_id)]
-    else:
-        icon_style = LAYER_STYLES['default']
-
-    # apply icon layout using symbol manager
-    symbol_manager = SymbolManager(ICON_ORIGINALS, os.path.join(settings.MEDIA_ROOT, 'generated_icons'))
-    output_filename = symbol_manager.get_symbol_transformed(icon_style['icon'], **icon_style)
+    output_filename = fews_symbol_name(filterkey)
     output_filename_abs = os.path.join(settings.MEDIA_ROOT, 'generated_icons', output_filename)
 
     # use filename in mapnik pointsymbolizer
