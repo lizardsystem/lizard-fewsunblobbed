@@ -1,0 +1,58 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-17 09:30-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models.py:13
+msgid "Filter"
+msgstr "Filter"
+
+#: models.py:14
+msgid "Filters"
+msgstr "Filters"
+
+#: models.py:82
+msgid "Location"
+msgstr "Locatie"
+
+#: models.py:83
+msgid "Locations"
+msgstr "Locaties"
+
+#: models.py:108
+msgid "Parameter"
+msgstr "Parameter"
+
+#: models.py:109
+msgid "Parameters"
+msgstr "Parameters"
+
+#: models.py:129
+msgid "Timeserie"
+msgstr "Tijdreeks"
+
+#: models.py:130
+msgid "Timeseries"
+msgstr "Tijdreeksen"
+
+#: models.py:165
+msgid "Timeserie data"
+msgstr "Tijdreeks data"
+
+#: models.py:166
+msgid "Timeseries data"
+msgstr "Tijdreeksen data"

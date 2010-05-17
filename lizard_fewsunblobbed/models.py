@@ -1,11 +1,18 @@
 from django.core import serializers
 from django.db import models
+from django.utils.translation import ugettext as _
+
 from composite_pk import composite
 from treebeard.al_tree import AL_Node
 
 
 class Filter(AL_Node):
     # use 'id' and not fkey as treebeard needs this name (is hardcoded)
+
+    class Meta:
+        verbose_name = _("Filter")
+        verbose_name_plural = _("Filters")
+
     id  = models.IntegerField(primary_key=True, db_column='fkey')
     # since 'id' is already used us another name
     fews_id = models.TextField(unique=True, db_column='id')
@@ -70,6 +77,11 @@ class Filter(AL_Node):
 
 
 class Location(models.Model):
+
+    class Meta:
+        verbose_name = _("Location")
+        verbose_name_plural = _("Locations")
+
     lkey = models.IntegerField(primary_key=True)
     id = models.TextField(unique=True)
     name = models.TextField(blank=True)
@@ -91,6 +103,11 @@ class Location(models.Model):
 
 
 class Parameter(models.Model):
+
+    class Meta:
+        verbose_name = _("Parameter")
+        verbose_name_plural = _("Parameters")
+
     pkey = models.IntegerField(primary_key=True)
     id = models.TextField(unique=True)
     name = models.TextField(blank=True)
@@ -107,6 +124,11 @@ class Parameter(models.Model):
 
 
 class Timeserie(models.Model):
+
+    class Meta:
+        verbose_name = _("Timeserie")
+        verbose_name_plural = _("Timeseries")
+
     tkey = models.IntegerField(primary_key=True)
     moduleinstanceid = models.TextField(blank=True)
     timestep = models.TextField(blank=True)
@@ -138,6 +160,11 @@ class Timeseriedata(composite.CompositePKModel):
                              primary_key=True,
                              db_column='tkey',
                              related_name='timeseriedata')
+
+    class Meta:
+        verbose_name = _("Timeserie data")
+        verbose_name_plural = _("Timeseries data")
+
     # ^^^ TODO: this is mighty slow in the django admin.  It grabs all the
     # timeserie names/ids.
     tsd_time = models.DateTimeField(primary_key=True, db_column='tsd_time')

@@ -41,7 +41,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 DATABASE_ROUTERS = ['lizard_fewsunblobbed.routers.FewsUnblobbedRouter', ]
 
-
 try:
     # Import local settings that aren't stored in svn.
     from lizard_fewsunblobbed.local_testsettings import *
