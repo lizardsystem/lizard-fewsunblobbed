@@ -10,8 +10,8 @@
   <body>
     <ul>
       {% for node in tree %}
-           <li>{{node.data.name}}</li>           
-           {% if  not node.data.isendnode %}      
+           <li>{{node.data.name}}</li>
+           {% if  not node.data.isendnode %}
            <ul>
              {% for child in node.children %}
              <li>{{child.data.name}}</li>
@@ -29,7 +29,7 @@
                    <li>{{child4.data.name}}</li>
                    {% if not child4.data.isendnode %}
                    <ul>
-                     {% for child5 in child4.children %}                     
+                     {% for child5 in child4.children %}
                      <li>{{child5.data.name}}</li>
                      {% endfor %}
                    </ul>
@@ -39,7 +39,7 @@
                  {% endif  %}
                  {% endfor %}
                </ul>
-               {% endif %}                   
+               {% endif %}
                {% endfor %}
              </ul>
              {% endif %}
