@@ -20,39 +20,40 @@ PLUS_ICON = pkg_resources.resource_filename('lizard_fewsunblobbed', 'add.png')
 LAYER_STYLES = {
     "default": {'icon': 'meetpuntPeil.png',
                 'mask': ('meetpuntPeil_mask.png', ),
-                'color': (1,1,1,0)},
+                'color': (1, 1, 1, 0)},
     "boezem_waterstanden": {'icon': 'meetpuntPeil.png',
                             'mask': ('meetpuntPeil_mask.png', ),
-                            'color': (0,0.5,1,0)},
+                            'color': (0, 0.5, 1, 0)},
     "boezem_meetpunt": {'icon': 'meetpuntPeil.png',
                         'mask': ('meetpuntPeil_mask.png', ),
-                        'color': (0,1,0,0)},
+                        'color': (0, 1, 0, 0)},
     "boezem_poldergemaal": {'icon': 'gemaal.png',
                             'mask': ('gemaal_mask.png', ),
-                            'color': (0,1,0,0)},
-    "west_opvoergemaal": {'icon': 'gemaal.png', 'mask': ('gemaal_mask.png', ),
-                          'color': (1,0,1,0)},
+                            'color': (0, 1, 0, 0)},
+    "west_opvoergemaal": {'icon': 'gemaal.png',
+                          'mask': ('gemaal_mask.png', ),
+                          'color': (1, 0, 1, 0)},
     "west_stuw_(hand)": {'icon': 'stuw.png',
                          'mask': ('stuw_mask.png', ),
-                         'color': (0,1,0,0)},
+                         'color': (0, 1, 0, 0)},
     "west_stuw_(auto)": {'icon': 'stuw.png',
                          'mask': ('stuw_mask.png', ),
-                         'color': (1,0,0,0)},
+                         'color': (1, 0, 0, 0)},
     "oost_stuw_(hand)": {'icon': 'stuw.png',
                          'mask': ('stuw_mask.png', ),
-                         'color': (0,1,0,0)},
+                         'color': (0, 1, 0, 0)},
     "oost_stuw_(auto)": {'icon': 'stuw.png',
                          'mask': ('stuw_mask.png', ),
-                         'color': (1,0,0,0)},
+                         'color': (1, 0, 0, 0)},
     "west_hevel": {'icon': 'hevel.png',
                    'mask': ('hevel_mask.png', ),
-                   'color': (1,1,0,0)},
+                   'color': (1, 1, 0, 0)},
     "waterketen_rioolgemalen": {'icon': 'gemaal.png',
                                 'mask': ('gemaal_mask.png', ),
-                                'color': (0.7,0.5,0,0)},
+                                'color': (0.7, 0.5, 0, 0)},
     "waterketen_overstorten": {'icon': 'overstort.png',
                                'mask': ('overstort_mask.png', ),
-                               'color': (1,1,1,0)},
+                               'color': (1, 1, 1, 0)},
     }
 
 
@@ -67,8 +68,11 @@ def fews_symbol_name(filterkey):
         icon_style = LAYER_STYLES['default']
 
     # apply icon layout using symbol manager
-    symbol_manager = SymbolManager(ICON_ORIGINALS, os.path.join(settings.MEDIA_ROOT, 'generated_icons'))
-    output_filename = symbol_manager.get_symbol_transformed(icon_style['icon'], **icon_style)
+    symbol_manager = SymbolManager(
+        ICON_ORIGINALS,
+        os.path.join(settings.MEDIA_ROOT, 'generated_icons'))
+    output_filename = symbol_manager.get_symbol_transformed(
+        icon_style['icon'], **icon_style)
 
     return output_filename
 
@@ -91,14 +95,15 @@ def fews_points_layer(filterkey=None, parameterkey=None, webcolor=None):
                      Timeserie.objects.filter(filterkey=filterkey,
                                               parameterkey=parameterkey)]
     for location in locations:
-        layer.datasource.add_point(location.x, location.y, 'Name', str(location.name))
+        layer.datasource.add_point(
+            location.x, location.y, 'Name', str(location.name))
 
     output_filename = fews_symbol_name(filterkey)
-    output_filename_abs = os.path.join(settings.MEDIA_ROOT, 'generated_icons', output_filename)
+    output_filename_abs = os.path.join(
+        settings.MEDIA_ROOT, 'generated_icons', output_filename)
 
     # use filename in mapnik pointsymbolizer
     point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 32, 32)
-
 
     point_looks.allow_overlap = True
     layout_rule = mapnik.Rule()
