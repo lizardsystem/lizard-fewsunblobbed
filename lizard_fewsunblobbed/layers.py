@@ -11,7 +11,7 @@ from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map.symbol_manager import SymbolManager
-from lizard_map.views import ICON_ORIGINALS
+from lizard_map.models import ICON_ORIGINALS
 
 PLUS_ICON = pkg_resources.resource_filename('lizard_fewsunblobbed', 'add.png')
 
