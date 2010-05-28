@@ -121,13 +121,15 @@ def fews_points_layer(filterkey=None, parameterkey=None, webcolor=None):
 
 def fews_points_layer_search(x, y, radius=None,
                              filterkey=None, parameterkey=None):
-    """Return fews points that match x, y, radius."""
-    distances = [(timeserie,
-                  sqrt((timeserie.locationkey.x - x) ** 2 +
-                       (timeserie.locationkey.y - y) ** 2))
+    """Return list of dict {'distance': <float>, 'timeserie':
+    <timeserie>} of closest fews point that matches x, y, radius."""
+    distances = [{'distance':
+                      sqrt((timeserie.locationkey.x - x) ** 2 +
+                           (timeserie.locationkey.y - y) ** 2),
+                  'timeserie': timeserie}
                  for timeserie in
                  Timeserie.objects.filter(filterkey=filterkey,
                                           parameterkey=parameterkey)]
-    distances.sort(key=lambda item: item[1])
+    distances.sort(key=lambda item: item['distance'])
     # For the time being: return the closest one.
-    return [distances[0]]
+    return [distances[0], ]
