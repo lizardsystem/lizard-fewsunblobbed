@@ -7,6 +7,7 @@ function applyTreeView() {
 }
 
 // (Re-)bind (possible) workspaceitems to the draggingmechanism.
+// req: $("a.url-lizard-map-session-workspace-add-item-temp").attr("href");
 function applyDragging() {
     // Parameters are draggable to workspaces.
     $(".workspace-acceptable").draggable({
