@@ -1,7 +1,6 @@
 import os
 from math import sqrt
 
-import pkg_resources
 import mapnik
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -13,7 +12,6 @@ from lizard_map import coordinates
 from lizard_map.symbol_manager import SymbolManager
 from lizard_map.models import ICON_ORIGINALS
 
-PLUS_ICON = pkg_resources.resource_filename('lizard_fewsunblobbed', 'add.png')
 
 # maps filter ids to icons
 # TODO: remove from this file to a generic place
