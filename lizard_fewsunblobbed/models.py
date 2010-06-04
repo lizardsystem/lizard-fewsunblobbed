@@ -151,6 +151,11 @@ class Timeserie(models.Model):
                                 self.parameterkey.unit,
                                 self.locationkey.name)
 
+    @property
+    def shortname(self):
+        """Return name for use in graph legends"""
+        return u'%s' % (self.locationkey.name)
+
     def data_count(self):
         return self.timeseriedata.all().count()
 
