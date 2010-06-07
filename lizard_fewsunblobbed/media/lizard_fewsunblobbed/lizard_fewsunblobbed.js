@@ -6,43 +6,11 @@ function applyTreeView() {
     });
 }
 
-// (Re-)bind (possible) workspaceitems to the draggingmechanism.
-// req: $("a.url-lizard-map-session-workspace-add-item-temp").attr("href");
-function applyDragging() {
-    // Parameters are draggable to workspaces.
-    $(".workspace-acceptable").draggable({
-        scroll: 'false',
-        cursor: 'move',
-        helper: 'clone',
-        appendTo: 'body',
-        revert: 'true',
-        placeholder: 'ui-sortable-placeholder'
-    });
+// The applydragging javascript has been moved to lizard-map.
 
-    // Clicking a workspace-acceptable shows it in the 'temp' workspace.
-    $(".workspace-acceptable").bind({
-        click: function(event) {
-            $(".workspace-acceptable").removeClass("selected");
-            $(this).addClass("selected");
-            var name = $(this).attr("name");
-            var layer_method = $(this).attr("layer_method");
-            var layer_method_json = $(this).attr("layer_method_json");
-            var url_add_item_temp = $("a.url-lizard-map-session-workspace-add-item-temp").attr("href");
-            $.post(url_add_item_temp,
-                   { name: name,
-                     layer_method: layer_method,
-                     layer_method_json: layer_method_json
-                   },
-                   function(workspace_id){
-                       updateLayer(workspace_id);
-                   }
-                  );
-            stretchOneSidebarBox();
-        }
-    });
-}
 
 function applyClickingOnFilter() {
+    // TODO: replace by generic lizard-map reload functionality.
     // Clicking a filter highlights it and loads its parameters.
     $(".file").click(function(){
         var id = $(this).attr('id');
@@ -50,10 +18,7 @@ function applyClickingOnFilter() {
         $("#navigation li.selected").removeClass("selected");
         $(this).parent("li").addClass("selected");
         $("#parametertree").load(
-            url_fews_parameter_tree_base + id + "/37551/",
-            function() {
-                applyDragging();
-            });
+            url_fews_parameter_tree_base + id + "/37551/");
         filterParameterAccordeon.click(1);
     });
 }
@@ -71,11 +36,10 @@ function loadFilterTree() {
                 applyTreeView();
                 applyClickingOnFilter();
                 stretchOneSidebarBox();
-            }   
+            }
         });
     }
-} 
+}
 
-// Set up filter tree if page is loaded 
+// Set up filter tree if page is loaded
 $(document).ready(loadFilterTree);
-
