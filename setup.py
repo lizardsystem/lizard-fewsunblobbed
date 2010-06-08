@@ -51,5 +51,8 @@ setup(name='lizard-fewsunblobbed',
           'lizard_map.search_method': [
             'fews_points_layer = lizard_fewsunblobbed.layers:fews_points_layer_search',
             ],
+          'lizard_map.location_method': [
+            'fews_points_layer = lizard_fewsunblobbed.layers:fews_points_layer_location',
+            ],
           },
       )

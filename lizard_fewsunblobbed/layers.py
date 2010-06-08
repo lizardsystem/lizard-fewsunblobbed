@@ -131,3 +131,26 @@ def fews_points_layer_search(x, y, radius=None,
     distances.sort(key=lambda item: item['distance'])
     # For the time being: return the closest one.
     return [distances[0], ]
+
+def fews_points_layer_location(workspace_item, locationkey=None):
+    """Return fews point corresponding to filter_id, location_id and
+    parameter_id in same format as search function
+
+    """
+    workspace_item_arguments = workspace_item.layer_method_arguments
+    filterkey = workspace_item_arguments['filterkey']
+    parameterkey = workspace_item_arguments['parameterkey']
+
+    print filterkey, locationkey, parameterkey
+
+    timeserie = get_object_or_404(
+        Timeserie, 
+        filterkey=filterkey, 
+        locationkey=locationkey,
+        parameterkey=parameterkey)
+    return [
+        {'distance': 0,
+         'timeserie': timeserie,
+         'workspace_item': workspace_item
+         },
+        ]
