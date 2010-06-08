@@ -17,7 +17,7 @@ install_requires = [
     'django-compositepk',
     'django-treebeard',
     'lizard-map',
-    'lizard-ui',
+    'lizard-ui >= 0.11',
     ],
 
 tests_require = [
