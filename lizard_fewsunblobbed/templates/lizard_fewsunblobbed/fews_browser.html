@@ -1,0 +1,51 @@
+{# fews browser #}
+{% extends "lizard_map/wms.html" %}
+{% load workspaces %}
+
+{% block subtitle %} Meetgegevens {% endblock %}
+
+{% block sidebar %}
+<div class="sidebarbox sidebarbox-stretched"
+     id="accordion">
+  <h2>1: Filters</h2>
+  <ul class="automatic-tree filetree pane accordion-load-next"
+      data-next-pane-id="#parameter-pane">
+    {% for node in filters %}
+      {% if node.data.isendnode %}
+        <li>
+          <a href="{% url fews_browser %}?filterkey={{ child.id }}"
+             class="file">
+            {{child.data.name}}
+          </a>
+        </li>
+      {% else %}
+        {% with "lizard_fewsunblobbed/fews_browser_tree_snippet.html" as ourselves %}
+          {% include ourselves %}
+        {% endwith %}
+      {% endif %}
+    {% endfor %}
+  </ul>
+  <h2>2: Parameters</h2>
+  <ul class="without-bullets pane"
+      id="parameter-pane">
+    {% for parameter in parameters %}
+    <li class="workspace-acceptable file"
+        data-name="{{ found_filter.name }} - {{ parameter.name }}"
+        data-layer_method="fews_points_layer"
+        data-layer_method_json='{"filterkey": {{ found_filter.pk }}, "parameterkey": {{ parameter.pk }}}'
+        data-filter_id="{{ found_filter.fews_id }}">
+      {{ parameter.name }}
+    </li>
+    {% empty %}
+    <li>Geen parameters gevonden.</li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% for workspace in workspaces.user %}
+  {% workspace workspace %}
+{% empty %}
+No workspace
+{% endfor %}
+
+{% endblock sidebar %}

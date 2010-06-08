@@ -5,7 +5,9 @@ Changelog of lizard-fewsunblobbed
 0.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Using lizard-ui's ajax loading and lizard-map's generic workspace drag/drop
+  now.  This means we can render a full fews-browser page ourselves including
+  all interaction.
 
 
 0.4 (2010-05-18)

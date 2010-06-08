@@ -1,10 +1,6 @@
 /* javascript files for fews unblobbed: handling filter trees and parameters */
 
-function applyTreeView() {
-    $("#navigation").treeview({
-        collapsed: true
-    });
-}
+// The treeview js has been moved to lizard-ui
 
 // The applydragging javascript has been moved to lizard-map.
 

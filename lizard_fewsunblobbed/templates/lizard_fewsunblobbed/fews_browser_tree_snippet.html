@@ -1,0 +1,21 @@
+<li>
+  <span class="folder">{{node.data.name}}</span>
+  <ul>
+    {% for child in node.children %}
+      {% if child.data.isendnode %}
+        <li>
+          <a href="{% url fews_browser %}?filterkey={{ child.id }}"
+             class="file">
+            {{child.data.name}}
+          </a>
+        </li>
+      {% else %}
+        {% with "lizard_fewsunblobbed/fews_browser_tree_snippet.html" as ourselves %}
+          {% with child as node %}
+            {% include ourselves %}
+          {% endwith %}
+        {% endwith %}
+      {% endif %}
+    {% endfor %}
+  </ul>
+</li>
