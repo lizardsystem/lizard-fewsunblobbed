@@ -7,6 +7,7 @@ from lizard_map.models import WorkspaceManager
 
 
 def fews_browser(request,
+                 javascript_click_handler=None,
                  template="lizard_fewsunblobbed/fews_browser.html"):
     workspace_manager = WorkspaceManager(request)
     workspaces = workspace_manager.load_or_create()
@@ -23,9 +24,11 @@ def fews_browser(request,
         parameters = [ts.parameterkey for ts in filtered_timeseries]
         parameters = list(set(parameters))
 
-    return render_to_response(template,
-                              {'filters': filters,
-                               'found_filter': found_filter,
-                               'parameters': parameters,
-                               'workspaces': workspaces},
-                              context_instance=RequestContext(request))
+    return render_to_response(
+        template,
+        {'filters': filters,
+         'found_filter': found_filter,
+         'parameters': parameters,
+         'javascript_click_handler': javascript_click_handler,
+         'workspaces': workspaces},
+        context_instance=RequestContext(request))
