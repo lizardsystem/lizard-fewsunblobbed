@@ -4,11 +4,11 @@ TEMPLATE_DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': 'test.db'
+        'NAME': 'test.db',
         },
     'fews-unblobbed': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'testunblobbed.db'
+        'NAME': 'testunblobbed.db',
         }
     }
 

@@ -8,7 +8,7 @@ urlpatterns = patterns(
     '',
     url(r'^$',
         'lizard_fewsunblobbed.views.fews_browser',
-        name="fews_browser"
+        name="fews_browser",
         ),
     )
 

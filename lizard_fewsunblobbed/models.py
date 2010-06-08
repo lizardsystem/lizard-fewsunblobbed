@@ -13,17 +13,18 @@ class Filter(AL_Node):
         verbose_name = _("Filter")
         verbose_name_plural = _("Filters")
 
-    id  = models.IntegerField(primary_key=True, db_column='fkey')
+    id = models.IntegerField(primary_key=True, db_column='fkey')
     # since 'id' is already used us another name
     fews_id = models.TextField(unique=True, db_column='id')
     name = models.TextField(blank=True)
     description = models.TextField(blank=True)
     issubfilter = models.BooleanField()
-    # use 'parent' and not parentfkey as treebeard needs this name (is hardcoded)
+    # Use 'parent' and not parentfkey as treebeard needs this name (is
+    # hardcoded)
     parent = models.ForeignKey('Filter', null=True, blank=True,
                                db_column='parentfkey')
     isendnode = models.BooleanField()
-    node_order_by = ['name',]
+    node_order_by = ['name']
 
     class Meta:
         db_table = u'filter'
@@ -31,10 +32,10 @@ class Filter(AL_Node):
     def __unicode__(self):
         return u'%s (id=%s)' % (self.name, self.fews_id)
 
-    # This method is overriden from the class AL_Node in al_tree.py
-    # from the django-treebeard application
-    # The method fixes checks first if the field sib_order exist before deleting,
-    # which the original version doesn't do (which causes a bug).
+    # This method is overriden from the class AL_Node in al_tree.py from the
+    # django-treebeard application.  The method fixes checks first if the
+    # field sib_order exist before deleting, which the original version
+    # doesn't do (which causes a bug).
     @classmethod
     def dump_bulk(cls, parent=None, keep_ids=True):
         """
@@ -182,4 +183,6 @@ class Timeseriedata(composite.CompositePKModel):
         db_table = u'timeseriedata'
 
     def __unicode__(self):
-        return u'Data for %s: %s = %s' % (self.tkey, self.tsd_time, self.tsd_value)
+        return u'Data for %s: %s = %s' % (self.tkey,
+                                          self.tsd_time,
+                                          self.tsd_value)
