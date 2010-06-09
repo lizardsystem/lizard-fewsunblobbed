@@ -141,8 +141,6 @@ def fews_points_layer_location(workspace_item, locationkey=None):
     filterkey = workspace_item_arguments['filterkey']
     parameterkey = workspace_item_arguments['parameterkey']
 
-    print filterkey, locationkey, parameterkey
-
     timeserie = get_object_or_404(
         Timeserie, 
         filterkey=filterkey, 
