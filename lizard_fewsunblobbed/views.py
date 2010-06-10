@@ -3,7 +3,7 @@ from django.template import RequestContext
 
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Timeserie
-from lizard_map.models import WorkspaceManager
+from lizard_map.workspace import WorkspaceManager
 
 
 def fews_browser(request,

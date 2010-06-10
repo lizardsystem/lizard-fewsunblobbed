@@ -31,13 +31,13 @@
     {% for parameter in parameters %}
     <li class="workspace-acceptable file"
         data-name="{{ found_filter.name }} - {{ parameter.name }}"
-        data-layer_method="fews_points_layer"
-        data-layer_method_json='{"filterkey": {{ found_filter.pk }}, "parameterkey": {{ parameter.pk }}}'
-        data-filter_id="{{ found_filter.fews_id }}">
+        data-adapter-class="adapter_fews"
+        data-adapter-layer-json='{"filterkey": {{ found_filter.pk }}, "parameterkey": {{ parameter.pk }}}'
+        data-filter-id="{{ found_filter.fews_id }}">
       {{ parameter.name }}
     </li>
     {% empty %}
-    <li>Geen parameters gevonden.</li>
+    <li>Geen parameters gevonden/geladen.</li>
     {% endfor %}
   </ul>
 </div>

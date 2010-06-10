@@ -45,14 +45,8 @@ setup(name='lizard-fewsunblobbed',
       entry_points={
           'console_scripts': [
           ],
-          'lizard_map.layer_method': [
-            'fews_points_layer = lizard_fewsunblobbed.layers:fews_points_layer',
-            ],
-          'lizard_map.search_method': [
-            'fews_points_layer = lizard_fewsunblobbed.layers:fews_points_layer_search',
-            ],
-          'lizard_map.location_method': [
-            'fews_points_layer = lizard_fewsunblobbed.layers:fews_points_layer_location',
+          'lizard_map.adapter_class': [
+            'adapter_fews = lizard_fewsunblobbed.layers:WorkspaceItemAdapterFewsUnblobbed',
             ],
           },
       )

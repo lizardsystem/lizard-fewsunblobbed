@@ -9,9 +9,10 @@ from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
+from lizard_map import workspace
 from lizard_map.symbol_manager import SymbolManager
 from lizard_map.models import ICON_ORIGINALS
-
+from lizard_map.workspace import WorkspaceItemAdapter
 
 # maps filter ids to icons
 # TODO: remove from this file to a generic place
@@ -74,81 +75,84 @@ def fews_symbol_name(filterkey):
 
     return output_filename
 
+class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
+    def __init__(self, *args, **kwargs):
+        super(WorkspaceItemAdapterFewsUnblobbed, self).__init__(*args, **kwargs)
+        self.filterkey = self.layer_arguments['filterkey']
+        self.parameterkey = self.layer_arguments['parameterkey']
 
-def fews_points_layer(filterkey=None, parameterkey=None, webcolor=None):
-    """Return layer and styles that render points.
+    def layer(self, webcolor=None):
+        """Return layer and styles that render points.
 
-    Registered as ``fews_points_layer``
-    """
-    layers = []
-    styles = {}
-    layer = mapnik.Layer("FEWS points layer", coordinates.RD)
-    # TODO: ^^^ translation!
-    layer.datasource = mapnik.PointDatasource()
-    if filterkey is None and parameterkey is None:
-        # Grab the first 1000 locations
-        locations = Location.objects.all()[:1000]
-    else:
-        locations = [timeserie.locationkey for timeserie in
-                     Timeserie.objects.filter(filterkey=filterkey,
-                                              parameterkey=parameterkey)]
-    for location in locations:
-        layer.datasource.add_point(
-            location.x, location.y, 'Name', str(location.name))
+        Registered as ``fews_points_layer``
+        """
+        layers = []
+        styles = {}
+        layer = mapnik.Layer("FEWS points layer", coordinates.RD)
+        filterkey = self.layer_arguments['filterkey']
+        parameterkey = self.layer_arguments['parameterkey']
+        print 'lala %s %s' % (filterkey, parameterkey)
+        # TODO: ^^^ translation!
+        layer.datasource = mapnik.PointDatasource()
+        if filterkey is None and parameterkey is None:
+            # Grab the first 1000 locations
+            locations = Location.objects.all()[:1000]
+        else:
+            locations = [timeserie.locationkey for timeserie in
+                         Timeserie.objects.filter(filterkey=filterkey,
+                                                  parameterkey=parameterkey)]
+        for location in locations:
+            layer.datasource.add_point(
+                location.x, location.y, 'Name', str(location.name))
 
-    output_filename = fews_symbol_name(filterkey)
-    output_filename_abs = os.path.join(
-        settings.MEDIA_ROOT, 'generated_icons', output_filename)
+        output_filename = fews_symbol_name(filterkey)
+        output_filename_abs = os.path.join(
+            settings.MEDIA_ROOT, 'generated_icons', output_filename)
 
-    # use filename in mapnik pointsymbolizer
-    point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 32, 32)
+        # use filename in mapnik pointsymbolizer
+        point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 32, 32)
 
-    point_looks.allow_overlap = True
-    layout_rule = mapnik.Rule()
-    layout_rule.symbols.append(point_looks)
-    point_style = mapnik.Style()
-    point_style.rules.append(layout_rule)
+        point_looks.allow_overlap = True
+        layout_rule = mapnik.Rule()
+        layout_rule.symbols.append(point_looks)
+        point_style = mapnik.Style()
+        point_style.rules.append(layout_rule)
 
-    # generate "unique" point style name and append to layer
-    style_name = "Point style %s::%s" % (filterkey, parameterkey)
-    styles[style_name] = point_style
-    layer.styles.append(style_name)
-    layers = [layer]
-    return layers, styles
+        # generate "unique" point style name and append to layer
+        style_name = "Point style %s::%s" % (filterkey, parameterkey)
+        styles[style_name] = point_style
+        layer.styles.append(style_name)
+        layers = [layer]
+        return layers, styles
 
 
-def fews_points_layer_search(x, y, radius=None,
-                             filterkey=None, parameterkey=None):
-    """Return list of dict {'distance': <float>, 'timeserie':
-    <timeserie>} of closest fews point that matches x, y, radius."""
-    distances = [{'distance':
-                      sqrt((timeserie.locationkey.x - x) ** 2 +
-                           (timeserie.locationkey.y - y) ** 2),
-                  'timeserie': timeserie}
-                 for timeserie in
-                 Timeserie.objects.filter(filterkey=filterkey,
-                                          parameterkey=parameterkey)]
-    distances.sort(key=lambda item: item['distance'])
-    # For the time being: return the closest one.
-    return [distances[0], ]
+    def search(self, x, y, radius=None):
+        """Return list of dict {'distance': <float>, 'timeserie':
+        <timeserie>} of closest fews point that matches x, y, radius."""
+        distances = [{'distance':
+                          sqrt((timeserie.locationkey.x - x) ** 2 +
+                               (timeserie.locationkey.y - y) ** 2),
+                      'object': timeserie}
+                     for timeserie in
+                     Timeserie.objects.filter(filterkey=self.filterkey,
+                                              parameterkey=self.parameterkey)]
+        distances.sort(key=lambda item: item['distance'])
+        # For the time being: return the closest one.
+        return [distances[0], ]
 
-def fews_points_layer_location(workspace_item, locationkey=None):
-    """Return fews point corresponding to filter_id, location_id and
-    parameter_id in same format as search function
+    def location(self, locationkey=None):
+        """Return fews point representation corresponding to filter_id, location_id and
+        parameter_id in same format as search function
 
-    """
-    workspace_item_arguments = workspace_item.layer_method_arguments
-    filterkey = workspace_item_arguments['filterkey']
-    parameterkey = workspace_item_arguments['parameterkey']
+        """
+        timeserie = get_object_or_404(
+            Timeserie, 
+            filterkey=self.filterkey, 
+            locationkey=locationkey,
+            parameterkey=self.parameterkey)
+        return {
+            'distance': 0,
+            'object': timeserie,
+            'workspace_item': workspace_item
+            }
 
-    timeserie = get_object_or_404(
-        Timeserie, 
-        filterkey=filterkey, 
-        locationkey=locationkey,
-        parameterkey=parameterkey)
-    return [
-        {'distance': 0,
-         'timeserie': timeserie,
-         'workspace_item': workspace_item
-         },
-        ]
