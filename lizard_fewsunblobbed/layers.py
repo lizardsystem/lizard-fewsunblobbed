@@ -75,6 +75,7 @@ def fews_symbol_name(filterkey):
 
     return output_filename
 
+
 class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     def __init__(self, *args, **kwargs):
         super(WorkspaceItemAdapterFewsUnblobbed, self).__init__(*args, **kwargs)
@@ -125,7 +126,6 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         layers = [layer]
         return layers, styles
 
-
     def search(self, x, y, radius=None):
         """Return list of dict {'distance': <float>, 'timeserie':
         <timeserie>} of closest fews point that matches x, y, radius."""
@@ -153,6 +153,6 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         return {
             'distance': 0,
             'object': timeserie,
-            'workspace_item': workspace_item
+            'workspace_item': self.workspace_item
             }
 
