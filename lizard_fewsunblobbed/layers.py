@@ -1,19 +1,26 @@
 import os
+import datetime
 from math import sqrt
 
 import mapnik
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.dates import date2num
+from matplotlib.figure import Figure
 
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map import workspace
-from lizard_map.symbol_manager import SymbolManager
+from lizard_map.daterange import current_start_end_dates
 from lizard_map.models import ICON_ORIGINALS
-from lizard_map.workspace import WorkspaceItemAdapter
+from lizard_map.symbol_manager import SymbolManager
+from lizard_map.views import _inches_from_pixels
+from lizard_map.views import SCREEN_DPI
 
 # maps filter ids to icons
 # TODO: remove from this file to a generic place
@@ -135,9 +142,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                                (timeserie.locationkey.y - y) ** 2),
                       'object': timeserie,
                       'workspace_item': self.workspace_item,
-                      'identifier': { 'locationkey': timeserie.locationkey.pk },
-                      'img_url': reverse("lizard_fewsunblobbed.timeserie_graph", 
-                                         kwargs={'id': timeserie.pk})
+                      'identifier': { 'locationkey': timeserie.locationkey.pk }
                       }
                      for timeserie in
                      Timeserie.objects.filter(filterkey=self.filterkey,
@@ -157,11 +162,64 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             locationkey=locationkey,
             parameterkey=self.parameterkey)
         return {
-            'distance': 0,
             'object': timeserie,
             'workspace_item': self.workspace_item,
-            'identifier': timeserie.locationkey.pk,
-            'img_url': reverse("lizard_fewsunblobbed.timeserie_graph", 
-                               kwargs={'id': timeserie.pk})
+            'identifier': { 'locationkey': timeserie.locationkey.pk }
             }
 
+    def image(self, identifier_list, start_end_dates, width=380.0, height=280.0):
+        """
+        Visualizes (timeserie) ids in a graph
+
+        identifier_list: [{'locationkey': ...}, ...]
+        start_end_dates: 2-tuple dates
+
+        Draw graph(s) from fews unblobbed timeserie. Ids are set in GET
+        parameter id (multiple ids allowed), or as a url parameter
+        """
+        timeserie = [get_object_or_404(Timeserie, 
+                                       locationkey=identifier['locationkey'],
+                                       filterkey=self.filterkey,
+                                       parameterkey=self.parameterkey) 
+                     for identifier in identifier_list]
+
+        color_list = ['blue', 'green', 'cyan', 'magenta', 'black']
+    
+        figure = Figure()
+        # Figure size
+        figure.set_size_inches((_inches_from_pixels(width),
+                                _inches_from_pixels(height)))
+        figure.set_dpi(SCREEN_DPI)
+        # Figure color
+        figure.set_facecolor('white')
+
+        axes = figure.add_subplot(111)
+        # Title.
+        if len(timeserie) <= 1:
+            figure.suptitle('/'.join([single_timeserie.name for single_timeserie in timeserie]))
+        else:
+            figure.suptitle('multiple graphs')
+        axes.grid(True)
+        today = datetime.datetime.now()
+        #start_date = today - datetime.timedelta(days=450)
+
+        for index, single_timeserie in enumerate(timeserie):
+            dates = []
+            values = []
+            for data in single_timeserie.timeseriedata.all():
+                dates.append(data.tsd_time)
+                values.append(data.tsd_value)
+            axes.plot(dates, values,
+                      lw=1,
+                      color=color_list[index % len(color_list)])
+        # Show line for today.
+        axes.axvline(today, color='blue', lw=1, ls='--')
+        # axvspan for years/seasons.
+
+        # Date range
+        axes.set_xlim(date2num(start_end_dates))
+
+        canvas = FigureCanvas(figure)
+        response = HttpResponse(content_type='image/png')
+        canvas.print_png(response)
+        return response

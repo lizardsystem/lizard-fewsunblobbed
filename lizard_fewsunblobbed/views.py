@@ -47,64 +47,6 @@ def fews_browser(request,
         context_instance=RequestContext(request))
 
 
-def timeserie_graph(request, id=None):
-    """
-    Draw graph(s) from fews unblobbed timeserie. Ids are set in GET
-    parameter id (multiple ids allowed), or as a url parameter
-    """
-    color_list = ['blue', 'green', 'cyan', 'magenta', 'black']
-
-    if id is None:
-        # get timeserie id's from GET parameter
-        timeserie_ids = request.GET.getlist('id')
-        timeserie = [get_object_or_404(Timeserie, pk=id) for id in timeserie_ids]
-    else:
-        # get timeserie id from url parameter
-        timeserie = [get_object_or_404(Timeserie, pk=id), ]
-    figure = Figure()
-    # Figure size
-    width = request.GET.get('width', 380)
-    height = request.GET.get('height', 280)
-    width = float(width)
-    height = float(height)
-    figure.set_size_inches((_inches_from_pixels(width),
-                            _inches_from_pixels(height)))
-    figure.set_dpi(SCREEN_DPI)
-    # Figure color
-    figure.set_facecolor('white')
-
-    axes = figure.add_subplot(111)
-    # Title.
-    if len(timeserie) <= 1:
-        figure.suptitle('/'.join([single_timeserie.name for single_timeserie in timeserie]))
-    else:
-        figure.suptitle('multiple graphs')
-    axes.grid(True)
-    today = datetime.datetime.now()
-    #start_date = today - datetime.timedelta(days=450)
-    
-    for index, single_timeserie in enumerate(timeserie):
-        dates = []
-        values = []
-        for data in single_timeserie.timeseriedata.all():
-            dates.append(data.tsd_time)
-            values.append(data.tsd_value)
-        axes.plot(dates, values,
-                  lw=1,
-                  color=color_list[index % len(color_list)])
-    # Show line for today.
-    axes.axvline(today, color='blue', lw=1, ls='--')
-    # axvspan for years/seasons.
-
-    # Date range
-    axes.set_xlim(date2num(current_start_end_dates(request)))
-
-    canvas = FigureCanvas(figure)
-    response = HttpResponse(content_type='image/png')
-    canvas.print_png(response)
-    return response
-
-
 def search_fews_points(request):
     """searches for fews point nearest to GET x,y, returns json_popup
     of results"""
@@ -124,7 +66,9 @@ def search_fews_points(request):
                 found += search_results
 
     if found:
-        return popup_json(found)
+        # ``found`` is a list of dicts {'distance': ..., 'timeserie': ...}.
+        found.sort(key=lambda item: item['distance'])
+        return popup_json([found[0], ])
     else:
         result = {'id': 'popup_nothing_found',
                   'objects': [{'html': 'Niets gevonden.',
@@ -132,3 +76,4 @@ def search_fews_points(request):
                                'y': google_y }]
                   }
         return HttpResponse(simplejson.dumps(result))
+
