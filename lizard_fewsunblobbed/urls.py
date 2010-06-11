@@ -10,6 +10,15 @@ urlpatterns = patterns(
         'lizard_fewsunblobbed.views.fews_browser',
         name="fews_browser",
         ),
+    # Graph for fews points
+    (r'^timeserie-graph/$',
+     'lizard_fewsunblobbed.views.timeserie_graph',
+     {},
+     "lizard_fewsunblobbed.timeserie_graph"),
+    (r'^timeserie-graph/(?P<id>\d*)/$',
+     'lizard_fewsunblobbed.views.timeserie_graph',
+     {},
+     "lizard_fewsunblobbed.timeserie_graph"),
     )
 
 

@@ -3,6 +3,7 @@ from math import sqrt
 
 import mapnik
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 
 from lizard_fewsunblobbed.models import Filter
@@ -132,7 +133,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         distances = [{'distance':
                           sqrt((timeserie.locationkey.x - x) ** 2 +
                                (timeserie.locationkey.y - y) ** 2),
-                      'object': timeserie}
+                      'object': timeserie,
+                      'workspace_item': self.workspace_item,
+                      'identifier': { 'locationkey': timeserie.locationkey.pk },
+                      'img_url': reverse("lizard_fewsunblobbed.timeserie_graph", 
+                                         kwargs={'id': timeserie.pk})
+                      }
                      for timeserie in
                      Timeserie.objects.filter(filterkey=self.filterkey,
                                               parameterkey=self.parameterkey)]
@@ -153,6 +159,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         return {
             'distance': 0,
             'object': timeserie,
-            'workspace_item': self.workspace_item
+            'workspace_item': self.workspace_item,
+            'identifier': timeserie.locationkey.pk,
+            'img_url': reverse("lizard_fewsunblobbed.timeserie_graph", 
+                               kwargs={'id': timeserie.pk})
             }
 

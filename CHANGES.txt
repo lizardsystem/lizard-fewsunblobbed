@@ -9,6 +9,7 @@ Changelog of lizard-fewsunblobbed
   now.  This means we can render a full fews-browser page ourselves including
   all interaction.
 
+- Added graph and search functions.
 
 0.4 (2010-05-18)
 ----------------
