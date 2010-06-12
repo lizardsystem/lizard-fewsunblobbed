@@ -1,21 +1,15 @@
-import datetime
 import simplejson
 
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.dates import date2num
-from matplotlib.figure import Figure
 
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map.daterange import current_start_end_dates
-from lizard_map.views import _inches_from_pixels
+from lizard_map.daterange import DateRangeForm
 from lizard_map.views import popup_json
-from lizard_map.views import SCREEN_DPI
 from lizard_map.workspace import WorkspaceManager
 
 
@@ -24,6 +18,8 @@ def fews_browser(request,
                  template="lizard_fewsunblobbed/fews_browser.html"):
     workspace_manager = WorkspaceManager(request)
     workspaces = workspace_manager.load_or_create()
+    date_range_form = DateRangeForm(
+        current_start_end_dates(request, for_form=True))
     filters = Filter.dump_bulk()
 
     filterkey = request.GET.get('filterkey', None)
@@ -42,6 +38,7 @@ def fews_browser(request,
         {'filters': filters,
          'found_filter': found_filter,
          'parameters': parameters,
+         'date_range_form': date_range_form,
          'javascript_click_handler': javascript_click_handler,
          'workspaces': workspaces},
         context_instance=RequestContext(request))
@@ -61,7 +58,8 @@ def search_fews_points(request):
     found = []
     for workspace_collection in workspace_collections.values():
         for workspace in workspace_collection:
-            for workspace_item in workspace.workspace_items.filter(visible=True):
+            for workspace_item in workspace.workspace_items.filter(
+                visible=True):
                 search_results = workspace_item.adapter.search(x, y)
                 found += search_results
 
@@ -73,7 +71,6 @@ def search_fews_points(request):
         result = {'id': 'popup_nothing_found',
                   'objects': [{'html': 'Niets gevonden.',
                                'x': google_x,
-                               'y': google_y }]
+                               'y': google_y}],
                   }
         return HttpResponse(simplejson.dumps(result))
-
