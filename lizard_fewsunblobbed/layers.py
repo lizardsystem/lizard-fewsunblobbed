@@ -85,6 +85,9 @@ def fews_symbol_name(filterkey):
 
 
 class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
+    """
+    Should be registered as adapter_fews
+    """
     def __init__(self, *args, **kwargs):
         super(WorkspaceItemAdapterFewsUnblobbed, self).__init__(*args, **kwargs)
         self.filterkey = self.layer_arguments['filterkey']
@@ -93,14 +96,13 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     def layer(self, webcolor=None):
         """Return layer and styles that render points.
 
-        Registered as ``fews_points_layer``
         """
         layers = []
         styles = {}
         layer = mapnik.Layer("FEWS points layer", coordinates.RD)
         filterkey = self.layer_arguments['filterkey']
         parameterkey = self.layer_arguments['parameterkey']
-        print 'lala %s %s' % (filterkey, parameterkey)
+
         # TODO: ^^^ translation!
         layer.datasource = mapnik.PointDatasource()
         if filterkey is None and parameterkey is None:
