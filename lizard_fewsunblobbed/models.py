@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 
 from composite_pk import composite
 from treebeard.al_tree import AL_Node
-
+from lizard_map import coordinates
 
 class Filter(AL_Node):
     # use 'id' and not fkey as treebeard needs this name (is hardcoded)
@@ -101,6 +101,9 @@ class Location(models.Model):
 
     def __unicode__(self):
         return u'%s (lkey=%s)' % (self.name, self.lkey)
+
+    def google_coords(self):
+        return coordinates.rd_to_google(self.x, self.y)
 
 
 class Parameter(models.Model):

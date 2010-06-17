@@ -136,22 +136,34 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         layers = [layer]
         return layers, styles
 
-    def search(self, x, y, radius=None):
+    def search(self, google_x, google_y, radius=None):
         """Return list of dict {'distance': <float>, 'timeserie':
-        <timeserie>} of closest fews point that matches x, y, radius."""
+        <timeserie>} of closest fews point that matches x, y, radius.
+
+        """
+        x, y = coordinates.google_to_rd(google_x, google_y)
         distances = [{'distance':
                           sqrt((timeserie.locationkey.x - x) ** 2 +
                                (timeserie.locationkey.y - y) ** 2),
-                      'object': timeserie,
+                      # 'object': timeserie,
+                      'name': timeserie.name,
+                      'shortname': timeserie.shortname,
                       'workspace_item': self.workspace_item,
-                      'identifier': { 'locationkey': timeserie.locationkey.pk }
+                      'identifier': { 'locationkey': timeserie.locationkey.pk },
+                      'coords': timeserie.locationkey.google_coords(),
                       }
                      for timeserie in
                      Timeserie.objects.filter(filterkey=self.filterkey,
                                               parameterkey=self.parameterkey)]
-        distances.sort(key=lambda item: item['distance'])
-        # For the time being: return the closest one.
-        return [distances[0], ]
+
+        #filter out correct distances
+        result = []
+        for found_result in distances:
+            if found_result['distance'] <= radius:
+                result.append(found_result)
+
+        result.sort(key=lambda item: item['distance'])
+        return result
 
     def location(self, locationkey=None):
         """Return fews point representation corresponding to filter_id, location_id and
@@ -164,9 +176,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             locationkey=locationkey,
             parameterkey=self.parameterkey)
         return {
-            'object': timeserie,
+            'name': timeserie.name,
+            'shortname': timeserie.shortname,
+            # 'object': timeserie,
             'workspace_item': self.workspace_item,
-            'identifier': { 'locationkey': timeserie.locationkey.pk }
+            'identifier': { 'locationkey': timeserie.locationkey.pk },
+            'coords': timeserie.locationkey.google_coords(),
             }
 
     def image(self, identifier_list, start_end_dates, width=380.0, height=280.0):
