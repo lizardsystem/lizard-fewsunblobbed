@@ -16,6 +16,7 @@ from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map import workspace
+from lizard_map.adapter import Graph
 from lizard_map.daterange import current_start_end_dates
 from lizard_map.models import ICON_ORIGINALS
 from lizard_map.symbol_manager import SymbolManager
@@ -201,42 +202,29 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                      for identifier in identifier_list]
 
         color_list = ['blue', 'green', 'cyan', 'magenta', 'black']
-    
-        figure = Figure()
-        # Figure size
-        figure.set_size_inches((_inches_from_pixels(width),
-                                _inches_from_pixels(height)))
-        figure.set_dpi(SCREEN_DPI)
-        # Figure color
-        figure.set_facecolor('white')
+        today = datetime.datetime.now()
 
-        axes = figure.add_subplot(111)
+        graph = Graph(start_end_dates[0], start_end_dates[1], 
+                      width=width, height=height)
+    
         # Title.
         if len(timeserie) <= 1:
-            figure.suptitle('/'.join([single_timeserie.name for single_timeserie in timeserie]))
+            title = '/'.join([single_timeserie.name for single_timeserie in timeserie])
         else:
-            figure.suptitle('multiple graphs')
-        axes.grid(True)
-        today = datetime.datetime.now()
-        #start_date = today - datetime.timedelta(days=450)
+            title = 'multiple graphs'
+        graph.suptitle(title)
+        graph.axes.grid(True)
 
+        # Draw the actual graph lines
         for index, single_timeserie in enumerate(timeserie):
             dates = []
             values = []
             for data in single_timeserie.timeseriedata.all():
                 dates.append(data.tsd_time)
                 values.append(data.tsd_value)
-            axes.plot(dates, values,
-                      lw=1,
-                      color=color_list[index % len(color_list)])
-        # Show line for today.
-        axes.axvline(today, color='blue', lw=1, ls='--')
-        # axvspan for years/seasons.
+            graph.axes.plot(dates, values,
+                            lw=1,
+                            color=color_list[index % len(color_list)])
 
-        # Date range
-        axes.set_xlim(date2num(start_end_dates))
-
-        canvas = FigureCanvas(figure)
-        response = HttpResponse(content_type='image/png')
-        canvas.print_png(response)
-        return response
+        graph.add_today()
+        return graph.http_png()
