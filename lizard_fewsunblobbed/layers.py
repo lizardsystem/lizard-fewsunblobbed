@@ -4,12 +4,7 @@ from math import sqrt
 
 import mapnik
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.dates import date2num
-from matplotlib.figure import Figure
 
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
@@ -17,11 +12,8 @@ from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map import workspace
 from lizard_map.adapter import Graph
-from lizard_map.daterange import current_start_end_dates
 from lizard_map.models import ICON_ORIGINALS
 from lizard_map.symbol_manager import SymbolManager
-from lizard_map.views import _inches_from_pixels
-from lizard_map.views import SCREEN_DPI
 
 # maps filter ids to icons
 # TODO: remove from this file to a generic place
@@ -150,7 +142,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                       'name': timeserie.name,
                       'shortname': timeserie.shortname,
                       'workspace_item': self.workspace_item,
-                      'identifier': { 'locationkey': timeserie.locationkey.pk },
+                      'identifier': {'locationkey': timeserie.locationkey.pk},
                       'coords': timeserie.locationkey.google_coords(),
                       }
                      for timeserie in
@@ -167,8 +159,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         return result
 
     def location(self, locationkey=None):
-        """Return fews point representation corresponding to filter_id, location_id and
-        parameter_id in same format as search function
+        """Return fews point representation corresponding to
+        filter_id, location_id and parameter_id in same format as
+        search function
 
         """
         timeserie = get_object_or_404(
@@ -181,11 +174,15 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             'shortname': timeserie.shortname,
             # 'object': timeserie,
             'workspace_item': self.workspace_item,
-            'identifier': { 'locationkey': timeserie.locationkey.pk },
+            'identifier': {'locationkey': timeserie.locationkey.pk},
             'coords': timeserie.locationkey.google_coords(),
             }
 
-    def image(self, identifier_list, start_end_dates, width=380.0, height=280.0):
+    def image(self, 
+              identifier_list, 
+              start_end_dates, 
+              width=380.0, 
+              height=280.0):
         """
         Visualizes (timeserie) ids in a graph
 
@@ -205,11 +202,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         today = datetime.datetime.now()
 
         graph = Graph(start_end_dates[0], start_end_dates[1], 
-                      width=width, height=height)
-    
+                      width=width, height=height, today=today)
+        
         # Title.
         if len(timeserie) <= 1:
-            title = '/'.join([single_timeserie.name for single_timeserie in timeserie])
+            title = '/'.join([single_timeserie.name 
+                              for single_timeserie in timeserie])
         else:
             title = 'multiple graphs'
         graph.suptitle(title)
