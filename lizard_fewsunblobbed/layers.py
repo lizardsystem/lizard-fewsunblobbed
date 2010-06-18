@@ -180,14 +180,15 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
     def image(self, 
               identifier_list, 
-              start_end_dates, 
+              start_date,
+              end_date, 
               width=380.0, 
               height=280.0):
         """
         Visualizes (timeserie) ids in a graph
 
         identifier_list: [{'locationkey': ...}, ...]
-        start_end_dates: 2-tuple dates
+        start_date, end_date: dates
 
         Draw graph(s) from fews unblobbed timeserie. Ids are set in GET
         parameter id (multiple ids allowed), or as a url parameter
@@ -201,7 +202,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         color_list = ['blue', 'green', 'cyan', 'magenta', 'black']
         today = datetime.datetime.now()
 
-        graph = Graph(start_end_dates[0], start_end_dates[1], 
+        graph = Graph(start_date, end_date, 
                       width=width, height=height, today=today)
         
         # Title.
