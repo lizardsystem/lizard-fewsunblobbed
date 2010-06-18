@@ -143,7 +143,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                       'shortname': timeserie.shortname,
                       'workspace_item': self.workspace_item,
                       'identifier': {'locationkey': timeserie.locationkey.pk},
-                      'coords': timeserie.locationkey.google_coords(),
+                      'google_coords': timeserie.locationkey.google_coords(),
                       }
                      for timeserie in
                      Timeserie.objects.filter(filterkey=self.filterkey,
@@ -172,10 +172,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         return {
             'name': timeserie.name,
             'shortname': timeserie.shortname,
-            # 'object': timeserie,
             'workspace_item': self.workspace_item,
             'identifier': {'locationkey': timeserie.locationkey.pk},
-            'coords': timeserie.locationkey.google_coords(),
+            'google_coords': timeserie.locationkey.google_coords(),
             }
 
     def image(self, 
