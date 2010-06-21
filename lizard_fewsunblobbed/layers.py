@@ -86,7 +86,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         self.filterkey = self.layer_arguments['filterkey']
         self.parameterkey = self.layer_arguments['parameterkey']
 
-    def layer(self, webcolor=None):
+    def layer(self, layer_ids=None, webcolor=None):
         """Return layer and styles that render points.
 
         """
@@ -182,7 +182,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
               start_date,
               end_date, 
               width=380.0, 
-              height=280.0):
+              height=250.0):
         """
         Visualizes (timeserie) ids in a graph
 
