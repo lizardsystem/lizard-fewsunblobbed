@@ -1,5 +1,6 @@
 import os
 import datetime
+import copy
 from math import sqrt
 
 import mapnik
@@ -57,15 +58,19 @@ LAYER_STYLES = {
     }
 
 
-def fews_symbol_name(filterkey):
+def fews_symbol_name(filterkey, nodata=False):
     """Find fews symbol name"""
 
     # determine icon layout by looking at filter.id
-    filter = get_object_or_404(Filter, pk=filterkey)
-    if str(filter.fews_id) in LAYER_STYLES:
-        icon_style = LAYER_STYLES[str(filter.fews_id)]
+    filter_ = get_object_or_404(Filter, pk=filterkey)
+    if str(filter_.fews_id) in LAYER_STYLES:
+        icon_style = copy.deepcopy(LAYER_STYLES[str(filter_.fews_id)])
     else:
-        icon_style = LAYER_STYLES['default']
+        icon_style = copy.deepcopy(LAYER_STYLES['default'])
+
+    #make icon grey
+    if nodata:
+        icon_style['color'] = (0.9, 0.9, 0.9, 0)
 
     # apply icon layout using symbol manager
     symbol_manager = SymbolManager(
@@ -75,6 +80,25 @@ def fews_symbol_name(filterkey):
         icon_style['icon'], **icon_style)
 
     return output_filename
+
+
+def fews_point_style(filterkey, nodata=False):
+    """
+    make mapnik point_style for fews point with given filterkey
+    """
+    output_filename = fews_symbol_name(filterkey, nodata)
+    output_filename_abs = os.path.join(
+        settings.MEDIA_ROOT, 'generated_icons', output_filename)
+
+    # use filename in mapnik pointsymbolizer
+    point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 32, 32)
+    point_looks.allow_overlap = True
+    layout_rule = mapnik.Rule()
+    layout_rule.symbols.append(point_looks)
+    point_style = mapnik.Style()
+    point_style.rules.append(layout_rule)
+
+    return point_style
 
 
 class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
@@ -93,40 +117,41 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         layers = []
         styles = {}
         layer = mapnik.Layer("FEWS points layer", coordinates.RD)
+        layer_nodata = mapnik.Layer("FEWS points layer (no data)", coordinates.RD)
         filterkey = self.layer_arguments['filterkey']
         parameterkey = self.layer_arguments['parameterkey']
 
         # TODO: ^^^ translation!
         layer.datasource = mapnik.PointDatasource()
+        layer_nodata.datasource = mapnik.PointDatasource()
         if filterkey is None and parameterkey is None:
             # Grab the first 1000 locations
-            locations = Location.objects.all()[:1000]
+            timeseries = Timeseries.objects.all()[:1000]
         else:
-            locations = [timeserie.locationkey for timeserie in
-                         Timeserie.objects.filter(filterkey=filterkey,
-                                                  parameterkey=parameterkey)]
-        for location in locations:
+            timeseries = Timeserie.objects.filter(filterkey=filterkey,
+                                                  parameterkey=parameterkey)
+        for timeserie in timeseries:
+            location = timeserie.locationkey
             layer.datasource.add_point(
                 location.x, location.y, 'Name', str(location.name))
+            # TODO: layer only points with data, but it misses some points
+            if timeserie.data_count() == 0:
+                layer_nodata.datasource.add_point(
+                    location.x, location.y, 'Name', str(location.name))
 
-        output_filename = fews_symbol_name(filterkey)
-        output_filename_abs = os.path.join(
-            settings.MEDIA_ROOT, 'generated_icons', output_filename)
-
-        # use filename in mapnik pointsymbolizer
-        point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 32, 32)
-
-        point_looks.allow_overlap = True
-        layout_rule = mapnik.Rule()
-        layout_rule.symbols.append(point_looks)
-        point_style = mapnik.Style()
-        point_style.rules.append(layout_rule)
-
+        point_style = fews_point_style(filterkey, nodata=False)
         # generate "unique" point style name and append to layer
-        style_name = "Point style %s::%s" % (filterkey, parameterkey)
+        style_name = "Style with data %s::%s " % (filterkey, parameterkey)
         styles[style_name] = point_style
         layer.styles.append(style_name)
-        layers = [layer]
+
+        point_style_nodata = fews_point_style(filterkey, nodata=True)
+        # generate "unique" point style name and append to layer
+        style_name_nodata = "Style nodata %s::%s" % (filterkey, parameterkey)
+        styles[style_name_nodata] = point_style_nodata
+        layer_nodata.styles.append(style_name_nodata)
+
+        layers = [layer_nodata, layer]  # TODO: the layer WITH data on top
         return layers, styles
 
     def search(self, google_x, google_y, radius=None):
