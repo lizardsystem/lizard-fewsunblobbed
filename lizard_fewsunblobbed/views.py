@@ -7,7 +7,6 @@ from django.template import RequestContext
 
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Parameter
-from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map.daterange import current_start_end_dates
 from lizard_map.daterange import DateRangeForm
