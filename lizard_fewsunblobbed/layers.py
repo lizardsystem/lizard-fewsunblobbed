@@ -8,7 +8,6 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from lizard_fewsunblobbed.models import Filter
-from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map import workspace
@@ -124,18 +123,14 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         # TODO: ^^^ translation!
         layer.datasource = mapnik.PointDatasource()
         layer_nodata.datasource = mapnik.PointDatasource()
-        if filterkey is None and parameterkey is None:
-            # Grab the first 1000 locations
-            timeseries = Timeseries.objects.all()[:1000]
-        else:
-            timeseries = Timeserie.objects.filter(filterkey=filterkey,
-                                                  parameterkey=parameterkey)
+        timeseries = Timeserie.objects.filter(filterkey=filterkey,
+                                              parameterkey=parameterkey)
         for timeserie in timeseries:
             location = timeserie.locationkey
             layer.datasource.add_point(
                 location.x, location.y, 'Name', str(location.name))
             # TODO: layer only points with data, but it misses some points
-            if timeserie.data_count() == 0:
+            if not timeserie.has_data:
                 layer_nodata.datasource.add_point(
                     location.x, location.y, 'Name', str(location.name))
 
@@ -190,8 +185,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
         """
         timeserie = get_object_or_404(
-            Timeserie, 
-            filterkey=self.filterkey, 
+            Timeserie,
+            filterkey=self.filterkey,
             locationkey=locationkey,
             parameterkey=self.parameterkey)
         return {
@@ -202,11 +197,11 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             'google_coords': timeserie.locationkey.google_coords(),
             }
 
-    def image(self, 
-              identifier_list, 
+    def image(self,
+              identifier_list,
               start_date,
-              end_date, 
-              width=380.0, 
+              end_date,
+              width=380.0,
               height=250.0):
         """
         Visualizes (timeserie) ids in a graph
@@ -217,21 +212,21 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         Draw graph(s) from fews unblobbed timeserie. Ids are set in GET
         parameter id (multiple ids allowed), or as a url parameter
         """
-        timeserie = [get_object_or_404(Timeserie, 
+        timeserie = [get_object_or_404(Timeserie,
                                        locationkey=identifier['locationkey'],
                                        filterkey=self.filterkey,
-                                       parameterkey=self.parameterkey) 
+                                       parameterkey=self.parameterkey)
                      for identifier in identifier_list]
 
         color_list = ['blue', 'green', 'cyan', 'magenta', 'black']
         today = datetime.datetime.now()
 
-        graph = Graph(start_date, end_date, 
+        graph = Graph(start_date, end_date,
                       width=width, height=height, today=today)
-        
+
         # Title.
         if len(timeserie) <= 1:
-            title = '/'.join([single_timeserie.name 
+            title = '/'.join([single_timeserie.name
                               for single_timeserie in timeserie])
         else:
             title = 'multiple graphs'

@@ -169,6 +169,10 @@ class Timeserie(models.Model):
     def data_count(self):
         return self.timeseriedata.all().count()
 
+    @property
+    def has_data(self):
+        return self.timeseriedata.exists()
+
 
 class Timeseriedata(composite.CompositePKModel):
     tkey = models.ForeignKey(Timeserie,
