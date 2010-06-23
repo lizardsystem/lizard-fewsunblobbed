@@ -16,8 +16,8 @@ install_requires = [
     'django-staticfiles',
     'django-compositepk',
     'django-treebeard',
-    'lizard-map >= 0.5',
-    'lizard-ui >= 0.11',
+    'lizard-map >= 0.11',
+    'lizard-ui >= 1.3',
     ],
 
 tests_require = [
