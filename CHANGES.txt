@@ -11,6 +11,14 @@ Changelog of lizard-fewsunblobbed
 
 - Added graph and search functions.
 
+- Switched layer display and search functions to lizard-map's new adapter
+  approach.
+
+- Added visual feedback whether points actually have data.
+
+- Using lizard-ui's generic sidebar accordion for the fews browser page.
+
+
 0.4 (2010-05-18)
 ----------------
 
