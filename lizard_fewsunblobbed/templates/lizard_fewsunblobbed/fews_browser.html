@@ -13,10 +13,14 @@
     {% for node in filters %}
       {% if node.data.isendnode %}
         <li>
+          {% if node.data.has_parameters %}
           <a href="{% url fews_browser %}?filterkey={{ child.id }}"
              class="file">
-            {{child.data.name}}
+            {{ node.data.name }}
           </a>
+          {% else %}
+          <span class="quiet">{{ node.data.name }}</span>
+          {% endif %}
         </li>
       {% else %}
         {% with "lizard_fewsunblobbed/fews_browser_tree_snippet.html" as ourselves %}
