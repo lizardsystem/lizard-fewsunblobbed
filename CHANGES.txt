@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 ===================================================
 
 
-0.5 (unreleased)
+0.5 (2010-06-23)
 ----------------
 
 - Using lizard-ui's ajax loading and lizard-map's generic workspace drag/drop
