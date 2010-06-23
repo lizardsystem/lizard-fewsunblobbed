@@ -6,6 +6,7 @@ from composite_pk import composite
 from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
 
+
 class Filter(AL_Node):
     # use 'id' and not fkey as treebeard needs this name (is hardcoded)
 
@@ -31,6 +32,11 @@ class Filter(AL_Node):
 
     def __unicode__(self):
         return u'%s (id=%s)' % (self.name, self.fews_id)
+
+    @property
+    def has_parameters(self):
+        """Return whether there is at least one connected timeserie."""
+        return Timeserie.objects.filter(filterkey=self.id).exists()
 
     # This method is overriden from the class AL_Node in al_tree.py from the
     # django-treebeard application.  The method fixes checks first if the
@@ -59,13 +65,13 @@ class Filter(AL_Node):
                 del fields['sib_order']
             if 'id' in fields:
                 del fields['id']
-
+            fields['has_parameters'] = node.has_parameters
             newobj = {'data': fields}
             if keep_ids:
                 newobj['id'] = pyobj['pk']
 
-            if (not parent and depth == 1) or \
-                    (parent and depth == parent.get_depth()):
+            if ((not parent and depth == 1) or
+                (parent and depth == parent.get_depth())):
                 ret.append(newobj)
             else:
                 parentobj = lnk[node.parent_id]

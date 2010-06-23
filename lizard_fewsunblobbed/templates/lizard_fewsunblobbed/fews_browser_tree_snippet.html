@@ -7,6 +7,9 @@
           <a href="{% url fews_browser %}?filterkey={{ child.id }}"
              class="file">
             {{child.data.name}}
+            {% if child.data.has_parameters %}
+            has parameters
+            {% endif %}
           </a>
         </li>
       {% else %}

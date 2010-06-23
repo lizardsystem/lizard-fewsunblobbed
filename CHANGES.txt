@@ -5,7 +5,11 @@ Changelog of lizard-fewsunblobbed
 0.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Using django's cache framework to cache the expensive filter tree (currently
+  for 8 hours).
+
+- Huge speed increase for the parameter list as we're using django's ``__``
+  tricks in the query now instead of looping by hand.
 
 
 0.5 (2010-06-23)
