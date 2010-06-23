@@ -11,6 +11,8 @@ Changelog of lizard-fewsunblobbed
 - Huge speed increase for the parameter list as we're using django's ``__``
   tricks in the query now instead of looping by hand.
 
+- Added Timeserie display/search caching.
+
 
 0.5 (2010-06-23)
 ----------------

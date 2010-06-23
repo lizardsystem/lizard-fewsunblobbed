@@ -5,6 +5,7 @@ from math import sqrt
 
 import mapnik
 from django.conf import settings
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 
 from lizard_fewsunblobbed.models import Filter
@@ -105,7 +106,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     Should be registered as adapter_fews
     """
     def __init__(self, *args, **kwargs):
-        super(WorkspaceItemAdapterFewsUnblobbed, self).__init__(*args, **kwargs)
+        super(WorkspaceItemAdapterFewsUnblobbed, self).__init__(
+            *args, **kwargs)
         self.filterkey = self.layer_arguments['filterkey']
         self.parameterkey = self.layer_arguments['parameterkey']
 
@@ -116,23 +118,20 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         layers = []
         styles = {}
         layer = mapnik.Layer("FEWS points layer", coordinates.RD)
-        layer_nodata = mapnik.Layer("FEWS points layer (no data)", coordinates.RD)
-        filterkey = self.layer_arguments['filterkey']
-        parameterkey = self.layer_arguments['parameterkey']
+        layer_nodata = mapnik.Layer("FEWS points layer (no data)",
+                                    coordinates.RD)
+        filterkey = self.filterkey
+        parameterkey = self.parameterkey
 
-        # TODO: ^^^ translation!
         layer.datasource = mapnik.PointDatasource()
         layer_nodata.datasource = mapnik.PointDatasource()
-        timeseries = Timeserie.objects.filter(filterkey=filterkey,
-                                              parameterkey=parameterkey)
-        for timeserie in timeseries:
-            location = timeserie.locationkey
+        for info in self._timeseries():
             layer.datasource.add_point(
-                location.x, location.y, 'Name', str(location.name))
+                info['rd_x'], info['rd_y'], 'Name', info['location_name'])
             # TODO: layer only points with data, but it misses some points
-            if not timeserie.has_data:
+            if not info['has_data']:
                 layer_nodata.datasource.add_point(
-                    location.x, location.y, 'Name', str(location.name))
+                    info['rd_x'], info['rd_y'], 'Name', info['location_name'])
 
         point_style = fews_point_style(filterkey, nodata=False)
         # generate "unique" point style name and append to layer
@@ -149,29 +148,41 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         layers = [layer_nodata, layer]  # TODO: the layer WITH data on top
         return layers, styles
 
+    def _timeseries(self):
+        cache_key = 'lizard_fewsunblobbed.layers.timeseries_%s_%s' % (
+            self.filterkey, self.parameterkey)
+        result = cache.get(cache_key)
+        if result is None:
+            result = [
+                {'rd_x': timeserie.locationkey.x,
+                 'rd_y': timeserie.locationkey.y,
+                 'location_name': str(timeserie.locationkey.name),
+                 'name': timeserie.name,
+                 'shortname': timeserie.shortname,
+                 'workspace_item': self.workspace_item,
+                 'identifier': {'locationkey': timeserie.locationkey.pk},
+                 'google_coords': timeserie.locationkey.google_coords(),
+                 'has_data': timeserie.has_data,
+                 }
+                for timeserie in
+                Timeserie.objects.filter(filterkey=self.filterkey,
+                                         parameterkey=self.parameterkey)]
+            cache.set(cache_key, result, 8 * 60 * 60)
+        return copy.deepcopy(result)
+
     def search(self, google_x, google_y, radius=None):
         """Return list of dict {'distance': <float>, 'timeserie':
         <timeserie>} of closest fews point that matches x, y, radius.
 
         """
         x, y = coordinates.google_to_rd(google_x, google_y)
-        distances = [{'distance':
-                          sqrt((timeserie.locationkey.x - x) ** 2 +
-                               (timeserie.locationkey.y - y) ** 2),
-                      # 'object': timeserie,
-                      'name': timeserie.name,
-                      'shortname': timeserie.shortname,
-                      'workspace_item': self.workspace_item,
-                      'identifier': {'locationkey': timeserie.locationkey.pk},
-                      'google_coords': timeserie.locationkey.google_coords(),
-                      }
-                     for timeserie in
-                     Timeserie.objects.filter(filterkey=self.filterkey,
-                                              parameterkey=self.parameterkey)]
-
-        #filter out correct distances
+        timeseries_info = self._timeseries()
+        for info in timeseries_info:
+            info['distance'] = sqrt((info['rd_x'] - x) ** 2 +
+                                    (info['rd_y'] - y) ** 2)
+        # Filter out correct distances.
         result = []
-        for found_result in distances:
+        for found_result in timeseries_info:
             if found_result['distance'] <= radius:
                 result.append(found_result)
 
