@@ -12,6 +12,7 @@ class TimeseriedataAdmin(admin.ModelAdmin):
 
 class TimeserieAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'data_count', ]
+    list_filter = ('filterkey', 'parameterkey', )
 
 admin.site.register(Filter)
 admin.site.register(Location)
