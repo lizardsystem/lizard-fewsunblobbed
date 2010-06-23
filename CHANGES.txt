@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 ===================================================
 
 
-0.7 (unreleased)
+0.7 (2010-06-24)
 ----------------
 
 - Fixed bug: we're including the workspace id in addition to the workspaceitem
