@@ -5,7 +5,8 @@ Changelog of lizard-fewsunblobbed
 0.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fixed bug: we're including the workspace id in addition to the workspaceitem
+  id. This fixes a bug when first viewing a graph in a temp workspace.
 
 
 0.6 (2010-06-23)

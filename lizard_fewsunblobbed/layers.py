@@ -203,8 +203,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         return layers, styles
 
     def _timeseries(self):
-        cache_key = 'lizard_fewsunblobbed.layers.timeseries_%s_%s' % (
-            self.filterkey, self.parameterkey)
+        workspace_id = self.workspace_item.workspace.id
+        cache_key = 'lizard_fewsunblobbed.layers.timeseries_%s_%s_%s' % (
+            workspace_id, self.filterkey, self.parameterkey)
         result = cache.get(cache_key)
         if result is None:
             result = [
