@@ -145,7 +145,7 @@ def fews_point_style(filterkey, nodata=False):
         settings.MEDIA_ROOT, 'generated_icons', output_filename)
 
     # use filename in mapnik pointsymbolizer
-    point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 32, 32)
+    point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 16, 16)
     point_looks.allow_overlap = True
     layout_rule = mapnik.Rule()
     layout_rule.symbols.append(point_looks)
@@ -238,7 +238,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         # Filter out correct distances.
         result = []
         for found_result in timeseries_info:
-            if found_result['distance'] <= radius:
+            if found_result['distance'] <= radius*0.3:
                 result.append(found_result)
 
         result.sort(key=lambda item: item['distance'])
@@ -312,3 +312,11 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
         graph.add_today()
         return graph.http_png()
+
+    def symbol_url(self, identifier=None, start_date=None, end_date=None):
+        """
+        returns symbol
+
+        """
+        output_filename = fews_symbol_name(self.filterkey, nodata=False)
+        return '%sgenerated_icons/%s' % (settings.MEDIA_URL, output_filename)
