@@ -1,4 +1,5 @@
 from django.core import serializers
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -172,6 +173,16 @@ class Timeserie(models.Model):
     @property
     def has_data(self):
         return self.timeseriedata.exists()
+
+    def get_absolute_url(self):
+        return reverse(
+            'lizard_fewsunblobbed.timeserie',
+            kwargs={
+                'filterkey': self.filterkey.pk,
+                'locationkey': self.locationkey.pk,
+                'parameterkey': self.parameterkey.pk,
+                }
+            )
 
 
 class Timeseriedata(composite.CompositePKModel):

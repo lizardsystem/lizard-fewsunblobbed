@@ -162,6 +162,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     """
     Should be registered as adapter_fews
     """
+
     def __init__(self, *args, **kwargs):
         super(WorkspaceItemAdapterFewsUnblobbed, self).__init__(
             *args, **kwargs)

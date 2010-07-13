@@ -10,6 +10,10 @@ urlpatterns = patterns(
         'lizard_fewsunblobbed.views.fews_browser',
         name="fews_browser",
         ),
+    url(r'^timeserie/(?P<filterkey>\d+)/(?P<locationkey>\d+)/(?P<parameterkey>\d+)/$',
+        'lizard_fewsunblobbed.views.timeserie',
+        name="lizard_fewsunblobbed.timeserie",
+        ),
     )
 
 

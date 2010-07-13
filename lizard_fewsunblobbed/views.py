@@ -53,33 +53,5 @@ def fews_browser(request,
         context_instance=RequestContext(request))
 
 
-def search_fews_points(request):
-    """searches for fews point nearest to GET x,y, returns json_popup
-    of results"""
-    workspace_manager = WorkspaceManager(request)
-    workspace_collections = workspace_manager.load_or_create()
-
-    # xy params from the GET request.
-    google_x = float(request.GET.get('x'))
-    google_y = float(request.GET.get('y'))
-    x, y = coordinates.google_to_rd(google_x, google_y)
-
-    found = []
-    for workspace_collection in workspace_collections.values():
-        for workspace in workspace_collection:
-            for workspace_item in workspace.workspace_items.filter(
-                visible=True):
-                search_results = workspace_item.adapter.search(x, y)
-                found += search_results
-
-    if found:
-        # ``found`` is a list of dicts {'distance': ..., 'timeserie': ...}.
-        found.sort(key=lambda item: item['distance'])
-        return popup_json([found[0], ])
-    else:
-        result = {'id': 'popup_nothing_found',
-                  'objects': [{'html': 'Niets gevonden.',
-                               'x': google_x,
-                               'y': google_y}],
-                  }
-        return HttpResponse(simplejson.dumps(result))
+def timeserie(request, filterkey, locationkey, parameterkey):
+    return HttpResponse("not implemented yet")
