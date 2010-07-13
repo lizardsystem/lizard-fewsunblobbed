@@ -6,7 +6,10 @@ from math import sqrt
 import mapnik
 from django.conf import settings
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+import simplejson as json
 
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Timeserie
@@ -211,6 +214,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             result = [
                 {'rd_x': timeserie.locationkey.x,
                  'rd_y': timeserie.locationkey.y,
+                 'object': timeserie,
                  'location_name': str(timeserie.locationkey.name),
                  'name': timeserie.name,
                  'shortname': timeserie.shortname,
@@ -258,6 +262,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         return {
             'name': timeserie.name,
             'shortname': timeserie.shortname,
+            'object': timeserie,
             'workspace_item': self.workspace_item,
             'identifier': {'locationkey': timeserie.locationkey.pk},
             'google_coords': timeserie.locationkey.google_coords(),
@@ -320,3 +325,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         """
         output_filename = fews_symbol_name(self.filterkey, nodata=False)
         return '%sgenerated_icons/%s' % (settings.MEDIA_URL, output_filename)
+
+    def html(self, identifiers, add_snippet=False):
+        return super(WorkspaceItemAdapterFewsUnblobbed, self).html_default(
+            identifiers, add_snippet=add_snippet)
