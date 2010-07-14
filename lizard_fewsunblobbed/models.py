@@ -151,9 +151,7 @@ class Timeserie(models.Model):
         db_table = u'timeserie'
 
     def __unicode__(self):
-        return u'%s for %s (tkey=%s)' % (self.parameterkey.name,
-                                         self.locationkey.name,
-                                         self.tkey)
+        return u'%s: %s' % (self.locationkey.name, self.parameterkey.name)
 
     @property
     def name(self):
@@ -173,17 +171,6 @@ class Timeserie(models.Model):
     @property
     def has_data(self):
         return self.timeseriedata.exists()
-
-    def get_absolute_url(self):
-        return reverse(
-            'lizard_fewsunblobbed.timeserie',
-            kwargs={
-                'filterkey': self.filterkey.pk,
-                'locationkey': self.locationkey.pk,
-                'parameterkey': self.parameterkey.pk,
-                }
-            )
-
 
 class Timeseriedata(composite.CompositePKModel):
     tkey = models.ForeignKey(Timeserie,

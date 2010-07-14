@@ -260,12 +260,22 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             filterkey=self.filterkey,
             locationkey=locationkey,
             parameterkey=self.parameterkey)
+
+        identifier = {'locationkey': timeserie.locationkey.pk}
+
+        # We want to combine workspace_item and identifier into get_absolute_url
+        timeserie.get_absolute_url = reverse(
+            'lizard_map.workspace_item.graph_edit',
+            kwargs={'workspace_item_id': self.workspace_item.id}
+            )
+        timeserie.get_absolute_url += '?identifier=%s' % (json.dumps(identifier).replace('"', '%22'))
+
         return {
             'name': timeserie.name,
             'shortname': timeserie.shortname,
             'object': timeserie,
             'workspace_item': self.workspace_item,
-            'identifier': {'locationkey': timeserie.locationkey.pk},
+            'identifier': identifier,
             'google_coords': timeserie.locationkey.google_coords(),
             }
 
