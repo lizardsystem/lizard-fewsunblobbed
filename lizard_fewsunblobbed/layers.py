@@ -7,6 +7,9 @@ import mapnik
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.db.models import Avg
+from django.db.models import Min
+from django.db.models import Max
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 import simplejson as json
@@ -293,38 +296,85 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
         Draw graph(s) from fews unblobbed timeserie. Ids are set in GET
         parameter id (multiple ids allowed), or as a url parameter
-        """
-        timeserie = [get_object_or_404(Timeserie,
-                                       locationkey=identifier['locationkey'],
-                                       filterkey=self.filterkey,
-                                       parameterkey=self.parameterkey)
-                     for identifier in identifier_list]
 
-        color_list = ['blue', 'green', 'cyan', 'magenta', 'black']
+        note: in a identifier extra parameters can be set to control
+        image behaviour.
+
+        extra parameters: y_min, y_max, line_min, line_max, line_avg,
+        title, y_label, x_label, colors
+        """
+        series = []
+        color_list = None
+        for identifier in identifier_list:
+            timeserie = get_object_or_404(Timeserie,
+                                          locationkey=identifier['locationkey'],
+                                          filterkey=self.filterkey,
+                                          parameterkey=self.parameterkey)
+            timeseriedata = timeserie.timeseriedata.filter(tsd_time__gte=start_date,
+                                                           tsd_time__lte=end_date)
+            if 'colors' in identifier:
+                color_list = identifier['colors']
+            series.append({
+                    'identifier': identifier,
+                    'timeserie': timeserie,
+                    'timeseriedata': timeseriedata,
+                    })
+
+        # Default color list
+        if color_list is None:
+            color_list = ['blue', 'green', 'cyan', 'magenta', 'black']
+
         today = datetime.datetime.now()
 
         graph = Graph(start_date, end_date,
                       width=width, height=height, today=today)
 
-        # Title.
-        if len(timeserie) <= 1:
-            title = '/'.join([single_timeserie.name
-                              for single_timeserie in timeserie])
-        else:
-            title = 'multiple graphs'
-        graph.suptitle(title)
         graph.axes.grid(True)
 
         # Draw the actual graph lines
-        for index, single_timeserie in enumerate(timeserie):
+        for index, single_series in enumerate(series):
             dates = []
             values = []
-            for data in single_timeserie.timeseriedata.all():
+            for data in single_series['timeseriedata']:
                 dates.append(data.tsd_time)
                 values.append(data.tsd_value)
             graph.axes.plot(dates, values,
                             lw=1,
                             color=color_list[index % len(color_list)])
+
+        # Extra parameters: title, axes, extra lines
+        title = ''
+        y_min, y_max = graph.axes.get_ylim()
+        for series_index, series in enumerate(series):
+            identifier = series['identifier']
+            if "title" in identifier:
+                title = identifier['title']
+            if "y_min" in identifier:
+                y_min = float(identifier['y_min'])
+            if "y_max" in identifier:
+                y_max = float(identifier['y_max'])
+            if "line_min" in identifier:
+                aggregated = series['timeseriedata'].aggregate(Min('tsd_value'))
+                graph.axes.axhline(aggregated['tsd_value__min'], color='green',
+                                   lw=3, label='Minimum')
+            if "line_max" in identifier:
+                aggregated = series['timeseriedata'].aggregate(Max('tsd_value'))
+                graph.axes.axhline(aggregated['tsd_value__max'], color='green',
+                                   lw=3, label='Maximum')
+            if "line_avg" in identifier:
+                aggregated = series['timeseriedata'].aggregate(Avg('tsd_value'))
+                graph.axes.axhline(aggregated['tsd_value__avg'], color='green',
+                                   lw=3, label='Gemiddelde')
+
+        # Title.
+        if not title:
+            if len(series) <= 1:
+                title = '/'.join([single_series['timeserie'].name
+                                  for single_series in series])
+            else:
+                title = 'multiple graphs'
+        graph.suptitle(title)
+        graph.axes.set_ylim(y_min, y_max)
 
         graph.add_today()
         return graph.http_png()
