@@ -252,11 +252,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         result.sort(key=lambda item: item['distance'])
         return result
 
-    def location(self, locationkey=None):
+    def location(self, locationkey=None, **extra_params):
         """Return fews point representation corresponding to
         filter_id, location_id and parameter_id in same format as
         search function
 
+        !!extra_params come from the graph_edit screen, see also image(..)
         """
         timeserie = get_object_or_404(
             Timeserie,
@@ -265,6 +266,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             parameterkey=self.parameterkey)
 
         identifier = {'locationkey': timeserie.locationkey.pk}
+        identifier.update(extra_params)
 
         # We want to combine workspace_item and identifier into get_absolute_url
         timeserie.get_absolute_url = reverse(
@@ -343,10 +345,11 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                             color=color_list[index % len(color_list)])
 
         # Extra parameters: title, axes, extra lines
-        title = ''
+        title = None
         y_min, y_max = graph.axes.get_ylim()
-        for series_index, series in enumerate(series):
-            identifier = series['identifier']
+        legend = None
+        for series_index, single_series in enumerate(series):
+            identifier = single_series['identifier']
             if "title" in identifier:
                 title = identifier['title']
             if "y_min" in identifier:
@@ -354,20 +357,22 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             if "y_max" in identifier:
                 y_max = float(identifier['y_max'])
             if "line_min" in identifier:
-                aggregated = series['timeseriedata'].aggregate(Min('tsd_value'))
+                aggregated = single_series['timeseriedata'].aggregate(Min('tsd_value'))
                 graph.axes.axhline(aggregated['tsd_value__min'], color='green',
                                    lw=3, label='Minimum')
             if "line_max" in identifier:
-                aggregated = series['timeseriedata'].aggregate(Max('tsd_value'))
+                aggregated = single_series['timeseriedata'].aggregate(Max('tsd_value'))
                 graph.axes.axhline(aggregated['tsd_value__max'], color='green',
                                    lw=3, label='Maximum')
             if "line_avg" in identifier:
-                aggregated = series['timeseriedata'].aggregate(Avg('tsd_value'))
+                aggregated = single_series['timeseriedata'].aggregate(Avg('tsd_value'))
                 graph.axes.axhline(aggregated['tsd_value__avg'], color='green',
                                    lw=3, label='Gemiddelde')
+            if "legend" in identifier:
+                legend = identifier['legend']
 
         # Title.
-        if not title:
+        if title is None:
             if len(series) <= 1:
                 title = '/'.join([single_series['timeserie'].name
                                   for single_series in series])
@@ -375,6 +380,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 title = 'multiple graphs'
         graph.suptitle(title)
         graph.axes.set_ylim(y_min, y_max)
+
+        if legend:
+            graph.legend()
 
         graph.add_today()
         return graph.http_png()
