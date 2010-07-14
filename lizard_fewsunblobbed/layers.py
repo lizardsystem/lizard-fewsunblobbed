@@ -252,12 +252,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         result.sort(key=lambda item: item['distance'])
         return result
 
-    def location(self, locationkey=None, **extra_params):
+    def location(self, locationkey=None, layout=None):
         """Return fews point representation corresponding to
         filter_id, location_id and parameter_id in same format as
         search function
 
-        !!extra_params come from the graph_edit screen, see also image(..)
+        !!layout params come from the graph_edit screen, see also image(..)
         """
         timeserie = get_object_or_404(
             Timeserie,
@@ -266,7 +266,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             parameterkey=self.parameterkey)
 
         identifier = {'locationkey': timeserie.locationkey.pk}
-        identifier.update(extra_params)
+        if layout is not None:
+            identifier['layout'] = layout
 
         # We want to combine workspace_item and identifier into get_absolute_url
         timeserie.get_absolute_url = reverse(
@@ -302,7 +303,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         note: in a identifier extra parameters can be set to control
         image behaviour.
 
-        extra parameters: y_min, y_max, line_min, line_max, line_avg,
+        extra parameters in 'layout': y_min, y_max, line_min, line_max, line_avg,
         title, y_label, x_label, colors
         """
         series = []
@@ -314,8 +315,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                                           parameterkey=self.parameterkey)
             timeseriedata = timeserie.timeseriedata.filter(tsd_time__gte=start_date,
                                                            tsd_time__lte=end_date)
-            if 'colors' in identifier:
-                color_list = identifier['colors']
+            if 'layout' in identifier:
+                if 'colors' in identifier['layout']:
+                    color_list = identifier['layout']['colors']
             series.append({
                     'identifier': identifier,
                     'timeserie': timeserie,
@@ -344,32 +346,34 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                             lw=1,
                             color=color_list[index % len(color_list)])
 
-        # Extra parameters: title, axes, extra lines
+        # Extra layout parameters: title, axes, extra lines, ...
         title = None
         y_min, y_max = graph.axes.get_ylim()
         legend = None
         for series_index, single_series in enumerate(series):
             identifier = single_series['identifier']
-            if "title" in identifier:
-                title = identifier['title']
-            if "y_min" in identifier:
-                y_min = float(identifier['y_min'])
-            if "y_max" in identifier:
-                y_max = float(identifier['y_max'])
-            if "line_min" in identifier:
-                aggregated = single_series['timeseriedata'].aggregate(Min('tsd_value'))
-                graph.axes.axhline(aggregated['tsd_value__min'], color='green',
-                                   lw=3, label='Minimum')
-            if "line_max" in identifier:
-                aggregated = single_series['timeseriedata'].aggregate(Max('tsd_value'))
-                graph.axes.axhline(aggregated['tsd_value__max'], color='green',
-                                   lw=3, label='Maximum')
-            if "line_avg" in identifier:
-                aggregated = single_series['timeseriedata'].aggregate(Avg('tsd_value'))
-                graph.axes.axhline(aggregated['tsd_value__avg'], color='green',
-                                   lw=3, label='Gemiddelde')
-            if "legend" in identifier:
-                legend = identifier['legend']
+            if 'layout' in identifier:
+                layout = identifier['layout']
+                if "title" in layout:
+                    title = layout['title']
+                if "y_min" in layout:
+                    y_min = float(layout['y_min'])
+                if "y_max" in layout:
+                    y_max = float(layout['y_max'])
+                if "line_min" in layout:
+                    aggregated = single_series['timeseriedata'].aggregate(Min('tsd_value'))
+                    graph.axes.axhline(aggregated['tsd_value__min'], color='green',
+                                       lw=3, label='Minimum')
+                if "line_max" in layout:
+                    aggregated = single_series['timeseriedata'].aggregate(Max('tsd_value'))
+                    graph.axes.axhline(aggregated['tsd_value__max'], color='green',
+                                       lw=3, label='Maximum')
+                if "line_avg" in layout:
+                    aggregated = single_series['timeseriedata'].aggregate(Avg('tsd_value'))
+                    graph.axes.axhline(aggregated['tsd_value__avg'], color='green',
+                                       lw=3, label='Gemiddelde')
+                if "legend" in layout:
+                    legend = layout['legend']
 
         # Title.
         if title is None:
