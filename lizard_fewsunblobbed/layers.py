@@ -211,8 +211,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
     def _timeseries(self):
         workspace_id = self.workspace_item.workspace.id
-        cache_key = 'lizard_fewsunblobbed.layers.timeseries_%s_%s_%s' % (
-            workspace_id, self.filterkey, self.parameterkey)
+        # multiple series based caching: effective, but low match rate
+        cache_key = 'lizard_fewsunblobbed.layers.timeseries_%s_%s_%s_%s' % (
+            workspace_id, self.workspace_item.id, self.filterkey, self.parameterkey)
         result = cache.get(cache_key)
         if result is None:
             result = [
@@ -225,7 +226,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                  'workspace_item': self.workspace_item,
                  'identifier': {'locationkey': timeserie.locationkey.pk},
                  'google_coords': timeserie.locationkey.google_coords(),
-                 'has_data': timeserie.has_data,
+                 'has_data': timeserie.has_data,  # most expensive
                  }
                 for timeserie in
                 Timeserie.objects.filter(filterkey=self.filterkey,
