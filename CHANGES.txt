@@ -5,7 +5,10 @@ Changelog of lizard-fewsunblobbed
 0.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Search points is now generic and uses function in lizard-map.
+- Adapter.image function now accepts layout options: y_min, y_max,
+  line_min, line_max, line_avg, colors, title.
+- Implement adapter.symbol function.
 
 
 0.7 (2010-06-24)
