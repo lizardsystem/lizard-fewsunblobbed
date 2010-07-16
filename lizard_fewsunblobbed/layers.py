@@ -213,7 +213,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
     def _timeseries(self):
         """
-        Get list of dicts of all timeseries. Optimized for performance
+        Get list of dicts of all timeseries. Optimized for performance.
         """
         cache_key = 'lizard_fewsunblobbed.layers.timeseries_%s_%s' % (
             self.filterkey, self.parameterkey)
@@ -244,7 +244,6 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                  'google_coords': location.google_coords(),
                  'has_data': timeserie.has_data,  # most expensive ~100 locs per second
                  })
-
             cache.set(cache_key, result, 8 * 60 * 60)
         else:
             # the workspace_item can be different, so overwrite with our own
