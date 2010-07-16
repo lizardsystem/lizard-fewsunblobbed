@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 ===================================================
 
 
-0.9 (unreleased)
+0.9 (2010-07-16)
 ----------------
 
 - Greatly improve performance of adapter.layer.
