@@ -15,6 +15,8 @@ from django.template.loader import render_to_string
 import simplejson as json
 
 from lizard_fewsunblobbed.models import Filter
+from lizard_fewsunblobbed.models import Location
+from lizard_fewsunblobbed.models import Parameter
 from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map import workspace
@@ -210,27 +212,39 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         return layers, styles
 
     def _timeseries(self):
-        workspace_id = self.workspace_item.workspace.id
-        # multiple series based caching: effective, but low match rate
+        """
+        Get list of dicts of all timeseries. Optimized for performance
+        """
         cache_key = 'lizard_fewsunblobbed.layers.timeseries_%s_%s' % (
             self.filterkey, self.parameterkey)
         result = cache.get(cache_key)
         if result is None:
-            result = [
-                {'rd_x': timeserie.locationkey.x,
-                 'rd_y': timeserie.locationkey.y,
+            # fetching locationkey and parameterkey seems to be very expensive
+            parameter = Parameter.objects.get(pk=self.parameterkey)
+
+            # pre load all used locations in a dictionary ! < 1 sec
+            locations = dict([(location.pk, location) \
+                                  for location in Location.objects.filter(
+                        timeserie__filterkey=self.filterkey)])
+            result = []
+            for timeserie in Timeserie.objects.filter(filterkey=self.filterkey,
+                                                      parameterkey=self.parameterkey):
+                location = locations[timeserie.locationkey_id]
+                name = u'%s (%s): %s' % (parameter.name, parameter.unit, location)
+                shortname = u'%s' % location.name
+                result.append(
+                {'rd_x': location.x,
+                 'rd_y': location.y,
                  'object': timeserie,
-                 'location_name': str(timeserie.locationkey.name),
-                 'name': timeserie.name,
-                 'shortname': timeserie.shortname,
+                 'location_name': str(location.name),
+                 'name': name,
+                 'shortname': shortname,
                  'workspace_item': self.workspace_item,
-                 'identifier': {'locationkey': timeserie.locationkey.pk},
-                 'google_coords': timeserie.locationkey.google_coords(),
-                 'has_data': timeserie.has_data,  # most expensive
-                 }
-                for timeserie in
-                Timeserie.objects.filter(filterkey=self.filterkey,
-                                         parameterkey=self.parameterkey)]
+                 'identifier': {'locationkey': location.pk},
+                 'google_coords': location.google_coords(),
+                 'has_data': timeserie.has_data,  # most expensive ~100 locs per second
+                 })
+
             cache.set(cache_key, result, 8 * 60 * 60)
         else:
             # the workspace_item can be different, so overwrite with our own
