@@ -18,6 +18,7 @@ install_requires = [
     'django-treebeard',
     'lizard-map >= 0.11',
     'lizard-ui >= 1.3',
+    'unittest-xml-reporting',
     ],
 
 tests_require = [
