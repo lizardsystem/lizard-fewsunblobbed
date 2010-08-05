@@ -1,5 +1,4 @@
 from django.core import serializers
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.translation import ugettext as _
 

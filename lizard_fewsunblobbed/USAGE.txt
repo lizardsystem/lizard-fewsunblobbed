@@ -21,38 +21,3 @@ How to make a sqlite fews-unblobbed database::
 
 (Finished! - it gives the errors because if you have existing tables,
 the script will remove the tables first)
-
-
-Usage:
-
-    >>> import lizard_fewsunblobbed
-
-Show how to import the main classes and how to use them.
-
-Smoketest
-
-    >>> from lizard_fewsunblobbed.models import *
-    >>> from lizard_fewsunblobbed import views
-
-    >>> Filter.objects.all()
-    []
-
-    >>> Location.objects.all()
-    []
-
-    >>> Parameter.objects.all()
-    []
-
-    >>> Timeserie.objects.all()
-    []
-
-    >>> Timeseriedata.objects.all()
-    []
-
-If you're using multiple databases, you can use the 'using' thingy
-
-    >>> Filter.objects.using('fews-unblobbed').all()
-    []
-
-However it's better to create a django router if there's only one fews
-unblobbed database available...
