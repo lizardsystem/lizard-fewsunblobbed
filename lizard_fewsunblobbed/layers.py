@@ -12,6 +12,7 @@ from django.db.models import Min
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
+from matplotlib.lines import Line2D
 import simplejson as json
 
 from lizard_fewsunblobbed.models import Filter
@@ -321,8 +322,10 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         note: in a identifier extra parameters can be set to control
         image behaviour.
 
-        extra parameters in 'layout': y_min, y_max, line_min, line_max, line_avg,
-        title, y_label, x_label, colors
+        extra parameters in 'layout': y_min, y_max, line_min,
+        line_max, line_avg, title, y_label, x_label, colors. the
+        colors attribute is a single string, colors are splitted by a
+        space ' '.
         """
         series = []
         color_list = None
@@ -335,7 +338,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                                                            tsd_time__lte=end_date)
             if 'layout' in identifier:
                 if 'colors' in identifier['layout']:
-                    color_list = identifier['layout']['colors']
+                    color_list = identifier['layout']['colors'].split()
             series.append({
                     'identifier': identifier,
                     'timeserie': timeserie,
@@ -392,6 +395,10 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                                        lw=3, label='Gemiddelde')
                 if "legend" in layout:
                     legend = layout['legend']
+                if "y_label" in layout:
+                    graph.axes.set_ylabel(layout['y_label'])
+                if "x_label" in layout:
+                    graph.set_xlabel(layout['x_label'])
 
         # Title.
         if title is None:
@@ -404,7 +411,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         graph.axes.set_ylim(y_min, y_max)
 
         if legend:
-            graph.legend()
+            handles, labels = graph.axes.get_legend_handles_labels()
+            for index, single_series in enumerate(series):
+                handles.append(Line2D([], [], color=color_list[index % len(color_list)], lw=1))
+                labels.append('Waarde')
+
+            graph.legend(handles, labels)
 
         graph.add_today()
         return graph.http_png()
