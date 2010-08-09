@@ -429,6 +429,6 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         output_filename = fews_symbol_name(self.filterkey, nodata=False)
         return '%sgenerated_icons/%s' % (settings.MEDIA_URL, output_filename)
 
-    def html(self, identifiers, add_snippet=False):
+    def html(self, identifiers, layout_options=None):
         return super(WorkspaceItemAdapterFewsUnblobbed, self).html_default(
-            identifiers, add_snippet=add_snippet)
+            identifiers, layout_options=layout_options)
