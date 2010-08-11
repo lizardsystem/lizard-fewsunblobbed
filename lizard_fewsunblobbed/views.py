@@ -1,18 +1,11 @@
-import simplejson
-
 from django.core.cache import cache
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Parameter
-from lizard_fewsunblobbed.models import Timeserie
-from lizard_map import coordinates
 from lizard_map.daterange import current_start_end_dates
 from lizard_map.daterange import DateRangeForm
-from lizard_map.views import popup_json
 from lizard_map.workspace import WorkspaceManager
 
 FILTER_CACHE_KEY = 'lizard.fewsunblobbed.views.filter_cache_key'

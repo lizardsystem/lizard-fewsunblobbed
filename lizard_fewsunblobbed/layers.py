@@ -11,7 +11,6 @@ from django.db.models import Avg
 from django.db.models import Min
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
-from django.template.loader import render_to_string
 from matplotlib.lines import Line2D
 import simplejson as json
 
@@ -228,10 +227,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                                   for location in Location.objects.filter(
                         timeserie__filterkey=self.filterkey)])
             result = []
-            for timeserie in Timeserie.objects.filter(filterkey=self.filterkey,
-                                                      parameterkey=self.parameterkey):
+            for timeserie in Timeserie.objects.filter(
+                filterkey=self.filterkey,
+                parameterkey=self.parameterkey):
                 location = locations[timeserie.locationkey_id]
-                name = u'%s (%s): %s' % (parameter.name, parameter.unit, location)
+                name = u'%s (%s): %s' % (parameter.name, parameter.unit,
+                                         location)
                 shortname = u'%s' % location.name
                 result.append(
                 {'rd_x': location.x,
@@ -243,7 +244,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                  'workspace_item': self.workspace_item,
                  'identifier': {'locationkey': location.pk},
                  'google_coords': location.google_coords(),
-                 'has_data': timeserie.has_data,  # most expensive ~100 locs per second
+                 'has_data': timeserie.has_data,
+                 # ^^^ Most expensive: ~100 locs per second
                  })
             cache.set(cache_key, result, 8 * 60 * 60)
         else:
@@ -265,7 +267,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         # Filter out correct distances.
         result = []
         for found_result in timeseries_info:
-            if found_result['distance'] <= radius*0.3:
+            if found_result['distance'] <= radius * 0.3:
                 result.append(found_result)
 
         result.sort(key=lambda item: item['distance'])
@@ -288,12 +290,14 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         if layout is not None:
             identifier['layout'] = layout
 
-        # We want to combine workspace_item and identifier into get_absolute_url
+        # We want to combine workspace_item and identifier into
+        # get_absolute_url.
         timeserie.get_absolute_url = reverse(
             'lizard_map.workspace_item.graph_edit',
-            kwargs={'workspace_item_id': self.workspace_item.id}
+            kwargs={'workspace_item_id': self.workspace_item.id},
             )
-        timeserie.get_absolute_url += '?identifier=%s' % (json.dumps(identifier).replace('"', '%22'))
+        timeserie.get_absolute_url += '?identifier=%s' % (
+            json.dumps(identifier).replace('"', '%22'))
 
         return {
             'name': timeserie.name,
@@ -330,12 +334,14 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         series = []
         color_list = None
         for identifier in identifier_list:
-            timeserie = get_object_or_404(Timeserie,
-                                          locationkey=identifier['locationkey'],
-                                          filterkey=self.filterkey,
-                                          parameterkey=self.parameterkey)
-            timeseriedata = timeserie.timeseriedata.filter(tsd_time__gte=start_date,
-                                                           tsd_time__lte=end_date)
+            timeserie = get_object_or_404(
+                Timeserie,
+                locationkey=identifier['locationkey'],
+                filterkey=self.filterkey,
+                parameterkey=self.parameterkey)
+            timeseriedata = timeserie.timeseriedata.filter(
+                tsd_time__gte=start_date,
+                tsd_time__lte=end_date)
             if 'layout' in identifier:
                 if 'colors' in identifier['layout']:
                     color_list = identifier['layout']['colors'].split()
@@ -382,17 +388,26 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 if "y_max" in layout:
                     y_max = float(layout['y_max'])
                 if "line_min" in layout:
-                    aggregated = single_series['timeseriedata'].aggregate(Min('tsd_value'))
-                    graph.axes.axhline(aggregated['tsd_value__min'], color='green',
-                                       lw=3, label='Minimum')
+                    aggregated = single_series['timeseriedata'].aggregate(
+                        Min('tsd_value'))
+                    graph.axes.axhline(aggregated['tsd_value__min'],
+                                       color='green',
+                                       lw=3,
+                                       label='Minimum')
                 if "line_max" in layout:
-                    aggregated = single_series['timeseriedata'].aggregate(Max('tsd_value'))
-                    graph.axes.axhline(aggregated['tsd_value__max'], color='green',
-                                       lw=3, label='Maximum')
+                    aggregated = single_series['timeseriedata'].aggregate(
+                        Max('tsd_value'))
+                    graph.axes.axhline(aggregated['tsd_value__max'],
+                                       color='green',
+                                       lw=3,
+                                       label='Maximum')
                 if "line_avg" in layout:
-                    aggregated = single_series['timeseriedata'].aggregate(Avg('tsd_value'))
-                    graph.axes.axhline(aggregated['tsd_value__avg'], color='green',
-                                       lw=3, label='Gemiddelde')
+                    aggregated = single_series['timeseriedata'].aggregate(
+                        Avg('tsd_value'))
+                    graph.axes.axhline(aggregated['tsd_value__avg'],
+                                       color='green',
+                                       lw=3,
+                                       label='Gemiddelde')
                 if "legend" in layout:
                     legend = layout['legend']
                 if "y_label" in layout:
@@ -413,7 +428,11 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         if legend:
             handles, labels = graph.axes.get_legend_handles_labels()
             for index, single_series in enumerate(series):
-                handles.append(Line2D([], [], color=color_list[index % len(color_list)], lw=1))
+                handles.append(
+                    Line2D([],
+                           [],
+                           color=color_list[index % len(color_list)],
+                           lw=1))
                 labels.append('Waarde')
 
             graph.legend(handles, labels)
