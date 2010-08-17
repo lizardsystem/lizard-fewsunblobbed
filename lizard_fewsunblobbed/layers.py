@@ -171,7 +171,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         self.filterkey = self.layer_arguments['filterkey']
         self.parameterkey = self.layer_arguments['parameterkey']
 
-    def layer(self, layer_ids=None, webcolor=None):
+    def layer(self, layer_ids=None, webcolor=None, request=None):
         """Return layer and styles that render points.
 
         """
@@ -288,6 +288,11 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                     'unit': '',  # We don't know the unit.
                     })
         return result
+
+    def value_aggregate(self, identifier, aggregate_functions,
+                        start_date, end_date):
+        return super(WorkspaceItemAdapterFewsUnblobbed, self).value_aggregate_default(
+            identifier, aggregate_functions, start_date, end_date)
 
     def location(self, locationkey=None, layout=None):
         """Return fews point representation corresponding to
