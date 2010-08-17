@@ -19,7 +19,7 @@ install_requires = [
     'lizard-map >= 0.11',
     'lizard-ui >= 1.3',
     'django-nose',
-    'nosexcover',
+    #'nosexcover',
     ],
 
 tests_require = [
