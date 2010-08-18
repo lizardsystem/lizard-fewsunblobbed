@@ -5,9 +5,11 @@ Changelog of lizard-fewsunblobbed
 0.10 (unreleased)
 -----------------
 
-- Update adapter to current lizard-map.
+- Updated adapter to current lizard-map.
 
-- Add several graph options to adapter.
+- Added several graph options to adapter.
+
+- Adjusted test setup to use nose and unittests.
 
 
 0.9 (2010-07-16)
