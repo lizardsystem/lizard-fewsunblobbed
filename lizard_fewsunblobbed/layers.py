@@ -229,7 +229,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 parameterkey=self.parameterkey):
                 location = locations[timeserie.locationkey_id]
                 name = u'%s (%s): %s' % (parameter.name, parameter.unit,
-                                         location)
+                                         location.name)
                 shortname = u'%s' % location.name
                 result.append(
                 {'rd_x': location.x,
