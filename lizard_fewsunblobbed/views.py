@@ -43,6 +43,7 @@ def fews_browser(request,
          'found_filter': found_filter,
          'parameters': parameters,
          'date_range_form': date_range_form,
+         'javascript_hover_handler': 'popup_hover_handler',
          'javascript_click_handler': javascript_click_handler,
          'workspaces': workspaces},
         context_instance=RequestContext(request))
