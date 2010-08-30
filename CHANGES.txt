@@ -2,8 +2,8 @@ Changelog of lizard-fewsunblobbed
 ===================================================
 
 
-0.11 (unreleased)
------------------
+1.0 (2010-08-30)
+----------------
 
 - Enabled hovering over points so that you get names.
 
