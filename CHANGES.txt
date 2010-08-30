@@ -5,7 +5,9 @@ Changelog of lizard-fewsunblobbed
 0.11 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Enabled hovering over points so that you get names.
+
+- Improved test setup.
 
 
 0.10 (2010-08-18)
