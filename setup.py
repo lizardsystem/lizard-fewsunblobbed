@@ -15,7 +15,7 @@ install_requires = [
     'Django',
     'django-staticfiles',
     'django-compositepk',
-    'django-treebeard',
+    'django-treebeard >= 1.61',
     'lizard-map >= 0.11',
     'lizard-ui >= 1.3',
     'django-nose',
