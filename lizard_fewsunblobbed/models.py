@@ -16,9 +16,9 @@ class Filter(AL_Node):
 
     id = models.IntegerField(primary_key=True, db_column='fkey')
     # since 'id' is already used us another name
-    fews_id = models.TextField(unique=True, db_column='id')
-    name = models.TextField(blank=True)
-    description = models.TextField(blank=True)
+    fews_id = models.CharField(max_length=64, unique=True, db_column='id')
+    name = models.CharField(max_length=256, blank=True)
+    description = models.CharField(max_length=256, blank=True)
     issubfilter = models.BooleanField()
     # Use 'parent' and not parentfkey as treebeard needs this name (is
     # hardcoded)
@@ -37,6 +37,13 @@ class Filter(AL_Node):
     def has_parameters(self):
         """Return whether there is at least one connected timeserie."""
         return Timeserie.objects.filter(filterkey=self.id).exists()
+
+
+    @classmethod
+    def get_database_engine(cls):
+        """Overriding treebeard: it grabs the 'default' database engine."""
+        engine = settings.DATABASES['fews-unblobbed']['ENGINE']
+        return engine.split('.')[-1]
 
     # This method is overriden from the class AL_Node in al_tree.py from the
     # django-treebeard application.  The method fixes checks first if the
@@ -90,12 +97,12 @@ class Location(models.Model):
         verbose_name_plural = _("Locations")
 
     lkey = models.IntegerField(primary_key=True)
-    id = models.TextField(unique=True)
-    name = models.TextField(blank=True)
-    parentid = models.TextField(blank=True)
-    description = models.TextField(blank=True)
-    shortname = models.TextField(blank=True)
-    tooltiptext = models.TextField(blank=True)
+    id = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=256, blank=True)
+    parentid = models.CharField(max_length=64, blank=True)
+    description = models.CharField(max_length=256, blank=True)
+    shortname = models.CharField(max_length=256, blank=True)
+    tooltiptext = models.CharField(max_length=1000, blank=True)
     x = models.FloatField(blank=True)
     y = models.FloatField(blank=True)
     z = models.FloatField(blank=True)
@@ -119,12 +126,12 @@ class Parameter(models.Model):
         verbose_name_plural = _("Parameters")
 
     pkey = models.IntegerField(primary_key=True)
-    id = models.TextField(unique=True)
-    name = models.TextField(blank=True)
-    shortname = models.TextField(blank=True)
-    unit = models.TextField(blank=True)
-    parametertype = models.TextField(blank=True)
-    parametergroup = models.TextField(blank=True)
+    id = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=256, blank=True)
+    shortname = models.CharField(max_length=256, blank=True)
+    unit = models.CharField(max_length=64, blank=True)
+    parametertype = models.CharField(max_length=64, blank=True)
+    parametergroup = models.CharField(max_length=64, blank=True)
 
     class Meta:
         db_table = u'parameter'
@@ -140,8 +147,8 @@ class Timeserie(models.Model):
         verbose_name_plural = _("Timeseries")
 
     tkey = models.IntegerField(primary_key=True)
-    moduleinstanceid = models.TextField(blank=True)
-    timestep = models.TextField(blank=True)
+    moduleinstanceid = models.CharField(max_length=64, blank=True)
+    timestep = models.CharField(max_length=64, blank=True)
     filterkey = models.ForeignKey(Filter, db_column='filterkey')
     locationkey = models.ForeignKey(Location, db_column='locationkey')
     parameterkey = models.ForeignKey(Parameter, db_column='parameterkey')
@@ -188,7 +195,7 @@ class Timeseriedata(composite.CompositePKModel):
     tsd_value = models.FloatField(blank=True)
     tsd_flag = models.IntegerField(blank=True)
     tsd_detection = models.BooleanField()
-    tsd_comments = models.TextField(blank=True)
+    tsd_comments = models.CharField(max_length=256, blank=True)
 
     class Meta:
         db_table = u'timeseriedata'
