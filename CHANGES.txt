@@ -5,7 +5,12 @@ Changelog of lizard-fewsunblobbed
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Django-treebeard: we need 1.61 minimum.
+
+- Fixed up the models: no more TextFields where we really need charfields.
+
+- Added a get_database_engine() that picks up the correct database engine for
+  treebeard.
 
 
 1.0 (2010-08-30)
