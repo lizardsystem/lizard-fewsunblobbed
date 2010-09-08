@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core import serializers
 from django.db import models
 from django.utils.translation import ugettext as _
@@ -38,7 +39,6 @@ class Filter(AL_Node):
         """Return whether there is at least one connected timeserie."""
         return Timeserie.objects.filter(filterkey=self.id).exists()
 
-
     @classmethod
     def get_database_engine(cls):
         """Overriding treebeard: it grabs the 'default' database engine."""
@@ -49,6 +49,7 @@ class Filter(AL_Node):
     # django-treebeard application.  The method fixes checks first if the
     # field sib_order exist before deleting, which the original version
     # doesn't do (which causes a bug).
+
     @classmethod
     def dump_bulk(cls, parent=None, keep_ids=True):
         """

@@ -291,7 +291,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
     def value_aggregate(self, identifier, aggregate_functions,
                         start_date, end_date):
-        return super(WorkspaceItemAdapterFewsUnblobbed, self).value_aggregate_default(
+        return super(
+            WorkspaceItemAdapterFewsUnblobbed,
+            self).value_aggregate_default(
             identifier, aggregate_functions, start_date, end_date)
 
     def location(self, locationkey=None, layout=None):
@@ -372,27 +374,30 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             if "line_min" in layout:
                 aggregated = timeseriedata.aggregate(
                     Min('tsd_value'))
-                graph.axes.axhline(aggregated['tsd_value__min'],
-                                   color=line_styles[str(identifier)]['color'],
-                                   lw=line_styles[str(identifier)]['min_linewidth'],
-                                   ls=line_styles[str(identifier)]['min_linestyle'],
-                                   label='Minimum')
+                graph.axes.axhline(
+                    aggregated['tsd_value__min'],
+                    color=line_styles[str(identifier)]['color'],
+                    lw=line_styles[str(identifier)]['min_linewidth'],
+                    ls=line_styles[str(identifier)]['min_linestyle'],
+                    label='Minimum')
             if "line_max" in layout:
                 aggregated = timeseriedata.aggregate(
                     Max('tsd_value'))
-                graph.axes.axhline(aggregated['tsd_value__max'],
-                                   color=line_styles[str(identifier)]['color'],
-                                   lw=line_styles[str(identifier)]['max_linewidth'],
-                                   ls=line_styles[str(identifier)]['max_linestyle'],
-                                   label='Maximum')
+                graph.axes.axhline(
+                    aggregated['tsd_value__max'],
+                    color=line_styles[str(identifier)]['color'],
+                    lw=line_styles[str(identifier)]['max_linewidth'],
+                    ls=line_styles[str(identifier)]['max_linestyle'],
+                    label='Maximum')
             if "line_avg" in layout:
                 aggregated = timeseriedata.aggregate(
                     Avg('tsd_value'))
-                graph.axes.axhline(aggregated['tsd_value__avg'],
-                                   color=line_styles[str(identifier)]['color'],
-                                   lw=line_styles[str(identifier)]['avg_linewidth'],
-                                   ls=line_styles[str(identifier)]['avg_linestyle'],
-                                   label='Gemiddelde')
+                graph.axes.axhline(
+                    aggregated['tsd_value__avg'],
+                    color=line_styles[str(identifier)]['color'],
+                    lw=line_styles[str(identifier)]['avg_linewidth'],
+                    ls=line_styles[str(identifier)]['avg_linestyle'],
+                    label='Gemiddelde')
 
 
         line_styles = self.line_styles(identifiers)
