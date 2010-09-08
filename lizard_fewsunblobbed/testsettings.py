@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'lizard_fewsunblobbed',
     'lizard_map',
     'lizard_ui',
+    'compressor',
     'staticfiles',
     'django_nose',
     'django.contrib.admin',

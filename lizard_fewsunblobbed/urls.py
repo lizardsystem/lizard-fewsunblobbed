@@ -10,6 +10,7 @@ urlpatterns = patterns(
         'lizard_fewsunblobbed.views.fews_browser',
         name="fews_browser",
         ),
+    (r'^map/', include('lizard_map.urls')),
     )
 
 
