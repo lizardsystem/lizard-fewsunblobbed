@@ -40,6 +40,6 @@ class SmokeTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_visit_fews_browser_filter(self):
-        url = reverse('fews_browser') + '?filterkey=23'
+        url = reverse('fews_browser') + '?filterkey=23467'
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
