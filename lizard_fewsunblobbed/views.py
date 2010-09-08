@@ -1,4 +1,5 @@
 from django.core.cache import cache
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
@@ -29,7 +30,7 @@ def fews_browser(request,
         parameters = None
     else:
         filterkey = int(filterkey)
-        found_filter = Filter.objects.get(pk=filterkey)
+        found_filter = get_object_or_404(Filter, pk=filterkey)
         parameter_cache_key = FILTER_CACHE_KEY + str(filterkey)
         parameters = cache.get(parameter_cache_key)
         if parameters is None:
