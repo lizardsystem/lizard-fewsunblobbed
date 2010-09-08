@@ -399,7 +399,6 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                     ls=line_styles[str(identifier)]['avg_linestyle'],
                     label='Gemiddelde')
 
-
         line_styles = self.line_styles(identifiers)
 
         today = datetime.datetime.now()
