@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 ===================================================
 
 
-1.2 (unreleased)
+1.2 (2010-09-22)
 ----------------
 
 - Add extra check when timeserie(filter, location, parameter) returns
