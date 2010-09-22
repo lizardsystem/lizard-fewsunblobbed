@@ -5,7 +5,8 @@ Changelog of lizard-fewsunblobbed
 1.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add extra check when timeserie(filter, location, parameter) returns
+  multiple results. This should never occur, but occurs when using a clients database.
 
 
 1.1 (2010-09-03)

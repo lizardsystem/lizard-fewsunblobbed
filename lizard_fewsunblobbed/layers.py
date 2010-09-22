@@ -1,6 +1,7 @@
 import os
 import datetime
 import copy
+import logging
 from math import sqrt
 
 import mapnik
@@ -9,6 +10,7 @@ from django.core.cache import cache
 from django.db.models import Avg
 from django.db.models import Min
 from django.db.models import Max
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 from lizard_fewsunblobbed.models import Filter
@@ -20,6 +22,9 @@ from lizard_map import workspace
 from lizard_map.adapter import Graph
 from lizard_map.models import ICON_ORIGINALS
 from lizard_map.symbol_manager import SymbolManager
+
+
+logger = logging.getLogger('lizard_fewsunblobbed.layers')
 
 # maps filter ids to icons
 # TODO: remove from this file to a generic place
@@ -160,6 +165,23 @@ def fews_point_style(filterkey, nodata=False):
     return point_style
 
 
+def fews_timeserie(filterkey, locationkey, parameterkey):
+    """Get fews timeserie from filter, location, parameter. Beware:
+    sometimes multiple items are returned."""
+
+    result = Timeserie.objects.filter(
+        filterkey=filterkey,
+        locationkey=locationkey,
+        parameterkey=parameterkey)
+    if len(result) == 0:
+        raise Http404
+    elif len(result) > 1:
+        logger.warn('Multiple timeserie objects found for '
+                    'filter, location, parameter = '
+                    '(%s, %s, %s)' % (filterkey, locationkey, parameterkey))
+    return result[0]
+
+
 class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     """
     Should be registered as adapter_fews
@@ -271,11 +293,10 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         return result
 
     def values(self, identifier, start_date, end_date):
-        timeserie = get_object_or_404(
-            Timeserie,
-            locationkey=identifier['locationkey'],
-            filterkey=self.filterkey,
-            parameterkey=self.parameterkey)
+        timeserie = fews_timeserie(
+            self.filterkey,
+            identifier['locationkey'],
+            self.parameterkey)
         timeseriedata = timeserie.timeseriedata.filter(
             tsd_time__gte=start_date,
             tsd_time__lte=end_date)
@@ -303,11 +324,10 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
         !!layout params come from the graph_edit screen, see also image(..)
         """
-        timeserie = get_object_or_404(
-            Timeserie,
-            filterkey=self.filterkey,
-            locationkey=locationkey,
-            parameterkey=self.parameterkey)
+        timeserie = fews_timeserie(
+            self.filterkey,
+            locationkey,
+            self.parameterkey)
 
         identifier = {'locationkey': timeserie.locationkey.pk}
         if layout is not None:
@@ -412,11 +432,10 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         legend = None
         for identifier in identifiers:
             # Find database object that contains the timeseries data.
-            timeserie = get_object_or_404(
-                Timeserie,
-                locationkey=identifier['locationkey'],
-                filterkey=self.filterkey,
-                parameterkey=self.parameterkey)
+            timeserie = fews_timeserie(
+                self.filterkey,
+                identifier['locationkey'],
+                self.parameterkey)
             timeseriedata = timeserie.timeseriedata.filter(
                 tsd_time__gte=start_date,
                 tsd_time__lte=end_date)
