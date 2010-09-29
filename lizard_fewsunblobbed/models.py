@@ -9,20 +9,20 @@ from lizard_map import coordinates
 
 
 class Filter(AL_Node):
-    # use 'id' and not fkey as treebeard needs this name (is hardcoded)
 
     class Meta:
         verbose_name = _("Filter")
         verbose_name_plural = _("Filters")
 
+    # treebeard expects (hardcoded) fields 'id' and 'parent', while
+    # fews exposes fkey and parentfkey.
     id = models.IntegerField(primary_key=True, db_column='fkey')
-    # since 'id' is already used us another name
+    # since 'id' is already used, we remap 'id' to 'fews_id'.
     fews_id = models.CharField(max_length=64, unique=True, db_column='id')
     name = models.CharField(max_length=256, blank=True)
     description = models.CharField(max_length=256, blank=True)
     issubfilter = models.BooleanField()
-    # Use 'parent' and not parentfkey as treebeard needs this name (is
-    # hardcoded)
+    # treebeard requirement (see 'id')
     parent = models.ForeignKey('Filter', null=True, blank=True,
                                db_column='parentfkey')
     isendnode = models.BooleanField()
