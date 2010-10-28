@@ -142,6 +142,14 @@ class Parameter(models.Model):
 
 
 class Timeserie(models.Model):
+    """Specifies a time series of a specific parameter.
+
+    Examples of parameters are water discharge, zinc concentration and chloride
+    concentration.
+
+    To get to the events that belong to the current Timeserie, use the implicit
+    attribute 'timeseriedata', which is a Manager for the events.
+    """
 
     class Meta:
         verbose_name = _("Timeserie")
@@ -181,6 +189,17 @@ class Timeserie(models.Model):
 
 
 class Timeseriedata(composite.CompositePKModel):
+    """Specifies the value of a parameter at a specific time.
+
+    Note that a WaterbalanceTimeserieData does not specify the parameter
+    itself, only its value at a specific time.
+
+    Instance variables:
+    * value -- value of the parameter
+    * time -- time at which the value was measured
+    * timeserie -- link to the time serie
+
+    """
     tkey = models.ForeignKey(Timeserie,
                              primary_key=True,
                              db_column='tkey',
