@@ -1,3 +1,6 @@
+# (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.txt.
+# $Id$
+
 from django.conf import settings
 from django.core import serializers
 from django.db import models
