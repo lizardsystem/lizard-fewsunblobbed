@@ -12,10 +12,7 @@ from lizard_map import coordinates
 
 
 class Filter(AL_Node):
-
-    class Meta:
-        verbose_name = _("Filter")
-        verbose_name_plural = _("Filters")
+    """Fews filter object."""
 
     # treebeard expects (hardcoded) fields 'id' and 'parent', while
     # fews exposes fkey and parentfkey.
@@ -32,6 +29,8 @@ class Filter(AL_Node):
     node_order_by = ['name']
 
     class Meta:
+        verbose_name = _("Filter")
+        verbose_name_plural = _("Filters")
         db_table = u'filter'
 
     def __unicode__(self):
@@ -95,10 +94,8 @@ class Filter(AL_Node):
 
 
 class Location(models.Model):
-
-    class Meta:
-        verbose_name = _("Location")
-        verbose_name_plural = _("Locations")
+    """Fews location object.
+    """
 
     lkey = models.IntegerField(primary_key=True)
     id = models.CharField(max_length=64, unique=True)
@@ -114,6 +111,8 @@ class Location(models.Model):
     latitude = models.FloatField(blank=True)
 
     class Meta:
+        verbose_name = _("Location")
+        verbose_name_plural = _("Locations")
         db_table = u'location'
 
     def __unicode__(self):
@@ -124,10 +123,7 @@ class Location(models.Model):
 
 
 class Parameter(models.Model):
-
-    class Meta:
-        verbose_name = _("Parameter")
-        verbose_name_plural = _("Parameters")
+    """Fews parameter object."""
 
     pkey = models.IntegerField(primary_key=True)
     id = models.CharField(max_length=64, unique=True)
@@ -138,6 +134,8 @@ class Parameter(models.Model):
     parametergroup = models.CharField(max_length=64, blank=True)
 
     class Meta:
+        verbose_name = _("Parameter")
+        verbose_name_plural = _("Parameters")
         db_table = u'parameter'
 
     def __unicode__(self):
@@ -145,7 +143,7 @@ class Parameter(models.Model):
 
 
 class Timeserie(models.Model):
-    """Specifies a time series of a specific parameter.
+    """Fews timeserie object. Specifies a time series of a specific parameter.
 
     Examples of parameters are water discharge, zinc concentration and chloride
     concentration.
@@ -153,10 +151,6 @@ class Timeserie(models.Model):
     To get to the events that belong to the current Timeserie, use the implicit
     attribute 'timeseriedata', which is a Manager for the events.
     """
-
-    class Meta:
-        verbose_name = _("Timeserie")
-        verbose_name_plural = _("Timeseries")
 
     tkey = models.IntegerField(primary_key=True)
     moduleinstanceid = models.CharField(max_length=64, blank=True)
@@ -166,6 +160,8 @@ class Timeserie(models.Model):
     parameterkey = models.ForeignKey(Parameter, db_column='parameterkey')
 
     class Meta:
+        verbose_name = _("Timeserie")
+        verbose_name_plural = _("Timeseries")
         db_table = u'timeserie'
 
     def __unicode__(self):
@@ -192,7 +188,8 @@ class Timeserie(models.Model):
 
 
 class Timeseriedata(composite.CompositePKModel):
-    """Specifies the value of a parameter at a specific time.
+    """Fews timeseriedata object. Specifies the value of a parameter at
+    a specific time.
 
     Note that a WaterbalanceTimeserieData does not specify the parameter
     itself, only its value at a specific time.
@@ -203,14 +200,11 @@ class Timeseriedata(composite.CompositePKModel):
     * timeserie -- link to the time serie
 
     """
+
     tkey = models.ForeignKey(Timeserie,
                              primary_key=True,
                              db_column='tkey',
                              related_name='timeseriedata')
-
-    class Meta:
-        verbose_name = _("Timeserie data")
-        verbose_name_plural = _("Timeseries data")
 
     # ^^^ TODO: this is mighty slow in the django admin.  It grabs all the
     # timeserie names/ids.
@@ -221,6 +215,8 @@ class Timeseriedata(composite.CompositePKModel):
     tsd_comments = models.CharField(max_length=256, blank=True)
 
     class Meta:
+        verbose_name = _("Timeserie data")
+        verbose_name_plural = _("Timeseries data")
         db_table = u'timeseriedata'
 
     def __unicode__(self):
