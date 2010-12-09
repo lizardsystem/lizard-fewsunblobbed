@@ -13,7 +13,7 @@ FILTER_CACHE_KEY = 'lizard.fewsunblobbed.views.filter_cache_key'
 
 
 def fews_browser(request,
-                 javascript_click_handler=None,
+                 javascript_click_handler='popup_click_handler',
                  template="lizard_fewsunblobbed/fews_browser.html"):
     workspace_manager = WorkspaceManager(request)
     workspaces = workspace_manager.load_or_create()
