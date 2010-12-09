@@ -5,6 +5,8 @@ Changelog of lizard-fewsunblobbed
 1.3 (unreleased)
 ----------------
 
+- Enabled default click handler on base fews browser page.
+
 - Solved #2148 by 'merging' Meta classes in model definitions.
 
 
