@@ -43,3 +43,52 @@ class SmokeTest(TestCase):
         url = reverse('fews_browser') + '?filterkey=23467'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+
+class FunctionTest(TestCase):
+
+    def setUp(self):
+        self.filters = [
+            {'data': {'fews_id': 'fews_id_1'}, 'children': []},
+            {'data': {'fews_id': 'fews_id_2'}},
+            {'data': {'fews_id': 'fews_id_3'}, 'children': [
+                    {'data': {'fews_id': 'fews_id_31'}, 'children': []},
+                    {'data': {'fews_id': 'fews_id_32'}, 'children': []},
+                    {'data': {'fews_id': 'fews_id_33'}, 'children': [
+                            {'data': {'fews_id': 'fews_id_331'}},
+                            ]},
+                    {'data': {'fews_id': 'fews_id_34'}, 'children': []},
+                    ]},
+            {'data': {'fews_id': 'fews_id_4'}, 'children': []},
+            ]
+
+
+    def test_filter_exclude(self):
+        exclude_filters = ['fews_id_2', 'fews_id_4', ]
+        expected = [
+            {'data': {'fews_id': 'fews_id_1'}, 'children': []},
+            {'data': {'fews_id': 'fews_id_3'}, 'children': [
+                    {'data': {'fews_id': 'fews_id_31'}, 'children': []},
+                    {'data': {'fews_id': 'fews_id_32'}, 'children': []},
+                    {'data': {'fews_id': 'fews_id_33'}, 'children': [
+                            {'data': {'fews_id': 'fews_id_331'}},
+                            ]},
+                    {'data': {'fews_id': 'fews_id_34'}, 'children': []},
+                    ]},
+            ]
+        result = views.filter_exclude(self.filters, exclude_filters)
+        self.assertEqual(result, expected)
+
+    def test_filter_exclude2(self):
+        exclude_filters = ['fews_id_33', 'fews_id_4', ]
+        expected = [
+            {'data': {'fews_id': 'fews_id_1'}, 'children': []},
+            {'data': {'fews_id': 'fews_id_2'}},
+            {'data': {'fews_id': 'fews_id_3'}, 'children': [
+                    {'data': {'fews_id': 'fews_id_31'}, 'children': []},
+                    {'data': {'fews_id': 'fews_id_32'}, 'children': []},
+                    {'data': {'fews_id': 'fews_id_34'}, 'children': []},
+                    ]},
+            ]
+        result = views.filter_exclude(self.filters, exclude_filters)
+        self.assertEqual(result, expected)

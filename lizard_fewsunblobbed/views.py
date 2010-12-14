@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
@@ -10,6 +13,18 @@ from lizard_map.daterange import DateRangeForm
 from lizard_map.workspace import WorkspaceManager
 
 FILTER_CACHE_KEY = 'lizard.fewsunblobbed.views.filter_cache_key'
+logger = logging.getLogger(__name__)
+
+
+def filter_exclude(filters, exclude_filters):
+    """ Filter out fews filters recursively. """
+    for f in filters:
+        if 'children' in f:
+            f['children'] = filter_exclude(f['children'], exclude_filters)
+
+    # Do not get confused, filter is a build-in function.
+    return filter(
+        lambda f: f['data']['fews_id'] not in exclude_filters, filters)
 
 
 def fews_browser(request,
@@ -19,9 +34,24 @@ def fews_browser(request,
     workspaces = workspace_manager.load_or_create()
     date_range_form = DateRangeForm(
         current_start_end_dates(request, for_form=True))
+
     filters = cache.get(FILTER_CACHE_KEY)
-    if filters is None:
-        filters = Filter.dump_bulk()
+    # Filters is a list of dicts (keys: 'data', 'id', 'children')
+    # In data, there's a key 'fews_id'
+    if 1: # filters is None:
+        filters = Filter.dump_bulk()  # Optional: parent
+
+        # Filter out some root filters: get settings.
+        try:
+            exclude_filters = settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS
+            logger.info('Excluding filters: %r.' % exclude_filters)
+        except AttributeError:
+            exclude_filters = ['ZZL_Meteo', 'ZZL_ZUIV_RUW', ]
+            logger.info('No setting FEWS_UNBLOBBED_EXCLUDE_FILTERS.')
+
+        # Filter the filters.
+        filters = filter_exclude(filters, exclude_filters)
+
         cache.set(FILTER_CACHE_KEY, filters, 8 * 60 * 60)
 
     filterkey = request.GET.get('filterkey', None)

@@ -208,16 +208,30 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         layer.datasource = mapnik.PointDatasource()
         layer_nodata.datasource = mapnik.PointDatasource()
         for info in self._timeseries():
+            # print info['rd_x'], info['rd_y'], info['location_name']
             layer.datasource.add_point(
                 info['rd_x'], info['rd_y'], 'Name', info['location_name'])
+            layer.datasource.add_point(
+            #     info['rd_x']+0.1, info['rd_y']+0.1, 'Name', info['location_name'])
+            # layer.datasource.add_point(
+            #     info['rd_x']-0.1, info['rd_y']-0.1, 'Name', info['location_name'])
+            # layer.datasource.add_point(
+            #     info['rd_x']+0.1, info['rd_y']-0.1, 'Name', info['location_name'])
             # TODO: layer only points with data, but it misses some points
             if not info['has_data']:
                 layer_nodata.datasource.add_point(
                     info['rd_x'], info['rd_y'], 'Name', info['location_name'])
 
+        # layer.datasource.add_point(114160.0, 548273.0, 'Name', 'Den Helder/De Kooy')
+        # layer.datasource.add_point(112899.0, 479292.0,'Name', 'Schiphol')
+        # layer.datasource.add_point(10256.0, 583664.0,'Name', 'K13/Alpha')
+        # layer.datasource.add_point(177326.0,  505596.0,'Name', 'zandwasser')
+
+        # print 'filterkey, paramkey: %r, %r' % (filterkey, parameterkey)
+
         point_style = fews_point_style(filterkey, nodata=False)
         # generate "unique" point style name and append to layer
-        style_name = "Style with data %s::%s " % (filterkey, parameterkey)
+        style_name = "Style with data %s::%s" % (filterkey, parameterkey)
         styles[style_name] = point_style
         layer.styles.append(style_name)
 

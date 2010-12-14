@@ -34,3 +34,12 @@ versions), add them as an "svn external" in the ``local_checkouts/`` directory
 and add them to the ``develop =`` list in buildout.cfg.
 
 Tests can always be run with ``bin/test`` or ``bin\test.exe``.
+
+
+Settings
+--------
+
+In your settings.py, it is possible to define some filters to be
+excluded from the filterlist.
+
+FEWS_UNBLOBBED_EXCLUDE_FILTERS = ['ZZL_Meteo', 'ZZL_ZUIV_RUW', ]

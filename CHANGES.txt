@@ -5,7 +5,8 @@ Changelog of lizard-fewsunblobbed
 1.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added option to exclude filters from your filters
+  tree. FEWS_UNBLOBBED_EXCLUDE_FILTERS in your settings.py.
 
 
 1.3 (2010-12-09)
