@@ -38,7 +38,7 @@ def fews_browser(request,
     filters = cache.get(FILTER_CACHE_KEY)
     # Filters is a list of dicts (keys: 'data', 'id', 'children')
     # In data, there's a key 'fews_id'
-    if 1: # filters is None:
+    if filters is None:
         filters = Filter.dump_bulk()  # Optional: parent
 
         # Filter out some root filters: get settings.
