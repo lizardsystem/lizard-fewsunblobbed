@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 ===================================================
 
 
-1.4 (unreleased)
+1.4 (2010-12-14)
 ----------------
 
 - Added option to exclude filters from your filters
