@@ -5,7 +5,7 @@ Changelog of lizard-fewsunblobbed
 1.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added tests.
 
 
 1.4 (2010-12-14)

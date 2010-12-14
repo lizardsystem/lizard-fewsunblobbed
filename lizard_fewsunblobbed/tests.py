@@ -2,6 +2,10 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
 
+from lizard_fewsunblobbed.layers import WorkspaceItemAdapterFewsUnblobbed
+from lizard_fewsunblobbed.layers import fews_point_style
+from lizard_fewsunblobbed.layers import fews_symbol_name
+from lizard_fewsunblobbed.layers import fews_timeserie
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Parameter
@@ -45,6 +49,56 @@ class SmokeTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+class AdapterTest(TestCase):
+
+    def mock_timeseries():
+        return {
+            'rd_x': 500000,
+            'rd_y': 200000,
+            'object': None,
+            'location_name': 'location.name',
+            'name': 'name',
+            'shortname': 'shortname',
+            'workspace_item': None,
+            'identifier': {'locationkey': 1},
+            'google_coords': (0, 0),
+            'has_data': True,
+            }
+
+    def setUp(self):
+        self.mock_workspace_item = None
+        self.adapter = WorkspaceItemAdapterFewsUnblobbed(
+            self.mock_workspace_item,
+            layer_arguments={'filterkey': 'filterkey',
+                             'parameterkey': 'parameterkey'})
+        self._timeseries = self.adapter._timeseries
+        self.adapter._timeseries = self.mock_timeseries
+        f = Filter(id=1, fews_id='default', name='default',
+                   issubfilter=False, isendnode=True)
+        f.save()
+
+    def test_smoke(self):
+        pass
+
+    def test_fews_symbol_name(self):
+        fews_symbol_name(1, nodata=False)
+        fews_symbol_name(1, nodata=True)
+
+    def test_fews_point_style(self):
+        fews_point_style(1, nodata=False)
+        fews_point_style(1, nodata=True)
+
+    # def test_fews_timeserie(self):
+    #     fews_timeserie('default', 'location', 'parameter')
+
+    def tearDown(self):
+        self.adapter._timeseries = self._timeseries
+
+        # Necessary, because test_available_and_empty will else
+        # fail. TODO: find out why
+        Filter.objects.all().delete()
+
+
 class FunctionTest(TestCase):
 
     def setUp(self):
@@ -61,7 +115,6 @@ class FunctionTest(TestCase):
                     ]},
             {'data': {'fews_id': 'fews_id_4'}, 'children': []},
             ]
-
 
     def test_filter_exclude(self):
         exclude_filters = ['fews_id_2', 'fews_id_4', ]
