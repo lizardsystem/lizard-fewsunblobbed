@@ -1,11 +1,12 @@
 Changelog of lizard-fewsunblobbed
-===================================================
+=================================
 
 
 1.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added hack that works around mapnik bug: we draw every point four times.
+  One in the right location, three with 10cm offsets.
 
 
 1.5 (2010-12-14)

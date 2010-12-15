@@ -211,6 +211,14 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             # print info['rd_x'], info['rd_y'], info['location_name']
             layer.datasource.add_point(
                 info['rd_x'], info['rd_y'], 'Name', info['location_name'])
+            # Due to mapnik bug, we render the very same point 10cm to the top
+            # right, bottom left, etc.
+            layer.datasource.add_point(
+                info['rd_x'] + 0.1, info['rd_y'] + 0.1, 'Name', info['location_name'])
+            layer.datasource.add_point(
+                info['rd_x'] - 0.1, info['rd_y'] - 0.1, 'Name', info['location_name'])
+            layer.datasource.add_point(
+                info['rd_x'] + 0.1, info['rd_y'] - 0.1, 'Name', info['location_name'])
             # TODO: layer only points with data, but it misses some points
             if not info['has_data']:
                 layer_nodata.datasource.add_point(
