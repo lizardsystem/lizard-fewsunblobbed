@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-1.7 (unreleased)
+1.7 (2011-01-31)
 ----------------
 
 - Fixed bug for endnodes at the root of the filtertree.
