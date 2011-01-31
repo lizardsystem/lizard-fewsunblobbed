@@ -15,7 +15,7 @@
       {% if node.data.isendnode %}
         <li>
           {% if node.data.has_parameters %}
-          <a href="{% url fews_browser %}?filterkey={{ child.id }}"
+          <a href="{% url fews_browser %}?filterkey={{ node.id }}"
              class="file">
             {{ node.data.name }}
           </a>
