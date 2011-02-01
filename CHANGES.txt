@@ -2,10 +2,10 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-1.8 (unreleased)
+1.8 (2011-02-01)
 ----------------
 
-- Nothing changed yet.
+- Added option crumbs_prepend (see lizard_ui).
 
 
 1.7 (2011-01-31)

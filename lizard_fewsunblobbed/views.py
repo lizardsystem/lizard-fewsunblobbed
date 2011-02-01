@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -29,7 +30,8 @@ def filter_exclude(filters, exclude_filters):
 
 def fews_browser(request,
                  javascript_click_handler='popup_click_handler',
-                 template="lizard_fewsunblobbed/fews_browser.html"):
+                 template="lizard_fewsunblobbed/fews_browser.html",
+                 crumbs_prepend=None):
     workspace_manager = WorkspaceManager(request)
     workspaces = workspace_manager.load_or_create()
     date_range_form = DateRangeForm(
@@ -68,6 +70,13 @@ def fews_browser(request,
                 timeserie__filterkey=filterkey).distinct()
             cache.set(parameter_cache_key, parameters, 8 * 60 * 60)
 
+    if crumbs_prepend is not None:
+        crumbs = crumbs_prepend
+    else:
+        crumbs = [{'name': 'home', 'url': '/'}]
+    crumbs.append({'name': 'metingen',
+                   'url': reverse('fews_browser')})
+
     return render_to_response(
         template,
         {'filters': filters,
@@ -76,5 +85,6 @@ def fews_browser(request,
          'date_range_form': date_range_form,
          'javascript_hover_handler': 'popup_hover_handler',
          'javascript_click_handler': javascript_click_handler,
-         'workspaces': workspaces},
+         'workspaces': workspaces,
+         'crumbs': crumbs},
         context_instance=RequestContext(request))
