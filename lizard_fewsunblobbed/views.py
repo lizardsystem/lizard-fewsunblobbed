@@ -71,7 +71,7 @@ def fews_browser(request,
             cache.set(parameter_cache_key, parameters, 8 * 60 * 60)
 
     if crumbs_prepend is not None:
-        crumbs = crumbs_prepend
+        crumbs = list(crumbs_prepend)
     else:
         crumbs = [{'name': 'home', 'url': '/'}]
     crumbs.append({'name': 'metingen',
