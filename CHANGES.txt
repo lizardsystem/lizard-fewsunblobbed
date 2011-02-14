@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-1.9 (unreleased)
+1.9 (2011-02-14)
 ----------------
 
 - Fixed breadcrumbs bug.
