@@ -266,7 +266,11 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 {'rd_x': location.x,
                  'rd_y': location.y,
                  'object': timeserie,
-                 'location_name': str(location.name),
+                 'location_name': location.name.encode('ascii', 'replace'),
+                 # ^^^ This used to be ``str(location.name)``.
+                 # Which fails on non-ascii input.
+                 # TODO: does it really need to be a string?
+                 # It seems to be proper unicode to begin with.
                  'name': name,
                  'shortname': shortname,
                  'workspace_item': self.workspace_item,
