@@ -250,14 +250,19 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             # fetching locationkey and parameterkey seems to be very expensive
             parameter = Parameter.objects.get(pk=self.parameterkey)
 
-            # pre load all used locations in a dictionary ! < 1 sec
-            locations = dict([(location.pk, location) \
-                                  for location in Location.objects.filter(
+            # Pre load all used locations in a dictionary.
+            # In some cases it takes 3 seconds?
+            locations = dict([(location.pk, location)
+                              for location in Location.objects.filter(
                         timeserie__filterkey=self.filterkey)])
             result = []
-            for timeserie in Timeserie.objects.filter(
-                filterkey=self.filterkey,
-                parameterkey=self.parameterkey):
+            related_timeseries = list(Timeserie.objects.filter(
+                    filterkey=self.filterkey,
+                    parameterkey=self.parameterkey))
+
+            # Fetch cached has_data dict for all timeseries.
+            timeseries_has_data = Timeserie.has_data_dict()
+            for timeserie in related_timeseries:
                 location = locations[timeserie.locationkey_id]
                 name = u'%s (%s): %s' % (parameter.name, parameter.unit,
                                          location.name)
@@ -276,8 +281,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                  'workspace_item': self.workspace_item,
                  'identifier': {'locationkey': location.pk},
                  'google_coords': location.google_coords(),
-                 'has_data': timeserie.has_data,
-                 # ^^^ Most expensive: ~100 locs per second
+                 'has_data': timeserie.pk in timeseries_has_data,
                  })
             cache.set(cache_key, result, 8 * 60 * 60)
         else:

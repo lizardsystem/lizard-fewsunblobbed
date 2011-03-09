@@ -1,14 +1,18 @@
 # (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.txt.
 # $Id$
 
+import logging
 from django.conf import settings
 from django.core import serializers
+from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext as _
 
 from composite_pk import composite
 from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
+
+logger = logging.getLogger(__name__)
 
 
 class Filter(AL_Node):
@@ -182,9 +186,39 @@ class Timeserie(models.Model):
     def data_count(self):
         return self.timeseriedata.all().count()
 
+    @classmethod
+    def has_data_dict(cls, ignore_cache=False):
+        """
+        Return for each timeserie id if it has data.
+
+        If a timeserie has data, its id is listed in the returned
+        dict. Handy when looping over great amounts of timeseries.
+        """
+        cache_key = 'lizard_fewsunblobbed.models.timeserie_hasdata'
+        result = cache.get(cache_key)
+        if result is None or ignore_cache:
+            logger.info('Populating Timeserie.has_data_dict...')
+            tsd = Timeseriedata.objects.all().values('tkey').distinct()
+            tsd_dict = {}
+            for row in tsd:
+                tsd_dict[row['tkey']] = None  # Just make an entry
+            cache.set(cache_key, tsd_dict, 8 * 60 * 60)
+            result = tsd_dict
+        return result
+
     @property
     def has_data(self):
-        return self.timeseriedata.exists()
+        """
+        Return true if this timeserie has data, false otherwise.
+
+        Uses has_data_dict index.
+        """
+        if self.pk in self.has_data_dict():
+            return True
+        else:
+            return False
+        # too slow
+        #return self.timeseriedata.exists()
 
 
 class Timeseriedata(composite.CompositePKModel):

@@ -6,8 +6,9 @@ Changelog of lizard-fewsunblobbed
 -----------------
 
 - Added fews_unblobbed_cache management command. This enables cronjob
-  to regularly refresh the cache, so users will always fetch a page
-  with a cached filter tree.
+  to regularly refresh the cache. Two levels of cache are implemented:
+  filter tree and Timeserie.has_data_dict. This greatly enhances the
+  user experience.
 
 
 1.9 (2011-02-14)
