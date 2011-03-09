@@ -21,3 +21,19 @@ How to make a sqlite fews-unblobbed database::
 
 (Finished! - it gives the errors because if you have existing tables,
 the script will remove the tables first)
+
+
+Deploying lizard-fewsunblobbed
+------------------------------
+
+Add crontab job to your deploy.cfg to run "bin/django
+fews_unblobbed_cache" every 8 hours. This way visitors of the page
+will always get its filters from the cache (= huge user experience
+boost).
+
+deploy.cfg::
+
+    [fews-unblobbed-cronjob]
+    recipe = z3c.recipe.usercrontab
+    times = * */8 * * *
+    command = ${buildout:bin-directory}/django fews_unblobbed_cache

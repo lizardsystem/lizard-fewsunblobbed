@@ -5,7 +5,9 @@ Changelog of lizard-fewsunblobbed
 1.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Added fews_unblobbed_cache management command. This enables cronjob
+  to regularly refresh the cache, so users will always fetch a page
+  with a cached filter tree.
 
 
 1.9 (2011-02-14)

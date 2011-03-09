@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -28,6 +29,35 @@ def filter_exclude(filters, exclude_filters):
         lambda f: f['data']['fews_id'] not in exclude_filters, filters)
 
 
+def fews_filters(ignore_cache=False):
+    """
+    Return fews filter tree.
+
+    Exclude filters from settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS.
+    """
+    filters = cache.get(FILTER_CACHE_KEY)
+    # Filters is a list of dicts (keys: 'data', 'id', 'children')
+    # In data, there's a key 'fews_id'
+    if filters is None or ignore_cache:
+        filters = Filter.dump_bulk()  # Optional: parent
+
+        # Filter out some root filters: get settings.
+        try:
+            exclude_filters = settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS
+            logger.info('Excluding filters: %r.' % exclude_filters)
+        except AttributeError:
+            exclude_filters = ['ZZL_Meteo', 'ZZL_ZUIV_RUW', ]
+            logger.warning(
+                'No setting FEWS_UNBLOBBED_EXCLUDE_FILTERS.'
+                'By default ZZL_Meteo and ZZL_ZUIV_RUW are excluded.')
+
+        # Filter the filters.
+        filters = filter_exclude(filters, exclude_filters)
+
+        cache.set(FILTER_CACHE_KEY, filters, 8 * 60 * 60)  # 8 hours
+    return filters
+
+
 def fews_browser(request,
                  javascript_click_handler='popup_click_handler',
                  template="lizard_fewsunblobbed/fews_browser.html",
@@ -37,24 +67,7 @@ def fews_browser(request,
     date_range_form = DateRangeForm(
         current_start_end_dates(request, for_form=True))
 
-    filters = cache.get(FILTER_CACHE_KEY)
-    # Filters is a list of dicts (keys: 'data', 'id', 'children')
-    # In data, there's a key 'fews_id'
-    if filters is None:
-        filters = Filter.dump_bulk()  # Optional: parent
-
-        # Filter out some root filters: get settings.
-        try:
-            exclude_filters = settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS
-            logger.info('Excluding filters: %r.' % exclude_filters)
-        except AttributeError:
-            exclude_filters = ['ZZL_Meteo', 'ZZL_ZUIV_RUW', ]
-            logger.info('No setting FEWS_UNBLOBBED_EXCLUDE_FILTERS.')
-
-        # Filter the filters.
-        filters = filter_exclude(filters, exclude_filters)
-
-        cache.set(FILTER_CACHE_KEY, filters, 8 * 60 * 60)
+    filters = fews_filters()
 
     filterkey = request.GET.get('filterkey', None)
     if filterkey is None:
