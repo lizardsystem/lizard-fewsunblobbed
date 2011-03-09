@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-1.10 (unreleased)
+1.10 (2011-03-09)
 -----------------
 
 - Added fews_unblobbed_cache management command. This enables cronjob
