@@ -229,9 +229,21 @@ class Timeseriedata(composite.CompositePKModel):
     itself, only its value at a specific time.
 
     Instance variables:
-    * value -- value of the parameter
-    * time -- time at which the value was measured
-    * timeserie -- link to the time serie
+      * value *
+        value of the parameter
+      * time *
+        time at which the value was measured
+      * timeserie *
+        link to the time serie
+
+    ..todo::
+
+      lizard_fewsunblobbeb.Timeseriedata has two primary keys although Django
+      does not support multiple primary keys. This means that we can use this
+      model to read from a FEWS unblobbed database but not write to.
+
+      http://code.djangoproject.com/ticket/373 describes the lack of support
+      for multiple keys and also a workaround.
 
     """
 
