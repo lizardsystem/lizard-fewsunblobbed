@@ -62,11 +62,6 @@ def fews_browser(request,
                  javascript_click_handler='popup_click_handler',
                  template="lizard_fewsunblobbed/fews_browser.html",
                  crumbs_prepend=None):
-    workspace_manager = WorkspaceManager(request)
-    workspaces = workspace_manager.load_or_create()
-    date_range_form = DateRangeForm(
-        current_start_end_dates(request, for_form=True))
-
     filters = fews_filters()
 
     filterkey = request.GET.get('filterkey', None)
@@ -95,9 +90,7 @@ def fews_browser(request,
         {'filters': filters,
          'found_filter': found_filter,
          'parameters': parameters,
-         'date_range_form': date_range_form,
          'javascript_hover_handler': 'popup_hover_handler',
          'javascript_click_handler': javascript_click_handler,
-         'workspaces': workspaces,
          'crumbs': crumbs},
         context_instance=RequestContext(request))

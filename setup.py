@@ -19,7 +19,7 @@ install_requires = [
     'django-nose',
     'django-staticfiles',
     'django-treebeard >= 1.61',
-    'lizard-map >= 0.11',
+    'lizard-map >= 1.60',
     'lizard-ui >= 1.3',
     ],
 
