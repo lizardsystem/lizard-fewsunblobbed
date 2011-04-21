@@ -5,7 +5,6 @@ from django.test.client import Client
 from lizard_fewsunblobbed.layers import WorkspaceItemAdapterFewsUnblobbed
 from lizard_fewsunblobbed.layers import fews_point_style
 from lizard_fewsunblobbed.layers import fews_symbol_name
-from lizard_fewsunblobbed.layers import fews_timeserie
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Parameter

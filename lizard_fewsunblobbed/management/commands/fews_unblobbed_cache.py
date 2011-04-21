@@ -2,7 +2,7 @@
 Retrieves fews unblobbed filter tree (and store it in the cache).
 """
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from lizard_fewsunblobbed.views import fews_filters
 from lizard_fewsunblobbed.models import Timeserie
 import logging
