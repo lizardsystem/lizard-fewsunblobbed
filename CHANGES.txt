@@ -5,6 +5,8 @@ Changelog of lizard-fewsunblobbed
 1.12 (unreleased)
 -----------------
 
+- Changed graph lines to 'o-' (dot-line).
+
 - Removed unused imports.
 
 
