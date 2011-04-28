@@ -493,7 +493,19 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         graph.axes.set_ylim(y_min, y_max)
 
         if legend:
-            graph.legend()
+            ## Quick fix for demo. Needs additional work.
+            graph.legend_on_bottom_height = 0.3
+            graph.axes.legend(bbox_to_anchor=(0., -0.65, 1., 1.),
+            loc=3, ncol=2, mode="expand", borderaxespad=0.)
+
+        if "horizontal_lines" in layout_extra:
+            for horizontal_line in layout_extra['horizontal_lines']:
+                graph.axes.axhline(
+                    horizontal_line['value'],
+                    ls=horizontal_line['style']['linestyle'],
+                    color=horizontal_line['style']['color'],
+                    lw=horizontal_line['style']['linewidth'],
+                    label=horizontal_line['name'])
 
         graph.add_today()
         return graph.http_png()
