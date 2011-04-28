@@ -5,13 +5,13 @@ Changelog of lizard-fewsunblobbed
 1.14 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Quick fix of legend for demo.
 
 
 1.13 (2011-04-28)
 -----------------
 
-- Nothing changed yet.
+- Quick fix of legend for demo.
 
 
 1.12 (2011-04-27)
