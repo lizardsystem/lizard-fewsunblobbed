@@ -5,7 +5,7 @@ Changelog of lizard-fewsunblobbed
 1.15 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Disabled the legend borders of popup form.
 
 
 1.14 (2011-04-28)

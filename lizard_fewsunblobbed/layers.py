@@ -497,6 +497,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             graph.legend_on_bottom_height = 0.3
             graph.axes.legend(bbox_to_anchor=(0., -0.8, 1., 1.),
             loc=3, ncol=1, mode="expand", borderaxespad=0.)
+            graph.axes.legend_.draw_frame(False)
 
         if "horizontal_lines" in layout_extra:
             for horizontal_line in layout_extra['horizontal_lines']:
