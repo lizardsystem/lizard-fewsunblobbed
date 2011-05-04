@@ -264,6 +264,7 @@ class Timeseriedata(composite.CompositePKModel):
         verbose_name = _("Timeserie data")
         verbose_name_plural = _("Timeseries data")
         db_table = u'timeseriedata'
+        unique_together = (('tkey', 'tsd_time'), )
 
     def __unicode__(self):
         return u'Data for %s: %s = %s' % (self.tkey,
