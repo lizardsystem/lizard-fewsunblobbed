@@ -245,8 +245,18 @@ class Timeseriedata(composite.CompositePKModel):
       http://code.djangoproject.com/ticket/373 describes the lack of support
       for multiple keys and also a workaround.
 
-    """
+      One example where this will affect you is when you try to create and save
+      a Timeseriedata programmatically. Django will report
 
+        ValidationError: [u'Enter a valid date/time in YYYY-MM-DD
+        HH:MM[:ss[.uuuuuu]] format.']
+
+      because it has to work with a dictionarity of values - the two primary
+      keys - where it expects a single value.
+
+      This issue is also reported in Trac in ticket:2590 and ticket:2674.
+
+    """
     tkey = models.ForeignKey(Timeserie,
                              primary_key=True,
                              db_column='tkey',
