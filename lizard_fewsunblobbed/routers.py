@@ -1,5 +1,5 @@
 class FewsUnblobbedRouter(object):
-    """Route all lizard_fewsunblobbed modesl to the 'fews-unblobbed' db."""
+    """Route all lizard_fewsunblobbed models to the 'fews-unblobbed' db."""
 
     def db_for_read(self, model, **hints):
         """Tell django to read our models from 'our' database"""
