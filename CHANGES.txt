@@ -5,6 +5,9 @@ Changelog of lizard-fewsunblobbed
 1.16 (unreleased)
 -----------------
 
+- Depending on lizard-map >= 1.80 now as that does away with the javascript
+  map hover handler. More performance!
+
 - Removed Timeseriedata from admin. See #2590.
 
 

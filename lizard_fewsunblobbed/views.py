@@ -55,7 +55,6 @@ def fews_filters(ignore_cache=False):
 
 
 def fews_browser(request,
-                 javascript_click_handler='popup_click_handler',
                  template="lizard_fewsunblobbed/fews_browser.html",
                  crumbs_prepend=None):
     filters = fews_filters()
@@ -86,7 +85,5 @@ def fews_browser(request,
         {'filters': filters,
          'found_filter': found_filter,
          'parameters': parameters,
-         'javascript_hover_handler': 'popup_hover_handler',
-         'javascript_click_handler': javascript_click_handler,
          'crumbs': crumbs},
         context_instance=RequestContext(request))
