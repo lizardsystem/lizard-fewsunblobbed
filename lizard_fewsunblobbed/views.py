@@ -46,6 +46,10 @@ def fews_filters(ignore_cache=False):
             logger.warning(
                 'No setting FEWS_UNBLOBBED_EXCLUDE_FILTERS.'
                 'By default ZZL_Meteo and ZZL_ZUIV_RUW are excluded.')
+        # ^^^ Who on earth added these hardcoded items in the basic app?
+        # a) settings.get(..., some_default) works fine.
+        # b) Hardcoded settings for zzl? Just add them in the settings.py,
+        #    then, if you're reading from it anyway!
 
         # Filter the filters.
         filters = filter_exclude(filters, exclude_filters)
