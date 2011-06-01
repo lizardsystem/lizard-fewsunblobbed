@@ -20,7 +20,7 @@ install_requires = [
     'django-staticfiles',
     'django-treebeard >= 1.61',
     'lizard-map >= 1.80',
-    'lizard-ui >= 1.3',
+    'lizard-ui >= 1.64',
     ],
 
 tests_require = [

@@ -61,13 +61,14 @@ def fews_filters(ignore_cache=False):
 def fews_browser(request,
                  template="lizard_fewsunblobbed/fews_browser.html",
                  crumbs_prepend=None):
-    filters = fews_filters()
-
     filterkey = request.GET.get('filterkey', None)
+
     if filterkey is None:
+        filters = fews_filters()
         found_filter = None
         parameters = None
     else:
+        filters = []  # We don't need to return them in the template.
         filterkey = int(filterkey)
         found_filter = get_object_or_404(Filter, pk=filterkey)
         parameter_cache_key = FILTER_CACHE_KEY + str(filterkey)

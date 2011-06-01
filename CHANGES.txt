@@ -5,6 +5,10 @@ Changelog of lizard-fewsunblobbed
 1.16 (unreleased)
 -----------------
 
+- Depending on lizard-ui > 1.64 as that allows us to not pass along the full
+  filter tree when viewing one specific filter item: it saves on the transfer
+  time.
+
 - Depending on lizard-map >= 1.80 now as that does away with the javascript
   map hover handler. More performance!
 
