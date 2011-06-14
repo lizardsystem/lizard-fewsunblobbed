@@ -5,7 +5,8 @@ Changelog of lizard-fewsunblobbed
 1.17 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Filter parents are now clickable. The result is all parameters of
+  the filter and its descendants.
 
 
 1.16 (2011-06-03)

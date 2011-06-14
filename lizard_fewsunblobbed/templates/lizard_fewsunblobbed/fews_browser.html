@@ -7,7 +7,7 @@
 {% block sidebar %}
 <div class="sidebarbox sidebarbox-stretched"
      id="accordion">
-  <h2>1: Filters{% block linkback %}{% endblock %}</h2>
+  <h2>1: Filters{% if found_filter %} ({{ found_filter.name }}){% endif %}{% block linkback %}{% endblock %}</h2>
   <ul class="automatic-tree filetree pane accordion-load-next"
       data-next-pane-id="#parameter-pane"
       id="filter-pane">
@@ -37,8 +37,8 @@
     <li class="workspace-acceptable file"
         data-name="{{ found_filter.name }} - {{ parameter.name }}"
         data-adapter-class="adapter_fews"
-        data-adapter-layer-json='{"filterkey": {{ found_filter.pk }}, "parameterkey": {{ parameter.pk }}}'
-        data-filter-id="{{ found_filter.fews_id }}">
+        data-adapter-layer-json='{"filterkey": {{ parameter.filterkey_pk }}, "parameterkey": {{ parameter.pk }}}'
+        data-filter-id="{{ parameter.filterkey_fews_id }}">
       {{ parameter.name }}
     </li>
     {% empty %}

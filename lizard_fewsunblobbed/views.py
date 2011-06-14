@@ -74,8 +74,18 @@ def fews_browser(request,
         parameter_cache_key = FILTER_CACHE_KEY + str(filterkey)
         parameters = cache.get(parameter_cache_key)
         if parameters is None:
-            parameters = Parameter.objects.filter(
-                timeserie__filterkey=filterkey).distinct()
+            param_dict = {}
+            # The loop is slightly inefficient, but we need the source
+            # filterkey in the template.
+            for f in [found_filter] + found_filter.get_descendants():
+                for p in Parameter.objects.filter(timeserie__filterkey=f):
+                    # Add filterkey for use in template
+                    p.filterkey_pk = f.pk
+                    p.filterkey_fews_id = f.fews_id
+                    param_dict[p.id] = p
+
+            parameters = param_dict.values()
+            parameters.sort(key=lambda p: p.name)
             cache.set(parameter_cache_key, parameters, 8 * 60 * 60)
 
     if crumbs_prepend is not None:
