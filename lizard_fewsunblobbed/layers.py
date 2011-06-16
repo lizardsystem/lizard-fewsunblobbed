@@ -24,7 +24,7 @@ from lizard_map.models import ICON_ORIGINALS
 from lizard_map.symbol_manager import SymbolManager
 
 
-logger = logging.getLogger('lizard_fewsunblobbed.layers')
+logger = logging.getLogger('lizard_fewsunblobbed.layers') # pylint: disable=C0103, C0301
 
 # maps filter ids to icons
 # TODO: remove from this file to a generic place
@@ -317,7 +317,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             self.filterkey,
             identifier['locationkey'],
             self.parameterkey)
-        timeseriedata = timeserie.timeseriedata.filter(
+        timeseriedata = timeserie.timeseriedata.order_by("tsd_time").filter(
             tsd_time__gte=start_date,
             tsd_time__lte=end_date)
 
@@ -456,7 +456,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 self.filterkey,
                 identifier['locationkey'],
                 self.parameterkey)
-            timeseriedata = timeserie.timeseriedata.filter(
+            timeseriedata = timeserie.timeseriedata.order_by("tsd_time").filter(
                 tsd_time__gte=start_date,
                 tsd_time__lte=end_date)
 
