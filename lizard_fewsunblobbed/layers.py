@@ -196,7 +196,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             *args, **kwargs)
         self.filterkey = self.layer_arguments['filterkey']
         self.parameterkey = self.layer_arguments['parameterkey']
-        # Check whether we exist.
+        if not 'skip_existence_verification' in kwargs:
+            # ^^^ TODO: hack for testing, needs better solution.
+            self.verify_existence()
+
+    def verify_existence(self):
+        """Raise WorkspaceItemError if we don't exist."""
         try:
             Filter.objects.get(pk=self.filterkey)
         except Filter.DoesNotExist:
