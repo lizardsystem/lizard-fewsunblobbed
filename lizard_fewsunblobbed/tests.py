@@ -65,10 +65,12 @@ class AdapterTest(TestCase):
 
     def setUp(self):
         self.mock_workspace_item = None
+        filter_ = Filter()
+        parameter_ = Parameter()
         self.adapter = WorkspaceItemAdapterFewsUnblobbed(
             self.mock_workspace_item,
-            layer_arguments={'filterkey': 'filterkey',
-                             'parameterkey': 'parameterkey'})
+            layer_arguments={'filterkey': 1,
+                             'parameterkey': 1})
         self._timeseries = self.adapter._timeseries
         self.adapter._timeseries = self.mock_timeseries
         f = Filter(id=1, fews_id='default', name='default',
