@@ -15,7 +15,6 @@ from lizard_fewsunblobbed import views
 
 
 routers  # pyflakes
-views  # pyflakes
 
 
 class SmokeTest(TestCase):
