@@ -470,6 +470,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                             lw=1,
                             color=line_styles[str(identifier)]['color'],
                             label=timeserie.name)
+            graph.axes.set_ylabel(timeserie.parameterkey.unit)
 
             # Apply custom layout parameters.
             if 'layout' in identifier:

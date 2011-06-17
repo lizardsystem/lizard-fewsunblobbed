@@ -5,7 +5,7 @@ Changelog of lizard-fewsunblobbed
 1.18 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Adding unit as the default y-axis label.
 
 
 1.17 (2011-06-16)
