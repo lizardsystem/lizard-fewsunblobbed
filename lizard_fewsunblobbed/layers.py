@@ -192,11 +192,13 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     """
 
     def __init__(self, *args, **kwargs):
+        perform_existence_verification = kwargs.pop(
+            'perform_existence_verification', True)
         super(WorkspaceItemAdapterFewsUnblobbed, self).__init__(
             *args, **kwargs)
         self.filterkey = self.layer_arguments['filterkey']
         self.parameterkey = self.layer_arguments['parameterkey']
-        if not 'skip_existence_verification' in kwargs:
+        if perform_existence_verification:
             # ^^^ TODO: hack for testing, needs better solution.
             self.verify_existence()
 
