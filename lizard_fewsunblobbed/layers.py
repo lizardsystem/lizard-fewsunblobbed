@@ -11,7 +11,6 @@ from django.db.models import Avg
 from django.db.models import Min
 from django.db.models import Max
 from django.http import Http404
-from django.shortcuts import get_object_or_404
 
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
@@ -127,7 +126,7 @@ def fews_symbol_name(filterkey, nodata=False):
     """Find fews symbol name"""
 
     # determine icon layout by looking at filter.id
-    filter_ = get_object_or_404(Filter, pk=filterkey)
+    filter_ = Filter.objects.get(pk=filterkey)
     if str(filter_.fews_id) in LAYER_STYLES:
         icon_style = copy.deepcopy(LAYER_STYLES[str(filter_.fews_id)])
     else:
