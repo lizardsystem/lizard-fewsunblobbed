@@ -69,7 +69,7 @@ class AdapterTest(TestCase):
             self.mock_workspace_item,
             layer_arguments={'filterkey': 1,
                              'parameterkey': 1},
-            perform_existence_verification=True)
+            perform_existence_verification=False)
         self._timeseries = self.adapter._timeseries
         self.adapter._timeseries = self.mock_timeseries
         f = Filter(id=1, fews_id='default', name='default',
