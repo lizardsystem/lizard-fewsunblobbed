@@ -174,7 +174,9 @@ def fews_timeserie(filterkey, locationkey, parameterkey):
         locationkey=locationkey,
         parameterkey=parameterkey)
     if len(result) == 0:
-        raise Http404
+        raise Http404(
+            "Timeserie for filter %s, location %s, param %s not found." % (
+                filterkey, locationkey, parameterkey))
     elif len(result) > 1:
         logger.warn('Multiple timeserie objects found for '
                     'filter, location, parameter = '
