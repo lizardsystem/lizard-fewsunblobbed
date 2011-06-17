@@ -5,6 +5,8 @@ Changelog of lizard-fewsunblobbed
 1.18 (unreleased)
 -----------------
 
+- Implemented extend() in the adapter.
+
 - Adding unit as the default y-axis label.
 
 

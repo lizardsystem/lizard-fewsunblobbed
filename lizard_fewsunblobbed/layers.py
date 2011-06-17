@@ -26,6 +26,7 @@ from lizard_map.symbol_manager import SymbolManager
 
 logger = logging.getLogger('lizard_fewsunblobbed.layers') # pylint: disable=C0103, C0301
 
+EPSILON = 0.0001
 # maps filter ids to icons
 # TODO: remove from this file to a generic place
 LAYER_STYLES = {
@@ -292,6 +293,40 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             for row in result:
                 row['workspace_item'] = self.workspace_item
         return copy.deepcopy(result)
+
+    def extent(self, identifiers=None):
+        """Return extent."""
+        north = None
+        south = None
+        east = None
+        west = None
+
+        wgs0coord_x, wgs0coord_y = coordinates.rd_to_wgs84(0.0, 0.0)
+        for info in self._timeseries():
+            x = info['rd_x']
+            y = info['rd_y']
+            # Ignore rd coordinates (0, 0).
+            if (abs(x - wgs0coord_x) > EPSILON or
+                abs(y - wgs0coord_y) > EPSILON):
+
+                if x > east or east is None:
+                    east = x
+                if x < west or west is None:
+                    west = x
+                if y < south or south is None:
+                    south = y
+                if y > north or north is None:
+                    north = y
+
+        west_transformed, north_transformed = coordinates.rd_to_google(
+            west, north)
+        east_transformed, south_transformed = coordinates.rd_to_google(
+            east, south)
+        return {
+            'north': north_transformed,
+            'west': west_transformed,
+            'south': south_transformed,
+            'east': east_transformed}
 
     def search(self, google_x, google_y, radius=None):
         """Return list of dict {'distance': <float>, 'timeserie':
