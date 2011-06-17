@@ -6,8 +6,11 @@ Changelog of lizard-fewsunblobbed
 -----------------
 
 - Workspace items for filters that aren't found don't "404" the entire site
-  anymore, but they generate a regular error. The workspace mechanism handles
-  that one quite fine, but a 404 not.
+  anymore.
+
+- Raising a WorkspaceItemError in the adapter when the filter/parameter
+  combination doesn't exist anymore. This removes the workspaceitem from the
+  workspace automatically, preventing stuck sites.
 
 
 1.18 (2011-06-17)

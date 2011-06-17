@@ -20,6 +20,7 @@ from lizard_map import coordinates
 from lizard_map import workspace
 from lizard_map.adapter import Graph
 from lizard_map.models import ICON_ORIGINALS
+from lizard_map.models import WorkspaceItemError
 from lizard_map.symbol_manager import SymbolManager
 
 
@@ -194,11 +195,20 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             *args, **kwargs)
         self.filterkey = self.layer_arguments['filterkey']
         self.parameterkey = self.layer_arguments['parameterkey']
+        # Check whether we exist.
+        try:
+            Filter.objects.get(pk=self.filterkey)
+        except Filter.DoesNotExist:
+            raise WorkspaceItemError(
+                "Filter %s not found" % self.filterkey)
+        try:
+            Parameter.objects.get(pk=self.parameterkey)
+        except Parameter.DoesNotExist:
+            raise WorkspaceItemError(
+                "Parameter %s not found" % self.parameterkey)
 
     def layer(self, layer_ids=None, webcolor=None, request=None):
-        """Return layer and styles that render points.
-
-        """
+        """Return layer and styles that render points."""
         layers = []
         styles = {}
         layer = mapnik.Layer("FEWS points layer", coordinates.RD)
