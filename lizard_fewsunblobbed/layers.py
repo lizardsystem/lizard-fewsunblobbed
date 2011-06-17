@@ -24,7 +24,8 @@ from lizard_map.models import WorkspaceItemError
 from lizard_map.symbol_manager import SymbolManager
 
 
-logger = logging.getLogger('lizard_fewsunblobbed.layers') # pylint: disable=C0103, C0301
+logger = logging.getLogger(
+    'lizard_fewsunblobbed.layers')  # pylint: disable=C0103, C0301
 
 EPSILON = 0.0001
 # maps filter ids to icons
@@ -502,7 +503,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 self.filterkey,
                 identifier['locationkey'],
                 self.parameterkey)
-            timeseriedata = timeserie.timeseriedata.order_by("tsd_time").filter(
+            timeseriedata = timeserie.timeseriedata.order_by(
+                "tsd_time").filter(
                 tsd_time__gte=start_date,
                 tsd_time__lte=end_date)
 
