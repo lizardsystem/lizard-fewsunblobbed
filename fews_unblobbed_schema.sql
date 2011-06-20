@@ -1,11 +1,12 @@
 --
--- PostgreSQL database dump
---
+-- PostgreSQL database dump. Deze werkt niet goed, zie
+-- http://public.deltares.nl/display/FEWSDOC/Rdbms+Export voor een
+-- werkende.
 
 --
 -- TOC entry 1483 (class 1259 OID 195810)
 -- Dependencies: 1764 1765 1766 3
--- Name: filter; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: filter; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
 DROP TABLE filter;
@@ -31,7 +32,7 @@ CREATE TABLE filter (
 --
 -- TOC entry 1482 (class 1259 OID 195797)
 -- Dependencies: 1758 1759 1760 1761 1762 1763 3
--- Name: location; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: location; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
 CREATE TABLE location (
@@ -55,7 +56,7 @@ CREATE TABLE location (
 --
 -- TOC entry 1481 (class 1259 OID 195784)
 -- Dependencies: 1752 1753 1754 1755 1756 1757 3
--- Name: parameter; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: parameter; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
 CREATE TABLE parameter (
@@ -74,7 +75,7 @@ CREATE TABLE parameter (
 --
 -- TOC entry 1484 (class 1259 OID 195825)
 -- Dependencies: 1767 3
--- Name: timeserie; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: timeserie; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
 CREATE TABLE timeserie (
@@ -94,7 +95,7 @@ CREATE TABLE timeserie (
 --
 -- TOC entry 1485 (class 1259 OID 195848)
 -- Dependencies: 1768 1769 1770 3
--- Name: timeseriedata; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: timeseriedata; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
 CREATE TABLE timeseriedata (

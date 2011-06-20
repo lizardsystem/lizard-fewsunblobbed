@@ -42,7 +42,9 @@ class Filter(AL_Node):
 
     @property
     def has_parameters(self):
-        """Return whether there is at least one connected timeserie."""
+        """Return whether there is at least one connected timeserie.
+
+        Note: parameters of descendants are not counted."""
         return Timeserie.objects.filter(filterkey=self.id).exists()
 
     @classmethod
