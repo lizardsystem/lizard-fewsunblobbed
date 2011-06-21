@@ -5,7 +5,8 @@ Changelog of lizard-fewsunblobbed
 1.21 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Fixed #2942: If the number of items is too large, the graph will not
+  plot balls anymore.
 
 
 1.20 (2011-06-21)
