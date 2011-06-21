@@ -34,31 +34,31 @@ LAYER_STYLES = {
     "default": {'icon': 'meetpuntPeil.png',
                 'mask': ('meetpuntPeil_mask.png', ),
                 'color': (0, 0, 1, 0)},
-    # Demo
+    # Demo. RWS, HHNK, gemeente
     "Grondwater": {
         'icon': 'meetpuntPeil.png',
         'mask': ('meetpuntPeil_mask.png', ),
         'color': (1, 0.5, 0.5, 0)},
     "Kusten en rivieren": {
-        'icon': 'meetpuntPeil.png',
-        'mask': ('meetpuntPeil_mask.png', ),
-        'color': (0, 1, 1, 0)},
+        'icon': 'buoy.png',
+        'mask': ('buoy_mask.png', ),
+        'color': (1, 0.2, 1, 0)},  # RWS
     "Meteo": {
-        'icon': 'meetpuntPeil.png',
-        'mask': ('meetpuntPeil_mask.png', ),
-        'color': (0, 0, 1, 0)},
+        'icon': 'neerslagstation.png',
+        'mask': ('neerslagstation_mask.png', ),
+        'color': (0.5, 0.5, 1, 0)},
     "Oppervlaktewater": {
-        'icon': 'meetpuntPeil.png',
-        'mask': ('meetpuntPeil_mask.png', ),
-        'color': (1, 0.5, 1, 0)},
+        'icon': 'gemaal.png',
+        'mask': ('gemaal_mask.png', ),
+        'color': (0, 0, 1, 0)},  # HHNK
     "Riolering": {
-        'icon': 'meetpuntPeil.png',
-        'mask': ('meetpuntPeil_mask.png', ),
-        'color': (1, 0.2, 0.2, 0)},
-    "Waterkwaliteit": {
-        'icon': 'meetpuntPeil.png',
-        'mask': ('meetpuntPeil_mask.png', ),
+        'icon': 'rioolgemaal.png',
+        'mask': ('rioolgemaal_mask.png', ),
         'color': (0, 1, 0, 0)},
+    "Waterkwaliteit": {
+        'icon': 'meetpuntBWS.png',
+        'mask': ('meetpuntBWS_mask.png', ),
+        'color': (0, 0, 1, 0)},  # HHNK
     # KRW waternet
     "boezem_waterstanden": {'icon': 'meetpuntPeil.png',
                             'mask': ('meetpuntPeil_mask.png', ),
