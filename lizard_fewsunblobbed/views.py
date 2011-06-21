@@ -73,7 +73,7 @@ def fews_browser(request,
         found_filter = get_object_or_404(Filter, pk=filterkey)
         parameter_cache_key = FILTER_CACHE_KEY + str(filterkey)
         parameters = cache.get(parameter_cache_key)
-        if 1:  #parameters is None:
+        if parameters is None:
             parameters = []  # Start new one
             # Fetch all filter -> parameter combinations.
             for f in [found_filter] + found_filter.get_descendants():
