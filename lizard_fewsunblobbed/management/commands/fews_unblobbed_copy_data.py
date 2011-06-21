@@ -20,19 +20,20 @@ class Command(BaseCommand):
 
     @transaction.commit_manually(using='fews-unblobbed')
     def handle(self, *args, **options):
-        logger.info('Copying data...')
+        logger.info('Copying data (last 2 days)...')
 
         # Take correct cursor!
         cursor = connections['fews-unblobbed'].cursor()
         count = 0
         errors = 0
+        today = datetime.datetime.now()
         # for tsd in Timeseriedata.objects.filter(
         #     tsd_time__gte=datetime.datetime(2010,6,1),
         #     tsd_time__lte=datetime.datetime(2010,7,20)):
         for ts in Timeserie.objects.all():
             for tsd in ts.timeseriedata.filter(
-                tsd_time__gte=datetime.datetime(2010,6,1),
-                tsd_time__lte=datetime.datetime(2010,6,20)):
+                tsd_time__gte=today-datetime.timedelta(days=367),
+                tsd_time__lte=today-datetime.timedelta(days=365)):
 
                 timestamp = tsd.tsd_time + datetime.timedelta(days=365)
                 # which fields do we want to copy?
