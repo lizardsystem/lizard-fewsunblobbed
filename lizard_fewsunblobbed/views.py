@@ -73,18 +73,20 @@ def fews_browser(request,
         found_filter = get_object_or_404(Filter, pk=filterkey)
         parameter_cache_key = FILTER_CACHE_KEY + str(filterkey)
         parameters = cache.get(parameter_cache_key)
-        if parameters is None:
-            param_dict = {}
-            # The loop is slightly inefficient, but we need the source
-            # filterkey in the template.
+        if 1:  #parameters is None:
+            parameters = []  # Start new one
+            # Fetch all filter -> parameter combinations.
             for f in [found_filter] + found_filter.get_descendants():
-                for p in Parameter.objects.filter(timeserie__filterkey=f):
-                    # Add filterkey for use in template
-                    p.filterkey_pk = f.pk
-                    p.filterkey_fews_id = f.fews_id
-                    param_dict[p.id] = p
+                for p in Parameter.objects.filter(
+                    timeserie__filterkey=f).distinct():
 
-            parameters = param_dict.values()
+                    # Add filterkey for use in template (it's a m2m).
+                    p.filterkey = f
+                    if f <> found_filter:
+                        p.name = '%s (%s)' % (p.name, f.name)
+                    parameters.append(p)
+
+            # parameters = param_dict.values()
             parameters.sort(key=lambda p: p.name)
             cache.set(parameter_cache_key, parameters, 8 * 60 * 60)
 

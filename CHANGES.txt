@@ -8,6 +8,9 @@ Changelog of lizard-fewsunblobbed
 - Added management command fews_unblobbed_copy_data to copy data for
   demo purposes.
 
+- Fixed #2927: Clicking on filters result in parameters from all
+  subfilters.
+
 
 1.19 (2011-06-17)
 -----------------
