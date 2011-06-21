@@ -34,6 +34,32 @@ LAYER_STYLES = {
     "default": {'icon': 'meetpuntPeil.png',
                 'mask': ('meetpuntPeil_mask.png', ),
                 'color': (0, 0, 1, 0)},
+    # Demo
+    "Grondwater": {
+        'icon': 'meetpuntPeil.png',
+        'mask': ('meetpuntPeil_mask.png', ),
+        'color': (1, 0.5, 0.5, 0)},
+    "Kusten en rivieren": {
+        'icon': 'meetpuntPeil.png',
+        'mask': ('meetpuntPeil_mask.png', ),
+        'color': (0, 1, 1, 0)},
+    "Meteo": {
+        'icon': 'meetpuntPeil.png',
+        'mask': ('meetpuntPeil_mask.png', ),
+        'color': (0, 0, 1, 0)},
+    "Oppervlaktewater": {
+        'icon': 'meetpuntPeil.png',
+        'mask': ('meetpuntPeil_mask.png', ),
+        'color': (1, 0.5, 1, 0)},
+    "Riolering": {
+        'icon': 'meetpuntPeil.png',
+        'mask': ('meetpuntPeil_mask.png', ),
+        'color': (1, 0.2, 0.2, 0)},
+    "Waterkwaliteit": {
+        'icon': 'meetpuntPeil.png',
+        'mask': ('meetpuntPeil_mask.png', ),
+        'color': (0, 1, 0, 0)},
+    # KRW waternet
     "boezem_waterstanden": {'icon': 'meetpuntPeil.png',
                             'mask': ('meetpuntPeil_mask.png', ),
                             'color': (0, 0.5, 1, 0)},

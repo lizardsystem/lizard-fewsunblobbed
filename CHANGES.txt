@@ -11,6 +11,8 @@ Changelog of lizard-fewsunblobbed
 - Fixed #2927: Clicking on filters result in parameters from all
   subfilters.
 
+- Added styling for demo filter map icons.
+
 
 1.19 (2011-06-17)
 -----------------
