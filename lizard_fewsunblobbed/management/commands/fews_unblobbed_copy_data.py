@@ -27,9 +27,8 @@ class Command(BaseCommand):
         count = 0
         errors = 0
         today = datetime.datetime.now()
-        # for tsd in Timeseriedata.objects.filter(
-        #     tsd_time__gte=datetime.datetime(2010,6,1),
-        #     tsd_time__lte=datetime.datetime(2010,7,20)):
+
+        # Fetch data from a year ago and put it on this year.
         for ts in Timeserie.objects.all():
             for tsd in ts.timeseriedata.filter(
                 tsd_time__gte=today-datetime.timedelta(days=367),
