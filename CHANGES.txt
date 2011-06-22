@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-1.22 (unreleased)
+1.22 (2011-06-22)
 -----------------
 
 - Fixed #2949: Changed coordinates to lon/lat prevents disappearing
