@@ -5,7 +5,8 @@ Changelog of lizard-fewsunblobbed
 1.22 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Fixed #2949: Changed coordinates to lon/lat prevents disappearing
+  icons.
 
 
 1.21 (2011-06-21)

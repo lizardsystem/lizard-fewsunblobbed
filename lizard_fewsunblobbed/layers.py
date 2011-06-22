@@ -22,6 +22,7 @@ from lizard_map.adapter import Graph
 from lizard_map.models import ICON_ORIGINALS
 from lizard_map.models import WorkspaceItemError
 from lizard_map.symbol_manager import SymbolManager
+from lizard_map.mapnik_helper import add_datasource_point
 
 
 logger = logging.getLogger(
@@ -245,33 +246,27 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         """Return layer and styles that render points."""
         layers = []
         styles = {}
-        layer = mapnik.Layer("FEWS points layer", coordinates.RD)
+        layer = mapnik.Layer("FEWS points layer", coordinates.WGS84)
         layer_nodata = mapnik.Layer("FEWS points layer (no data)",
-                                    coordinates.RD)
+                                    coordinates.WGS84)
         filterkey = self.filterkey
         parameterkey = self.parameterkey
 
         layer.datasource = mapnik.PointDatasource()
         layer_nodata.datasource = mapnik.PointDatasource()
+
         for info in self._timeseries():
-            # print info['rd_x'], info['rd_y'], info['location_name']
-            layer.datasource.add_point(
-                info['rd_x'], info['rd_y'], 'Name', info['location_name'])
             # Due to mapnik bug, we render the very same point 10cm to the top
             # right, bottom left, etc.
-            layer.datasource.add_point(
-                info['rd_x'] + 0.1, info['rd_y'] + 0.1, 'Name',
-                info['location_name'])
-            layer.datasource.add_point(
-                info['rd_x'] - 0.1, info['rd_y'] - 0.1, 'Name',
-                info['location_name'])
-            layer.datasource.add_point(
-                info['rd_x'] + 0.1, info['rd_y'] - 0.1, 'Name',
-                info['location_name'])
-            # TODO: layer only points with data, but it misses some points
+            add_datasource_point(
+                layer.datasource, info['longitude'], info['latitude'],
+                'Name', info['location_name'])
+
             if not info['has_data']:
-                layer_nodata.datasource.add_point(
-                    info['rd_x'], info['rd_y'], 'Name', info['location_name'])
+                add_datasource_point(
+                    layer_nodata.datasource,
+                    info['longitude'], info['latitude'],
+                    'Name', info['location_name'])
 
         point_style = fews_point_style(filterkey, nodata=False)
         # generate "unique" point style name and append to layer
@@ -319,6 +314,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 result.append(
                 {'rd_x': location.x,
                  'rd_y': location.y,
+                 'longitude': location.longitude,
+                 'latitude': location.latitude,
                  'object': timeserie,
                  'location_name': location.name.encode('ascii', 'replace'),
                  # ^^^ This used to be ``str(location.name)``.
