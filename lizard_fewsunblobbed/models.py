@@ -15,6 +15,9 @@ from lizard_map import coordinates
 logger = logging.getLogger(__name__)
 
 
+PARAMETER_CACHE_KEY = 'lizard.fewsunblobbed.models.parameter_cache_key::%s'
+
+
 class Filter(AL_Node):
     """Fews filter object."""
 
@@ -46,6 +49,32 @@ class Filter(AL_Node):
 
         Note: parameters of descendants are not counted."""
         return Timeserie.objects.filter(filterkey=self.id).exists()
+
+    def parameters(self):
+        """Return parameters for this filter and the filters children.
+
+        The parameters returned have an added property 'filterkey'.
+        """
+        parameter_cache_key = PARAMETER_CACHE_KEY % str(self.id)
+        parameters = cache.get(parameter_cache_key)
+        if parameters is None:
+            parameters = []  # Start new one
+            # Fetch all filter -> parameter combinations.
+            for f in [self] + self.get_descendants():
+                for p in Parameter.objects.filter(
+                    timeserie__filterkey=f).distinct():
+
+                    # Add filterkey for use in template (it's a m2m).
+                    p.filterkey = f
+                    if f <> self:
+                        p.name = '%s (%s)' % (p.name, f.name)
+                    parameters.append(p)
+
+            # parameters = param_dict.values()
+            parameters.sort(key=lambda p: p.name)
+            cache.set(parameter_cache_key, parameters, 8 * 60 * 60)
+
+        return parameters
 
     @classmethod
     def get_database_engine(cls):
