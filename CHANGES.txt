@@ -5,6 +5,9 @@ Changelog of lizard-fewsunblobbed
 1.23 (unreleased)
 -----------------
 
+- Changed graph: now uses standard Graph.legend. The legend is
+  displayed on top of the graph. #2990
+
 - Moved filter.parameters calculation to model Filter.
 
 - Added filter.parameters to fews_unblobbed_cache management command.

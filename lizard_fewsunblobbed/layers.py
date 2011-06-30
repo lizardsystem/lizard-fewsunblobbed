@@ -576,10 +576,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         graph.axes.set_ylim(y_min, y_max)
 
         if legend:
-            ## Quick fix for demo. Needs additional work.
-            graph.legend_on_bottom_height = 0.3
-            graph.axes.legend(bbox_to_anchor=(0., -0.8, 1., 1.),
-            loc=3, ncol=1, mode="expand", borderaxespad=0.)
+            # Place legend on top op graph, no borders.
+            graph.legend()
             graph.axes.legend_.draw_frame(False)
 
         if "horizontal_lines" in layout_extra:
