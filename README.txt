@@ -43,3 +43,16 @@ In your settings.py, it is possible to define some filters to be
 excluded from the filterlist.
 
 FEWS_UNBLOBBED_EXCLUDE_FILTERS = ['ZZL_Meteo', 'ZZL_ZUIV_RUW', ]
+
+
+Installation
+------------
+
+Run the Deltares postgis script to create the tables Filter, Location,
+Parameter, Timeserie, Timeseriedata.
+
+After creating the standard tables, install the IconStyle table by
+running the command::
+
+    $> bin/django syncdb --database=fews-unblobbed
+

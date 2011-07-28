@@ -12,6 +12,7 @@ from django.db.models import Min
 from django.db.models import Max
 from django.http import Http404
 
+from lizard_fewsunblobbed.models import IconStyle
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Parameter
@@ -151,15 +152,19 @@ LAYER_STYLES = {
     }
 
 
-def fews_symbol_name(filterkey, nodata=False):
+def fews_symbol_name(
+    fews_filter_pk, fews_location_pk, fews_parameter_pk,
+    nodata=False, styles=None, lookup=None):
+
     """Find fews symbol name"""
 
     # determine icon layout by looking at filter.id
-    filter_ = Filter.objects.get(pk=filterkey)
-    if str(filter_.fews_id) in LAYER_STYLES:
-        icon_style = copy.deepcopy(LAYER_STYLES[str(filter_.fews_id)])
-    else:
-        icon_style = copy.deepcopy(LAYER_STYLES['default'])
+    # if str(fews_filter.fews_id) in LAYER_STYLES:
+    #     icon_style = copy.deepcopy(LAYER_STYLES[str(fews_filter.fews_id)])
+    # else:
+    #     icon_style = copy.deepcopy(LAYER_STYLES['default'])
+    style_name, icon_style = IconStyle.style(
+        fews_filter_pk, fews_location_pk, fews_parameter_pk, styles, lookup)
 
     #make icon grey
     if nodata:
@@ -172,26 +177,32 @@ def fews_symbol_name(filterkey, nodata=False):
     output_filename = symbol_manager.get_symbol_transformed(
         icon_style['icon'], **icon_style)
 
-    return output_filename
+    return style_name, output_filename
 
 
-def fews_point_style(filterkey, nodata=False):
+def fews_point_style(
+    fews_filter, fews_location,
+    fews_parameter, nodata=False, styles=None, lookup=None):
     """
     make mapnik point_style for fews point with given filterkey
     """
-    output_filename = fews_symbol_name(filterkey, nodata)
+    point_style_name, output_filename = fews_symbol_name(
+        fews_filter.pk, fews_location.pk, fews_parameter.pk,
+        nodata, styles, lookup)
     output_filename_abs = os.path.join(
         settings.MEDIA_ROOT, 'generated_icons', output_filename)
 
     # use filename in mapnik pointsymbolizer
-    point_looks = mapnik.PointSymbolizer(output_filename_abs, 'png', 16, 16)
+    point_looks = mapnik.PointSymbolizer(
+        str(output_filename_abs), 'png', 16, 16)
     point_looks.allow_overlap = True
     layout_rule = mapnik.Rule()
     layout_rule.symbols.append(point_looks)
+
     point_style = mapnik.Style()
     point_style.rules.append(layout_rule)
 
-    return point_style
+    return point_style_name, point_style
 
 
 def fews_timeserie(filterkey, locationkey, parameterkey):
@@ -246,14 +257,20 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         """Return layer and styles that render points."""
         layers = []
         styles = {}
+        styles_nodata = {}
+        styles_data = {}
         layer = mapnik.Layer("FEWS points layer", coordinates.WGS84)
         layer_nodata = mapnik.Layer("FEWS points layer (no data)",
                                     coordinates.WGS84)
         filterkey = self.filterkey
         parameterkey = self.parameterkey
+        #fews_filter = Filter.objects.get(pk=filterkey)
+        #fews_parameter = Parameter.objects.get(pk=parameterkey)
 
         layer.datasource = mapnik.PointDatasource()
         layer_nodata.datasource = mapnik.PointDatasource()
+
+        fews_styles, fews_style_lookup = IconStyle._styles_lookup()
 
         for info in self._timeseries():
             # Due to mapnik bug, we render the very same point 10cm to the top
@@ -268,17 +285,32 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                     info['longitude'], info['latitude'],
                     'Name', info['location_name'])
 
-        point_style = fews_point_style(filterkey, nodata=False)
-        # generate "unique" point style name and append to layer
-        style_name = "Style with data %s::%s" % (filterkey, parameterkey)
-        styles[style_name] = point_style
-        layer.styles.append(style_name)
+            point_style_name, point_style = fews_point_style(
+                info['object'].filterkey, info['object'].locationkey,
+                info['object'].parameterkey, nodata=False, styles=fews_styles,
+                lookup=fews_style_lookup)
+            # generate "unique" point style name and append to layer
+            style_name = "fews-unblobbed::%s" % point_style_name
+            styles_data[style_name] = point_style
 
-        point_style_nodata = fews_point_style(filterkey, nodata=True)
-        # generate "unique" point style name and append to layer
-        style_name_nodata = "Style nodata %s::%s" % (filterkey, parameterkey)
-        styles[style_name_nodata] = point_style_nodata
-        layer_nodata.styles.append(style_name_nodata)
+            point_style_nodata_name, point_style_nodata = fews_point_style(
+                info['object'].filterkey, info['object'].locationkey,
+                info['object'].parameterkey, nodata=True, styles=fews_styles,
+                lookup=fews_style_lookup)
+            # generate "unique" point style name and append to layer
+            style_name_nodata = "fews-unblobbed-nodata::%s" % (
+                point_style_nodata_name)
+            styles[style_name_nodata] = point_style_nodata  # to return
+            styles_nodata[style_name_nodata] = point_style_nodata  # for layer
+
+        for style_name in styles_data.keys():
+            layer.styles.append(style_name)
+
+        for style_name_nodata in styles_nodata.keys():
+            layer_nodata.styles.append(style_name_nodata)
+
+        styles = styles_data
+        styles.update(styles_nodata)
 
         layers = [layer_nodata, layer]  # TODO: the layer WITH data on top
         return layers, styles
@@ -596,8 +628,16 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         """
         returns symbol
 
+        TODO: fill identifier from caller.
         """
-        output_filename = fews_symbol_name(self.filterkey, nodata=False)
+        point_style_name, output_filename = fews_symbol_name(
+            self.filterkey, None, self.parameterkey,
+            nodata=False)
+
+        # output_filename = fews_symbol_name(
+        #     self.filterkey,
+        #     nodata=False)
+
         return '%sgenerated_icons/%s' % (settings.MEDIA_URL, output_filename)
 
     def html(self, snippet_group=None, identifiers=None, layout_options=None):

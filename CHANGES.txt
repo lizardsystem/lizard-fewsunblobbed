@@ -5,7 +5,10 @@ Changelog of lizard-fewsunblobbed
 1.24 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Added IconStyle model and migration. Icons are now configurable. It
+  will revert to a default when nothing is configurated.
+
+Note: When upgrading, run: bin/django syncdb --database=fews-unblobbed
 
 
 1.23 (2011-06-30)
