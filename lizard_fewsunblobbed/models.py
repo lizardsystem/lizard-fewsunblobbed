@@ -6,11 +6,14 @@ from django.conf import settings
 from django.core import serializers
 from django.core.cache import cache
 from django.db import models
+from django.db.models.signals import post_save
+from django.db.models.signals import post_delete
 from django.utils.translation import ugettext as _
 
 from composite_pk import composite
 from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
+from lizard_map.models import ColorField
 
 logger = logging.getLogger(__name__)
 
@@ -311,3 +314,163 @@ class Timeseriedata(composite.CompositePKModel):
         return u'Data for %s: %s = %s' % (self.tkey,
                                           self.tsd_time,
                                           self.tsd_value)
+
+
+class IconStyle(models.Model):
+    """
+    Customizable icon styles where all "selector fields" are optional.
+
+    The styles are cached for performance.
+
+    Based on lizard_fewsjdbc.models.IconStyle
+    """
+    CACHE_KEY = 'lizard_fewsunblobbed.IconStyle'
+
+    # Selector fields.
+    fews_filter = models.ForeignKey(Filter, null=True, blank=True)
+    fews_location = models.ForeignKey(Location, null=True, blank=True)
+    fews_parameter = models.ForeignKey(Parameter, null=True, blank=True)
+
+    # Icon properties.
+    icon = models.CharField(max_length=40)
+    mask = models.CharField(max_length=40)
+    color = ColorField()
+
+    class Meta:
+        verbose_name = _("Icon style")
+        verbose_name_plural = _("Icon styles")
+
+    def __unicode__(self):
+        return u'%s' % (self._key)
+
+    @property
+    def _key(self):
+        return '%s::%s::%s' % (
+            self.fews_filter.pk if self.fews_filter else '',
+            self.fews_location.pk if self.fews_location else '',
+            self.fews_parameter.pk if self.fews_parameter else '')
+
+    @classmethod
+    def _styles(cls):
+        """
+        Return styles in a symbol manager style in a dict.
+
+        The dict key consist of
+        "fews_filter::fews_location::fews_parameter"
+        """
+        result = {}
+        for icon_style in cls.objects.all():
+            result[icon_style._key] = {
+                'icon': icon_style.icon,
+                'mask': (icon_style.mask, ),
+                'color': icon_style.color.to_tuple()
+                }
+        return result
+
+    @classmethod
+    def _lookup(cls):
+        """
+        Return style lookup dictionary based on class objects.
+
+        This lookup dictionary is cached and it is rebuild every time
+        the IconStyle table changes.
+
+        The structure (always) has 3 levels and is used to lookup icon
+        styles with fallback in a fast way:
+
+        level 0 (highest) {None: {level1}, "<fews_filter_id>": {level1}, ...}
+
+        level 1 {None: {level2}, "<fews_location_id>": {level2}, ...}
+
+        level 2 {None: icon_key, "<fews_parameter_id>": icon_key, ...}
+        """
+
+        lookup = {}
+
+        # Insert style into lookup
+        for style in cls.objects.all():
+            level0 = style.fews_filter.pk if style.fews_filter else None
+            level1 = style.fews_location.pk if style.fews_location else None
+            level2 = (style.fews_parameter.pk
+                      if style.fews_parameter else None)
+            if level0 not in lookup:
+                lookup[level0] = {}
+            if level1 not in lookup[level0]:
+                lookup[level0][level1] = {}
+            if level2 not in lookup[level0][level1]:
+                lookup[level0][level1][level2] = style._key
+            # Every 'breach' needs a 'None' / default side.
+            if None not in lookup:
+                lookup[None] = {}
+            if None not in lookup[level0]:
+                lookup[level0][None] = {}
+            if None not in lookup[level0][level1]:
+                lookup[level0][level1][None] = '%s::%s::' % (
+                    level0 if level0 else '',
+                    level1 if level1 else '')
+        return lookup
+
+    @classmethod
+    def _styles_lookup(cls, ignore_cache=False):
+        cache_lookup = cache.get(cls.CACHE_KEY)
+
+        if cache_lookup is None or ignore_cache:
+            # Calculate styles and lookup and store in cache.
+            styles = cls._styles()
+            lookup = cls._lookup()
+            cache.set(cls.CACHE_KEY, (styles, lookup))
+        else:
+            # The cache has a 2-tuple (styles, lookup) stored.
+            styles, lookup = cache_lookup
+
+        return styles, lookup
+
+    @classmethod
+    def style(
+        cls,
+        fews_filter,
+        fews_location, fews_parameter,
+        styles=None, lookup=None, ignore_cache=False):
+        """
+        Return the best corresponding icon style and return in format:
+
+        'xx::yy::zz',
+        {'icon': 'icon.png',
+         'mask': 'mask.png',
+         'color': (1,1,1,0)
+         }
+        """
+        if styles is None or lookup is None:
+            styles, lookup = cls._styles_lookup(ignore_cache)
+
+        try:
+            level1 = lookup.get(fews_filter.pk, lookup[None])
+            level2 = level1.get(fews_location.pk, level1[None])
+            found_key = level2.get(fews_parameter.pk, level2[None])
+            result = styles[found_key]
+        except KeyError:
+            # Default, this only occurs when '::::::' is not defined
+            return '::::', {
+                'icon': 'meetpuntPeil.png',
+                'mask': ('meetpuntPeil_mask.png', ),
+                'color': (0.0, 0.5, 1.0, 1.0)
+                }
+
+        return found_key, result
+
+
+# For Django 1.3:
+# @receiver(post_save, sender=Setting)
+# @receiver(post_delete, sender=Setting)
+def icon_style_post_save_delete(sender, **kwargs):
+    """
+    Invalidates cache after saving or deleting an IconStyle.
+    """
+    logger.debug('Changed IconStyle fewsunblobbed. '
+                 'Invalidating cache for %s...' %
+                 sender.CACHE_KEY)
+    cache.delete(sender.CACHE_KEY)
+
+
+post_save.connect(icon_style_post_save_delete, sender=IconStyle)
+post_delete.connect(icon_style_post_save_delete, sender=IconStyle)
