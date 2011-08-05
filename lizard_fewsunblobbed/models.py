@@ -14,6 +14,7 @@ from composite_pk import composite
 from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
 from lizard_map.models import ColorField
+from lizard_map.symbol_manager import list_image_file_names
 
 logger = logging.getLogger(__name__)
 
@@ -332,9 +333,9 @@ class IconStyle(models.Model):
     fews_parameter = models.ForeignKey(Parameter, null=True, blank=True)
 
     # Icon properties.
-    icon = models.CharField(max_length=40)
-    mask = models.CharField(max_length=40)
-    color = ColorField()
+    icon = models.CharField(max_length=40, choices=list_image_file_names())
+    mask = models.CharField(max_length=40, choices=list_image_file_names())
+    color = ColorField(help_text="Use color format fffff or 333333")
 
     class Meta:
         verbose_name = _("Icon style")
