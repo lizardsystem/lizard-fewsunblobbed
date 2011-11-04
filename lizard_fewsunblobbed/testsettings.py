@@ -35,6 +35,9 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Used for django-staticfiles
 STATIC_URL = '/static_media/'
+
+COMPRESS_ROOT = STATIC_URL # Test gives an error otherwise
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     # Default items.
     "django.core.context_processors.auth",

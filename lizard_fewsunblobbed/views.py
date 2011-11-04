@@ -66,8 +66,11 @@ class FewsBrowserView(AppView):
 
     def get(self, request, *args, **kwargs):
         """Overriden to get self.filterkey from the GET parameters. TODO: Do this in a nicer way."""
-
-        self.filterkey = request.GET.get('filterkey', None)
+        
+        try:
+            self.filterkey = int(request.GET.get('filterkey', None))
+        except (TypeError, ValueError):
+            self.filterkey = None
 
         return super(FewsBrowserView, self).get(request, *args, **kwargs)
 
