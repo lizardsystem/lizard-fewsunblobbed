@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-1.24 (unreleased)
+1.24 (2011-11-04)
 -----------------
 
 - Removed hack for http://code.djangoproject.com/ticket/12999 in AlarmRouter, as it is fixed in
