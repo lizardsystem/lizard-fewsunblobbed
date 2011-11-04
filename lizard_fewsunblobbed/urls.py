@@ -4,10 +4,12 @@ from django.contrib import admin
 
 admin.autodiscover()
 
+from lizard_fewsunblobbed.views import FewsBrowserView
+
 urlpatterns = patterns(
     '',
     url(r'^$',
-        'lizard_fewsunblobbed.views.fews_browser',
+        FewsBrowserView.as_view(),
         name="fews_browser",
         ),
     (r'^map/', include('lizard_map.urls')),

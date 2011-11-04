@@ -4,6 +4,16 @@ Changelog of lizard-fewsunblobbed
 
 1.24 (unreleased)
 -----------------
+
+- Removed hack for http://code.djangoproject.com/ticket/12999 in AlarmRouter, as it is fixed in
+  Django versions >= 1.2.
+
+- Added hack for https://code.djangoproject.com/ticket/16353 in AlarmRouter, it was breaking tests.
+
+- Increased version dependency for lizard_map (to 3.3) and lizard_ui (to 3.6)
+
+- Modified views.py, templates to class based views for lizard_map 3.3 compatibility
+
 - Added version dependency to lizard_map and lizard_ui.
 
 - Added option for admin IconStyles.

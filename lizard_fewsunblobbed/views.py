@@ -10,6 +10,8 @@ from django.template import RequestContext
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Parameter
 
+from lizard_map.views import AppView
+
 FILTER_CACHE_KEY = 'lizard.fewsunblobbed.views.filter_cache_key'
 logger = logging.getLogger(__name__)
 
@@ -57,33 +59,32 @@ def fews_filters(ignore_cache=False):
         cache.set(FILTER_CACHE_KEY, filters, 8 * 60 * 60)  # 8 hours
     return filters
 
+class FewsBrowserView(AppView):
+    """Class based view for fews-unblobbed. TODO: Crumbs."""
 
-def fews_browser(request,
-                 template="lizard_fewsunblobbed/fews_browser.html",
-                 crumbs_prepend=None):
-    filterkey = request.GET.get('filterkey', None)
+    template_name = 'lizard_fewsunblobbed/fews_browser.html'
 
-    if filterkey is None:
-        filters = fews_filters()
-        found_filter = None
-        parameters = None
-    else:
-        filters = []  # We don't need to return them in the template.
-        filterkey = int(filterkey)
-        found_filter = get_object_or_404(Filter, pk=filterkey)
-        parameters = found_filter.parameters()
+    def get(self, request, *args, **kwargs):
+        """Overriden to get self.filterkey from the GET parameters. TODO: Do this in a nicer way."""
 
-    if crumbs_prepend is not None:
-        crumbs = list(crumbs_prepend)
-    else:
-        crumbs = [{'name': 'home', 'url': '/'}]
-    crumbs.append({'name': 'metingen',
-                   'url': reverse('fews_browser')})
+        self.filterkey = request.GET.get('filterkey', None)
 
-    return render_to_response(
-        template,
-        {'filters': filters,
-         'found_filter': found_filter,
-         'parameters': parameters,
-         'crumbs': crumbs},
-        context_instance=RequestContext(request))
+        return super(FewsBrowserView, self).get(request, *args, **kwargs)
+
+    def filters(self):
+        if self.filterkey:
+            return []
+        else:
+            return fews_filters()
+
+    def found_filter(self):
+        if self.filterkey:
+            return get_object_or_404(Filter, pk=self.filterkey)
+        else:
+            return None
+
+    def parameters(self):
+        filter = self.found_filter()
+        if filter:
+            return filter.parameters()
+

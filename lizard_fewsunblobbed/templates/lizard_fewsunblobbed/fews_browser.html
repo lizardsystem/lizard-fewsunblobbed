@@ -7,11 +7,11 @@
 {% block sidebar %}
 <div class="sidebarbox sidebarbox-stretched"
      id="accordion">
-  <h2>1: Filters{% if found_filter %} ({{ found_filter.name }}){% endif %}{% block linkback %}{% endblock %}</h2>
+  <h2>1: Filters{% if view.found_filter %} ({{ view.found_filter.name }}){% endif %}{% block linkback %}{% endblock %}</h2>
   <ul class="automatic-tree filetree pane accordion-load-next"
       data-next-pane-id="#parameter-pane"
       id="filter-pane">
-    {% for node in filters %}
+    {% for node in view.filters %}
       {% if node.data.isendnode %}
         <li>
           {% if node.data.has_parameters %}
@@ -34,12 +34,11 @@
   <ul class="without-bullets pane"
       id="parameter-pane">
     {% for parameter in parameters %}
-    {# note: parameter.filterkey is manually added in the view #}
     <li class="workspace-acceptable file"
         data-name="{{ parameter.name }}"
         data-adapter-class="adapter_fews"
-        data-adapter-layer-json='{"filterkey": {{ parameter.filterkey.pk }}, "parameterkey": {{ parameter.pk }}}'
-        data-filter-id="{{ parameter.filterkey.fews_id }}">
+        data-adapter-layer-json='{"filterkey": {{ view.filterkey }}, "parameterkey": {{ parameter.pk }}}'
+        data-filter-id="{{ view.filterkey.fews_id }}">
       {{ parameter.name }}
     </li>
     {% empty %}
@@ -47,10 +46,8 @@
     {% endfor %}
   </ul>
 </div>
-{% for workspace in workspaces.user %}
-  {% workspace workspace %}
-{% empty %}
-No workspace
-{% endfor %}
+
+{% workspace_edit view.workspace_edit %}
+{% collage_edit view.collage_edit %}
 
 {% endblock sidebar %}
