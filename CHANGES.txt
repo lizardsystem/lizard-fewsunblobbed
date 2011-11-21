@@ -5,7 +5,12 @@ Changelog of lizard-fewsunblobbed
 1.25 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Rather gross hacks that turn the IconStyle model into a class that
+  acts as if it's a model with an empty database behind it. The reason
+  for this is that the current IconStyle implementation doesn't work
+  (it wants to put data into the fews-unblobbed database, which is
+  readonly and not under our control), but should be fixed soonish.
+
 
 
 1.24 (2011-11-04)
