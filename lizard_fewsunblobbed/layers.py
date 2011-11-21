@@ -262,8 +262,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         layer = mapnik.Layer("FEWS points layer", coordinates.WGS84)
         layer_nodata = mapnik.Layer("FEWS points layer (no data)",
                                     coordinates.WGS84)
-        filterkey = self.filterkey
-        parameterkey = self.parameterkey
+        #filterkey = self.filterkey
+        #parameterkey = self.parameterkey
         #fews_filter = Filter.objects.get(pk=filterkey)
         #fews_parameter = Parameter.objects.get(pk=parameterkey)
 

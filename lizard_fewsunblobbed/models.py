@@ -70,7 +70,7 @@ class Filter(AL_Node):
 
                     # Add filterkey for use in template (it's a m2m).
                     p.filterkey = f
-                    if f <> self:
+                    if f != self:
                         p.name = '%s (%s)' % (p.name, f.name)
                     parameters.append(p)
 

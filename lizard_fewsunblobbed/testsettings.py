@@ -36,7 +36,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # Used for django-staticfiles
 STATIC_URL = '/static_media/'
 
-COMPRESS_ROOT = STATIC_URL # Test gives an error otherwise
+COMPRESS_ROOT = STATIC_URL  # Test gives an error otherwise
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     # Default items.
@@ -48,6 +48,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # {{ STATIC_URL }}myapp/my.css in your templates.
     'staticfiles.context_processors.static_url',
     )
+
+# We switch off compression so that the automated tests also can get the full
+# javascript.
+COMPRESS_ENABLED = False
+COMPRESS_ROOT = STATIC_URL
 
 DATABASE_ROUTERS = ['lizard_fewsunblobbed.routers.FewsUnblobbedRouter', ]
 

@@ -3,8 +3,6 @@ from django.test import TestCase
 from django.test.client import Client
 
 from lizard_fewsunblobbed.layers import WorkspaceItemAdapterFewsUnblobbed
-from lizard_fewsunblobbed.layers import fews_point_style
-from lizard_fewsunblobbed.layers import fews_symbol_name
 from lizard_fewsunblobbed.models import IconStyle
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
@@ -179,26 +177,26 @@ class TestIconStyle(TestCase):
 
     # def test_styles(self):
     #     """See if styles() output correspond to database contents.
-
+    #
     #     It seems that the database contains more IconStyles than the
     #     ones defined here. Strange??
     #     """
     #     IconStyle(fews_filter=None, fews_location=None, fews_parameter=None,
     #               icon='icon.png', mask='mask.png', color='ff00ff').save()
-
+    #
     #     expected = {
     #         '::::':
     #         {'icon': 'icon.png', 'mask': ('mask.png', ),
     #          'color': (1.0, 0.0, 1.0, 1.0)}}
-
+    #
     #     # You can see here that the database contains 10+ IconStyles...
     #     print IconStyle.objects.all()
     #     self.assertEqual(IconStyle._styles(), expected)
-
-
+    #
+    #
     # def test_styles(self):
     #     """See if styles_lookup() output correspond to database contents.
-
+    #
     #     It seems that the database contains more IconStyles than the
     #     ones defined here. Strange??
     #     """
@@ -207,7 +205,7 @@ class TestIconStyle(TestCase):
     #     IconStyle(fews_filter=self.filter1,
     #               fews_location=None, fews_parameter=None,
     #               icon='filter1.png', mask='mask.png', color='ff00ff').save()
-
+    #
     #     expected = {
     #         '::::':
     #         {'icon': 'icon.png', 'mask': ('mask.png', ),
@@ -215,10 +213,10 @@ class TestIconStyle(TestCase):
     #         '%d::::' % (self.filter1.pk):
     #         {'icon': 'filter1.png', 'mask': ('mask.png', ),
     #          'color': (1.0, 0.0, 1.0, 1.0)}}
-
+    #
     #     # You can see here that the database contains 10+ IconStyles...
     #     print IconStyle.objects.all()
-
+    #
     #     self.assertEqual(IconStyle._styles(), expected)
 
     def test_lookup(self):

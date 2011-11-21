@@ -4,7 +4,6 @@ Retrieves fews unblobbed filter tree (and store it in the cache).
 
 from django.core.management.base import BaseCommand
 from django.db import connections, transaction
-from lizard_fewsunblobbed.views import fews_filters
 from lizard_fewsunblobbed.models import Timeserie
 import logging
 import datetime
@@ -31,13 +30,19 @@ class Command(BaseCommand):
         # Fetch data from a year ago and put it on this year.
         for ts in Timeserie.objects.all():
             for tsd in ts.timeseriedata.filter(
-                tsd_time__gte=today-datetime.timedelta(days=367),
-                tsd_time__lte=today-datetime.timedelta(days=365)):
+                tsd_time__gte=today - datetime.timedelta(days=367),
+                tsd_time__lte=today - datetime.timedelta(days=365)):
 
                 timestamp = tsd.tsd_time + datetime.timedelta(days=365)
                 # which fields do we want to copy?
                 try:
-                    cursor.execute("insert into timeseriedata (tsd_time, tsd_value, tsd_flag, tsd_detection, tsd_comments, tkey) values (%s, %s, %s, %s, %s, %s)" , [timestamp.isoformat(), tsd.tsd_value, tsd.tsd_flag, tsd.tsd_detection, ('%s' % tsd.tsd_comments), ts.tkey])
+                    cursor.execute("insert into timeseriedata (tsd_time," +
+                                   " tsd_value, tsd_flag, tsd_detection," +
+                                   " tsd_comments, tkey) values " +
+                                   "(%s, %s, %s, %s, %s, %s)",
+                                   [timestamp.isoformat(), tsd.tsd_value,
+                                    tsd.tsd_flag, tsd.tsd_detection,
+                                    ('%s' % tsd.tsd_comments), ts.tkey])
                     transaction.commit(using='fews-unblobbed')
                     #transaction.commit_unless_managed(using='fews-unblobbed')
 
@@ -51,7 +56,7 @@ class Command(BaseCommand):
                         traceback.print_exc(file=sys.stdout)
                         logger.info('Errors (duplicates?)... %d' % errors)
 
-                print "\r",count,
+                print "\r", count,
 
         logger.info('Copied: %d' % count)
         logger.info('Errors (duplicates?): %d' % errors)

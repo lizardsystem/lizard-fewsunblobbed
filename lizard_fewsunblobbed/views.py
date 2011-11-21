@@ -2,13 +2,9 @@ import logging
 
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 
 from lizard_fewsunblobbed.models import Filter
-from lizard_fewsunblobbed.models import Parameter
 
 from lizard_map.views import AppView
 
@@ -59,14 +55,16 @@ def fews_filters(ignore_cache=False):
         cache.set(FILTER_CACHE_KEY, filters, 8 * 60 * 60)  # 8 hours
     return filters
 
+
 class FewsBrowserView(AppView):
     """Class based view for fews-unblobbed. TODO: Crumbs."""
 
     template_name = 'lizard_fewsunblobbed/fews_browser.html'
 
     def get(self, request, *args, **kwargs):
-        """Overriden to get self.filterkey from the GET parameters. TODO: Do this in a nicer way."""
-        
+        """Overriden to get self.filterkey from the GET parameters.
+           TODO: Do this in a nicer way."""
+
         try:
             self.filterkey = int(request.GET.get('filterkey', None))
         except (TypeError, ValueError):
@@ -90,4 +88,3 @@ class FewsBrowserView(AppView):
         filter = self.found_filter()
         if filter:
             return filter.parameters()
-

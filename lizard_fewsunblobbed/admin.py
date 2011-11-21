@@ -15,6 +15,7 @@ class TimeserieAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'data_count', ]
     list_filter = ('filterkey', 'parameterkey', )
 
+
 class IconStyleAdmin(admin.ModelAdmin):
     list_display = (
         '__unicode__', 'fews_filter', 'fews_location',
