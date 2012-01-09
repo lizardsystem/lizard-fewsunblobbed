@@ -6,15 +6,11 @@ from django.conf import settings
 from django.core import serializers
 from django.core.cache import cache
 from django.db import models
-from django.db.models.signals import post_save
-from django.db.models.signals import post_delete
 from django.utils.translation import ugettext as _
 
 from composite_pk import composite
 from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
-from lizard_map.models import ColorField
-from lizard_map.symbol_manager import list_image_file_names
 
 logger = logging.getLogger(__name__)
 
@@ -441,7 +437,7 @@ class IconStyle(object):  # Used to superclass models.Model
          'color': (1,1,1,0)
          }
         """
-        
+
         # Hack - removing IconStyle
         return '::::', {
             'icon': 'meetpuntPeil.png',
