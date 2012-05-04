@@ -1,5 +1,20 @@
+import os
+
+from lizard_ui.settingshelper import setup_logging
+from lizard_ui.settingshelper import STATICFILES_FINDERS
+
 DEBUG = True
 TEMPLATE_DEBUG = True
+
+# SETTINGS_DIR allows media paths and so to be relative to this settings file
+# instead of hardcoded to c:\only\on\my\computer.
+SETTINGS_DIR = os.path.dirname(os.path.realpath(__file__))
+
+# BUILDOUT_DIR is for access to the "surrounding" buildout, for instance for
+# BUILDOUT_DIR/var/static files to give django-staticfiles a proper place
+# to place all collected static files.
+BUILDOUT_DIR = os.path.abspath(os.path.join(SETTINGS_DIR, '..'))
+LOGGING = setup_logging(BUILDOUT_DIR)
 
 DATABASES = {
     'default': {
@@ -21,7 +36,6 @@ INSTALLED_APPS = [
     'compressor',
     'staticfiles',
     'django_nose',
-    'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,8 +49,11 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Used for django-staticfiles
 STATIC_URL = '/static_media/'
-
-COMPRESS_ROOT = STATIC_URL  # Test gives an error otherwise
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BUILDOUT_DIR, 'var', 'static')
+MEDIA_ROOT = os.path.join(BUILDOUT_DIR, 'var', 'media')
+STATICFILES_FINDERS = STATICFILES_FINDERS
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     # Default items.
