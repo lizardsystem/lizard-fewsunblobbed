@@ -12,7 +12,7 @@ from django.db.models import Min
 from django.db.models import Max
 from django.http import Http404
 
-from lizard_fewsunblobbed.models import IconStyle
+from lizard_fewsunblobbed.dummy import IconStyle
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Parameter
