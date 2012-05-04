@@ -5,7 +5,7 @@ version = '1.26dev'
 
 long_description = '\n\n'.join([
     open('README.txt').read(),
-    open(os.path.join('lizard_fewsunblobbed', 'USAGE.txt')).read(),
+    open('USAGE.txt').read(),
     open('TODO.txt').read(),
     open('CREDITS.txt').read(),
     open('CHANGES.txt').read(),
