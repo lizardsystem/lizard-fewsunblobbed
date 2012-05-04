@@ -9,6 +9,7 @@ from lizard_fewsunblobbed.views import FewsBrowserView
 
 urlpatterns = patterns(
     '',
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^$', FewsBrowserView.as_view(), name="fews_browser"),
     (r'^map/', include('lizard_map.urls')),
 )
