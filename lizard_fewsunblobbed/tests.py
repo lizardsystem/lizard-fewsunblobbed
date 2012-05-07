@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.test.client import Client
 
 from lizard_fewsunblobbed.layers import WorkspaceItemAdapterFewsUnblobbed
-from lizard_fewsunblobbed.dummy import IconStyle
+from lizard_fewsunblobbed.models_dummy import IconStyle
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Parameter
