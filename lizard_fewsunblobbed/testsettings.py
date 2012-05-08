@@ -21,10 +21,23 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.spatialite',
         'NAME': 'test.db',
         },
-    'fews-unblobbed': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'testunblobbed.db',
-        }
+    #'fewsnorm': {
+    #    'NAME': 'lizard-fewsunblobbednorm',
+    #    #'ENGINE': 'django.contrib.gis.db.backends.postgis',
+    #    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #    'USER': 'buildout',
+    #    'PASSWORD': 'buildout',
+    #    'HOST': 'localhost',  # empty string for localhost.
+    #    'PORT': '',  # empty string for default.
+    #    },
+    'fewsnorm': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': 'orcl1',
+        'USER': 'lizard_zzl_ejvos',
+        'PASSWORD': 'lizard_zzl_ejvos',
+        'HOST': '192.168.1.137', #nens-oraw08
+        'PORT': '1521',
+        },
     }
 
 SITE_ID = 1

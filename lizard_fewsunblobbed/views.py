@@ -23,7 +23,7 @@ def filter_exclude(filters, exclude_filters):
         lambda f: f['data']['fews_id'] not in exclude_filters, filters)
 
 
-def fews_filters(ignore_cache=False):
+def fews_filters(ignore_cache=True):
     """
     Return fews filter tree.
 
@@ -34,6 +34,8 @@ def fews_filters(ignore_cache=False):
     # In data, there's a key 'fews_id'
     if filters is None or ignore_cache:
         filters = Filter.dump_bulk()  # Optional: parent
+        from pprint import pprint
+        pprint(filters)
 
         # Filter out some root filters: get settings.
         try:

@@ -1,0 +1,36 @@
+[
+  {
+    "pk": 1,
+    "model": "lizard_fewsunblobbed.filter",
+    "fields": {
+      "parent": null,
+      "isendnode": false,
+      "issubfilter": false,
+      "fews_id": "1",
+      "name": "filter1name",
+      "description": "filter1desc",
+      "parentfilterid": null,
+      "validationiconsvisible": 0,
+      "mapextentid": null,
+      "viewpermission": null,
+      "editpermission": null
+    }
+  },
+  {
+    "pk": 2,
+    "model": "lizard_fewsunblobbed.filter",
+    "fields": {
+      "parent": 1,
+      "isendnode": true,
+      "issubfilter": false,
+      "fews_id": "2",
+      "name": "filter2name",
+      "description": "filter2desc",
+      "parentfilterid": "1",
+      "validationiconsvisible": 0,
+      "mapextentid": null,
+      "viewpermission": null,
+      "editpermission": null
+    }
+  }
+]
