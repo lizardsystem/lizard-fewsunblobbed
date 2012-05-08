@@ -435,6 +435,22 @@ class Parameter(models.Model):
         return '%s' % self.id
 
 
+class TimeStep(models.Model):
+    timestepkey = models.IntegerField(primary_key=True, db_column='timeStepKey')
+    id          = models.CharField(unique=True, null=False, max_length=64)
+    label       = models.CharField(max_length=64)
+
+    class Meta:
+        verbose_name = "TimeStep"
+        verbose_name_plural = "TimeSteps"
+        db_table = u'Timesteps'
+        is_fews_model = True
+        managed = True
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+
 class Location(models.Model):
     """
     Fewsnorm Location.
@@ -469,13 +485,64 @@ class Location(models.Model):
         return u'%s' % self.id
 
 
+class ModuleInstance(models.Model):
+    moduleinstancekey = models.IntegerField(primary_key=True, db_column='moduleInstanceKey')
+    id                = models.CharField(null=False, unique=True, max_length=64)
+    name              = models.CharField(max_length=64)
+    description       = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = "ModuleInstance"
+        verbose_name_plural = "ModuleInstances"
+        db_table = u'ModuleInstances'
+        is_fews_model = True
+        managed = True
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+
+class AggregationPeriod(models.Model):
+    aggregationperiodkey = models.IntegerField(primary_key=True, db_column='aggregationPeriodKey')
+    id                   = models.CharField(null=False, unique=True, max_length=64)
+    description          = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = "AggregationPeriod"
+        verbose_name_plural = "AggregationPeriods"
+        db_table = u'AggregationPeriods'
+        is_fews_model = True
+        managed = True
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+
+class Qualifier(models.Model):
+    qualifierkey = models.IntegerField(primary_key=True, db_column='qualifierKey')
+    id           = models.CharField(null=False, unique=True, max_length=64)
+    name         = models.CharField(max_length=64)
+    shortname    = models.CharField(max_length=64, db_column='shortName')
+    description  = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = "Qualifier"
+        verbose_name_plural = "Qualifiers"
+        db_table = u'Qualifiers'
+        is_fews_model = True
+        managed = True
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+
 class QualifierSet(models.Model):
     qualifiersetkey = models.IntegerField(primary_key=True, db_column='qualifierSetKey')
     id              = models.CharField(unique=True, null=False, blank=False, max_length=64)
-    qualifier1    = ForeignKey(Qualifier, null=False, db_column='qualifierKey1')
-    qualifier2    = ForeignKey(Qualifier, null=True, db_column='qualifierKey2')
-    qualifier3    = ForeignKey(Qualifier, null=True, db_column='qualifierKey3')
-    qualifier4    = ForeignKey(Qualifier, null=True, db_column='qualifierKey4')
+    qualifier1      = models.ForeignKey(Qualifier, null=False, db_column='qualifierKey1', related_name='+')
+    qualifier2      = models.ForeignKey(Qualifier, null=True, db_column='qualifierKey2', related_name='+')
+    qualifier3      = models.ForeignKey(Qualifier, null=True, db_column='qualifierKey3', related_name='+')
+    qualifier4      = models.ForeignKey(Qualifier, null=True, db_column='qualifierKey4', related_name='+')
 
     class Meta:
         verbose_name = "QualifierSet"
@@ -517,6 +584,18 @@ class TimeSeriesKey(models.Model):
             self.parameter,
             self.qualifierset,
             self.moduleinstance)
+
+
+class FilterTimeSeriesKey(models.Model):
+    filter = models.ForeignKey(Filter, null=False, db_column='filterKey')
+    series = models.ForeignKey(TimeSeriesKey, null=False, db_column='seriesKey')
+
+    class Meta:
+        verbose_name = "FilterTimeSeriesKey"
+        verbose_name_plural = "FilterTimeSeriesKeys"
+        db_table = u'FilterTimeSeriesKeys'
+        is_fews_model = True
+        managed = True
 
 
 class Timeserie(models.Model):
