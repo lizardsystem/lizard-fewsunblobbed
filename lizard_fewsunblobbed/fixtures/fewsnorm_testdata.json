@@ -32,5 +32,96 @@
       "viewpermission": null,
       "editpermission": null
     }
+  },
+  {
+    "pk": 1,
+    "model": "lizard_fewsunblobbed.location",
+    "fields": {
+      "id": "1",
+      "name": 1,
+      "shortname": "1",
+      "description": "1",
+      "icon": 1,
+      "tooltip": 1,
+      "parentlocationid": "null",
+      "visibilitystarttime": "2000-01-01 12:01",
+      "visibilityendtime": "2000-01-01 12:01",
+      "x": 1.1,
+      "y": 2.2,
+      "z": 3.3,
+      "area": 9.9,
+      "relationalocationid": "null",
+      "relationblocationid": "null",
+      "attributea": "a",
+      "attributeb": 4.4
+    }
+  },
+  {
+    "pk": 1,
+    "model": "lizard_fewsunblobbed.timestep",
+    "fields": {
+      "id": "1",
+      "label": "1"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "lizard_fewsunblobbed.moduleinstance",
+    "fields": {
+      "id": "1",
+      "name": 1,
+      "description": "1"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "lizard_fewsunblobbed.parametergroup",
+    "fields": {
+      "id": "1",
+      "name": 1,
+      "description": "1",
+      "parametertype": "1",
+      "unit": "1",
+      "displayunit": "1"
+    }
+  },  {
+    "pk": 1,
+    "model": "lizard_fewsunblobbed.parameter",
+    "fields": {
+      "group": 1,
+      "id": "1",
+      "name": "param1name",
+      "shortname": "1",
+      "description": "param1desc",
+      "valueresolution": "1",
+      "allowmissing": 1,
+      "standardname": "1",
+      "standardnamemodifier": "1",
+      "attributea": "1",
+      "attributeb": 1.2
+    }
+  },
+  {
+    "pk": 1,
+    "model": "lizard_fewsunblobbed.timeserieskey",
+    "fields": {
+      "series": 1,
+      "location": 1,
+      "parameter": 1,
+      "qualifierset": null,
+      "moduleinstance": 1,
+      "timestep": 1,
+      "aggregationperiod": null,
+      "valuetype": 1,
+      "modificationtime": "2000-01-01 12:01"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "lizard_fewsunblobbed.filtertimeserieskey",
+    "fields": {
+      "filter": 2,
+      "series": 1
+    }
   }
 ]

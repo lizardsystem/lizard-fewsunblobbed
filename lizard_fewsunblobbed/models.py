@@ -21,7 +21,7 @@ import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('is_fews_model',)
 
 
-PARAMETER_CACHE_KEY = 'lizard.fewsunblobbed.models.parameter_cache_key::%s'
+PARAMETER_CACHE_KEY = 'lizard_fewsunblobbed.models.parameter_cache_key::%s'
 
 
 '''
@@ -311,7 +311,7 @@ class Filter(AL_Node):
 
         Note: parameters of descendants are not counted."""
         #return Timeserie.objects.filter(filterkey=self.id).exists()
-        return True
+        return FilterTimeSeriesKey.objects.filter(filter=self).exists()
 
     def parameters(self, ignore_cache=True):
         """Return parameters for this filter and the filters children.
@@ -325,7 +325,7 @@ class Filter(AL_Node):
             # Fetch all filter -> parameter combinations.
             for f in [self] + self.get_descendants():
                 for p in Parameter.objects.filter(
-                    timeserie__filterkey=f).distinct():
+                    timeserieskey__filtertimeserieskey__filter=f).distinct():
 
                     # Add filterkey for use in template (it's a m2m).
                     p.filterkey = f
@@ -412,7 +412,7 @@ class ParameterGroup(models.Model):
 
 class Parameter(models.Model):
     parameterkey         = models.IntegerField(primary_key=True, db_column='parameterKey')
-    groupkey             = models.ForeignKey(ParameterGroup, null=False, db_column='groupKey')
+    group                = models.ForeignKey(ParameterGroup, null=False, db_column='groupKey')
     id                   = models.CharField(max_length=64, unique=True, null=False, blank=False)
     name                 = models.CharField(max_length=64)
     shortname            = models.CharField(max_length=64, db_column='shortName')

@@ -17,6 +17,7 @@ from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Parameter
 from lizard_fewsunblobbed.models import Timeserie
+
 from lizard_map import coordinates
 from lizard_map import workspace
 from lizard_map.adapter import Graph
@@ -26,8 +27,7 @@ from lizard_map.symbol_manager import SymbolManager
 from lizard_map.mapnik_helper import add_datasource_point
 
 
-logger = logging.getLogger(
-    'lizard_fewsunblobbed.layers')  # pylint: disable=C0103, C0301
+logger = logging.getLogger('lizard_fewsunblobbed.layers')  # pylint: disable=C0103, C0301
 
 EPSILON = 0.0001
 # maps filter ids to icons

@@ -8,7 +8,7 @@ from lizard_fewsunblobbed.models import Filter
 
 from lizard_map.views import AppView
 
-FILTER_CACHE_KEY = 'lizard.fewsunblobbed.views.filter_cache_key'
+FILTER_CACHE_KEY = 'lizard_fewsunblobbed.views.filter_cache_key'
 logger = logging.getLogger(__name__)
 
 
