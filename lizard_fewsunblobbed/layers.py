@@ -1,3 +1,4 @@
+from pprint import pprint
 import os
 import datetime
 import copy
@@ -14,9 +15,9 @@ from django.http import Http404
 
 from lizard_fewsunblobbed.models_dummy import IconStyle
 from lizard_fewsunblobbed.models import Filter
-from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Parameter
-from lizard_fewsunblobbed.models import Timeserie
+from lizard_fewsunblobbed.models import TimeSeriesKey
+from lizard_fewsunblobbed.models import query_locations_for_filter, query_timeseries_for_parameter, query_timeseries_for_location
 
 from lizard_map import coordinates
 from lizard_map import workspace
@@ -29,6 +30,7 @@ from lizard_map.mapnik_helper import add_datasource_point
 
 logger = logging.getLogger('lizard_fewsunblobbed.layers')  # pylint: disable=C0103, C0301
 
+TIMESERIES_CACHE_KEY = 'lizard_fewsunblobbed.layers.timeseries_%s_%s'
 EPSILON = 0.0001
 # maps filter ids to icons
 # TODO: remove from this file to a generic place
@@ -187,7 +189,7 @@ def fews_point_style(
     make mapnik point_style for fews point with given filterkey
     """
     point_style_name, output_filename = fews_symbol_name(
-        fews_filter.pk, fews_location.pk, fews_parameter.pk,
+        None, None, None,
         nodata, styles, lookup)
     output_filename_abs = os.path.join(
         settings.MEDIA_ROOT, 'generated_icons', output_filename)
@@ -209,10 +211,7 @@ def fews_timeserie(filterkey, locationkey, parameterkey):
     """Get fews timeserie from filter, location, parameter. Beware:
     sometimes multiple items are returned."""
 
-    result = Timeserie.objects.filter(
-        filterkey=filterkey,
-        locationkey=locationkey,
-        parameterkey=parameterkey)
+    result = query_timeseries_for_location(filterkey, locationkey, parameterkey)
     if len(result) == 0:
         raise Http404(
             "Timeserie for filter %s, location %s, param %s not found." % (
@@ -286,16 +285,14 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                     'Name', info['location_name'])
 
             point_style_name, point_style = fews_point_style(
-                info['object'].filterkey, info['object'].locationkey,
-                info['object'].parameterkey, nodata=False, styles=fews_styles,
+                None, None, None, nodata=False, styles=fews_styles,
                 lookup=fews_style_lookup)
             # generate "unique" point style name and append to layer
             style_name = "fews-unblobbed::%s" % point_style_name
             styles_data[style_name] = point_style
 
             point_style_nodata_name, point_style_nodata = fews_point_style(
-                info['object'].filterkey, info['object'].locationkey,
-                info['object'].parameterkey, nodata=True, styles=fews_styles,
+                None, None, None, nodata=True, styles=fews_styles,
                 lookup=fews_style_lookup)
             # generate "unique" point style name and append to layer
             style_name_nodata = "fews-unblobbed-nodata::%s" % (
@@ -313,14 +310,15 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         styles.update(styles_nodata)
 
         layers = [layer_nodata, layer]  # TODO: the layer WITH data on top
+        #pprint(layers) # TODO
+        #pprint(styles) # TODO
         return layers, styles
 
     def _timeseries(self):
         """
         Get list of dicts of all timeseries. Optimized for performance.
         """
-        cache_key = 'lizard_fewsunblobbed.layers.timeseries_%s_%s' % (
-            self.filterkey, self.parameterkey)
+        cache_key = TIMESERIES_CACHE_KEY % (self.filterkey, self.parameterkey)
         result = cache.get(cache_key)
         if result is None:
             # fetching locationkey and parameterkey seems to be very expensive
@@ -328,44 +326,44 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
             # Pre load all used locations in a dictionary.
             # In some cases it takes 3 seconds?
-            locations = dict([(location.pk, location)
-                              for location in Location.objects.filter(
-                        timeserie__filterkey=self.filterkey)])
+            #locations = dict([(location.pk, location) for location in query_locations_for_filter(self.filterkey)]) #TODO
             result = []
-            related_timeseries = list(Timeserie.objects.filter(
-                    filterkey=self.filterkey,
-                    parameterkey=self.parameterkey))
+            related_timeseries = query_timeseries_for_parameter(self.filterkey, self.parameterkey)
 
             # Fetch cached has_data dict for all timeseries.
-            timeseries_has_data = Timeserie.has_data_dict()
+            timeseries_has_data = TimeSeriesKey.has_data_dict() #TODO
             for timeserie in related_timeseries:
-                location = locations[timeserie.locationkey_id]
-                name = u'%s (%s): %s' % (parameter.name, parameter.unit,
+                #location = locations[timeserie.locationkey_id] #TODO
+                location = timeserie.location
+                name = u'%s (%s): %s' % (parameter.name, parameter.group.unit,
                                          location.name)
                 shortname = u'%s' % location.name
-                result.append(
-                {'rd_x': location.x,
-                 'rd_y': location.y,
-                 'longitude': location.longitude,
-                 'latitude': location.latitude,
-                 'object': timeserie,
-                 'location_name': location.name.encode('ascii', 'replace'),
-                 # ^^^ This used to be ``str(location.name)``.
-                 # Which fails on non-ascii input.
-                 # TODO: does it really need to be a string?
-                 # It seems to be proper unicode to begin with.
-                 'name': name,
-                 'shortname': shortname,
-                 'workspace_item': self.workspace_item,
-                 'identifier': {'locationkey': location.pk},
-                 'google_coords': location.google_coords(),
-                 'has_data': timeserie.pk in timeseries_has_data,
-                 })
+                gc = location.google_coords()
+                lat, lon = location.wgs84_coords()
+                result.append({
+                    'rd_x': location.x,
+                    'rd_y': location.y,
+                    'longitude': lat,
+                    'latitude': lon,
+                    'object': timeserie,
+                    'location_name': location.name.encode('ascii', 'replace'),
+                    # ^^^ This used to be ``str(location.name)``.
+                    # Which fails on non-ascii input.
+                    # TODO: does it really need to be a string?
+                    # It seems to be proper unicode to begin with.
+                    'name': name,
+                    'shortname': shortname,
+                    'workspace_item': self.workspace_item,
+                    'identifier': {'locationkey': location.pk},
+                    'google_coords': gc,
+                    'has_data': timeserie.pk in timeseries_has_data,
+                })
             cache.set(cache_key, result, 8 * 60 * 60)
         else:
             # the workspace_item can be different, so overwrite with our own
             for row in result:
                 row['workspace_item'] = self.workspace_item
+        #pprint(result, depth=3) # TODO
         return copy.deepcopy(result)
 
     def extent(self, identifiers=None):
@@ -458,7 +456,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             locationkey,
             self.parameterkey)
 
-        identifier = {'locationkey': timeserie.locationkey.pk}
+        identifier = {'locationkey': timeserie.location.pk}
         if layout is not None:
             identifier['layout'] = layout
 
@@ -468,7 +466,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             'object': timeserie,
             'workspace_item': self.workspace_item,
             'identifier': identifier,
-            'google_coords': timeserie.locationkey.google_coords(),
+            'google_coords': timeserie.location.google_coords(),
             }
 
     def image(self,

@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('is_fews_model',)
 
-
+TSK_HAS_DATA_CACHE_KEY = 'lizard_fewsunblobbed.models.timeserieskey_hasdata'
 PARAMETER_CACHE_KEY = 'lizard_fewsunblobbed.models.parameter_cache_key::%s'
 
 
@@ -281,9 +281,9 @@ class Filter(AL_Node):
     # treebeard expects (hardcoded) fields 'id' and 'parent', while
     # fews exposes fkey and parentfkey.
     id                     = models.IntegerField(primary_key=True, db_column='filterKey')
-    parent                 = models.ForeignKey('Filter', null=True, blank=True, db_column='parentFilterKey') # NOTE: not in FEWSNORM-ZZL
-    isendnode              = models.BooleanField() # NOTE: not in FEWSNORM-ZZL
-    issubfilter            = models.BooleanField() # NOTE: not in FEWSNORM-ZZL
+    parent                 = models.ForeignKey('Filter', null=True, blank=True, db_column='parentFilterKey') # TODO: NOTE: not in FEWSNORM-ZZL
+    isendnode              = models.BooleanField() # TODO: NOTE: not in FEWSNORM-ZZL
+    issubfilter            = models.BooleanField() # TODO: NOTE: not in FEWSNORM-ZZL
     # since 'id' is already used, we remap 'id' to 'fews_id'.
     fews_id                = models.CharField(max_length=64, unique=True, null=False, blank=False, db_column='id')
     name                   = Nullable64CharField()
@@ -310,8 +310,7 @@ class Filter(AL_Node):
         """Return whether there is at least one connected timeserie.
 
         Note: parameters of descendants are not counted."""
-        #return Timeserie.objects.filter(filterkey=self.id).exists()
-        return FilterTimeSeriesKey.objects.filter(filter=self).exists()
+        return query_parameters_exists_for_filter(self)
 
     def parameters(self, ignore_cache=True):
         """Return parameters for this filter and the filters children.
@@ -324,8 +323,7 @@ class Filter(AL_Node):
             parameters = []  # Start new one
             # Fetch all filter -> parameter combinations.
             for f in [self] + self.get_descendants():
-                for p in Parameter.objects.filter(
-                    timeserieskey__filtertimeserieskey__filter=f).distinct():
+                for p in query_distinct_parameters_for_filter(f):
 
                     # Add filterkey for use in template (it's a m2m).
                     p.filterkey = f
@@ -349,7 +347,7 @@ class Filter(AL_Node):
     def dump_bulk(cls, parent=None, keep_ids=True):
         '''Dumps a tree branch to a python data structure.
         NOTE: Bugfix for sib_order already in treebeard 1.61.
-        Overridden from treebeard to retain has_parameters.
+        Overridden from treebeard to retain "has_parameters".
         '''
         serializable_cls = cls._get_serializable_model()
         if parent and serializable_cls != cls and \
@@ -484,6 +482,11 @@ class Location(models.Model):
     def __unicode__(self):
         return u'%s' % self.id
 
+    def google_coords(self):
+        return coordinates.rd_to_google(self.x, self.y)
+
+    def wgs84_coords(self):
+        return coordinates.rd_to_wgs84(self.x, self.y)
 
 class ModuleInstance(models.Model):
     moduleinstancekey = models.IntegerField(primary_key=True, db_column='moduleInstanceKey')
@@ -585,6 +588,59 @@ class TimeSeriesKey(models.Model):
             self.qualifierset,
             self.moduleinstance)
 
+    @property
+    def name(self):
+        """Return name for use in graph legends"""
+        return u'%s (%s): %s' % (self.parameter.name,
+                                self.parameter.group.displayunit,
+                                self.location.name)
+
+    @property
+    def shortname(self):
+        """Return name for use in graph legends"""
+        return u'%s' % (self.location.name)
+
+    @classmethod
+    def has_data_dict(cls, ignore_cache=True):
+        """
+        Return for each timeserie id if it has data.
+
+        If a timeserie has data, its id is listed in the returned
+        dict. Handy when looping over great amounts of timeseries.
+        """
+        cache_key = TSK_HAS_DATA_CACHE_KEY
+        result = cache.get(cache_key)
+        if result is None or ignore_cache:
+            logger.info('Populating TimeSeriesKey.has_data_dict...')
+            tsd = TimeSeriesValuesAndFlag.objects.all().values('series').distinct()
+            tsd_dict = {}
+            for row in tsd:
+                tsd_dict[row['series']] = None  # Just make an entry
+            cache.set(cache_key, tsd_dict, 8 * 60 * 60)
+            result = tsd_dict
+        return result
+
+
+class TimeSeriesValuesAndFlag(models.Model):
+    id = models.IntegerField(primary_key=True, db_column='id') # TODO: NOTE: not in FEWSNORM-ZZL
+    series = models.ForeignKey(TimeSeriesKey, db_column='seriesKey')
+    datetime = models.DateTimeField(db_column='dateTime')
+    scalarvalue = models.FloatField(db_column='scalarValue', null=True)
+    flags = models.IntegerField(db_column='flags', null=False)
+
+    class Meta:
+        verbose_name = "TimeSeriesValuesAndFlag"
+        verbose_name_plural = "TimeSeriesValuesAndFlags"
+        db_table = u'TimeSeriesValuesAndFlags'
+        is_fews_model = True
+        managed = True
+
+    def __unicode__(self):
+        return u'%s value=%s %s' % (
+            self.datetime,
+            self.scalarvalue,
+            self.flags)
+
 
 class FilterTimeSeriesKey(models.Model):
     filter = models.ForeignKey(Filter, null=False, db_column='filterKey')
@@ -600,3 +656,26 @@ class FilterTimeSeriesKey(models.Model):
 
 class Timeserie(models.Model):
     pass
+
+
+# queries defined here, to make an improvised data access layer,
+# and because we expect the need for raw sql optimisations
+
+def query_distinct_parameters_for_filter(filter):
+    return Parameter.objects.filter(timeserieskey__filtertimeserieskey__filter=filter).distinct()
+
+def query_parameters_exists_for_filter(filter):
+    #return Timeserie.objects.filter(filterkey=self.id).exists()
+    return FilterTimeSeriesKey.objects.filter(filter=filter).exists()
+
+def query_locations_for_filter(filterkey):
+    #Location.objects.filter(timeserie__filterkey=self.filterkey)])
+    return Location.objects.filter(timeserieskey__filtertimeserieskey__filter=filterkey)
+
+def query_timeseries_for_parameter(filterkey, parameterkey):
+    #Timeserie.objects.filter(filterkey=self.filterkey, parameterkey=self.parameterkey)
+    return TimeSeriesKey.objects.filter(filtertimeserieskey__filter=filterkey, parameter=parameterkey)
+
+def query_timeseries_for_location(filterkey, parameterkey, locationkey):
+    #Timeserie.objects.filter(filterkey=filterkey, locationkey=locationkey, parameterkey=parameterkey)
+    return TimeSeriesKey.objects.filter(filtertimeserieskey__filter=filterkey, parameter=parameterkey, location=locationkey)

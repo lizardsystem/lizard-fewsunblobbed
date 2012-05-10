@@ -34,8 +34,6 @@ def fews_filters(ignore_cache=True):
     # In data, there's a key 'fews_id'
     if filters is None or ignore_cache:
         filters = Filter.dump_bulk()  # Optional: parent
-        from pprint import pprint
-        pprint(filters)
 
         # Filter out some root filters: get settings.
         try:
