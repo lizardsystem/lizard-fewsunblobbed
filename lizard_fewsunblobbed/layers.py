@@ -1,4 +1,3 @@
-from pprint import pprint
 import os
 import datetime
 import copy
@@ -315,8 +314,6 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         styles.update(styles_nodata)
 
         layers = [layer_nodata, layer]  # TODO: the layer WITH data on top
-        #pprint(layers) # TODO
-        #pprint(styles) # TODO
         return layers, styles
 
     def _timeseries(self):
@@ -331,14 +328,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
             # Pre load all used locations in a dictionary.
             # In some cases it takes 3 seconds?
-            #locations = dict([(location.pk, location) for location in query_locations_for_filter(self.filterkey)]) #TODO
             result = []
             related_timeseries = query_timeseries_for_parameter(self.filterkey, self.parameterkey)
 
             # Fetch cached has_data dict for all timeseries.
-            timeseries_has_data = TimeSeriesKey.has_data_dict() #TODO
+            timeseries_has_data = TimeSeriesKey.has_data_dict()
             for timeserie in related_timeseries:
-                #location = locations[timeserie.locationkey_id] #TODO
                 location = timeserie.location
                 name = u'%s (%s): %s' % (parameter.name, parameter.group.unit,
                                          location.name)
@@ -368,7 +363,6 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             # the workspace_item can be different, so overwrite with our own
             for row in result:
                 row['workspace_item'] = self.workspace_item
-        #pprint(result, depth=3) # TODO
         return copy.deepcopy(result)
 
     def extent(self, identifiers=None):

@@ -23,7 +23,7 @@ def filter_exclude(filters, exclude_filters):
         lambda f: f['data']['fews_id'] not in exclude_filters, filters)
 
 
-def fews_filters(ignore_cache=True):
+def fews_filters(ignore_cache=False):
     """
     Return fews filter tree.
 
