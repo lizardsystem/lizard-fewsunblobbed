@@ -17,7 +17,7 @@
     "pk": 2,
     "model": "lizard_fewsunblobbed.filter",
     "fields": {
-      "fews_id": "2",
+      "fews_id": "Afdeling_KNMI",
       "name": "filter2name",
       "description": "filter2desc",
       "parent": "1",
@@ -73,7 +73,7 @@
     "pk": 1,
     "model": "lizard_fewsunblobbed.location",
     "fields": {
-      "id": "1",
+      "id": "HANOP",
       "name": "1",
       "shortname": "1",
       "description": "1",
@@ -119,8 +119,8 @@
     "pk": 1,
     "model": "lizard_fewsunblobbed.timestep",
     "fields": {
-      "id": "1",
-      "label": "1"
+      "id": "uur",
+      "label": "uur"
     }
   },
   {
@@ -135,7 +135,7 @@
     "pk": 1,
     "model": "lizard_fewsunblobbed.moduleinstance",
     "fields": {
-      "id": "1",
+      "id": "RegimeApp",
       "name": 1,
       "description": "1"
     }
@@ -178,7 +178,7 @@
     "model": "lizard_fewsunblobbed.parameter",
     "fields": {
       "group": 1,
-      "id": "1",
+      "id": "P.radar.merge",
       "name": "param1name",
       "shortname": "1",
       "description": "param1desc",

@@ -31,7 +31,7 @@ class Filter(AL_Node):
     # treebeard expects (hardcoded) fields 'id' and 'parent', while
     # fews exposes id and parentFilterId.
     id                     = models.IntegerField(primary_key=True, db_column='filterKey')
-    parent                 = models.ForeignKey('Filter', null=True, db_column='parentFilterId', related_name='+', to_field='fews_id')
+    parent                 = models.ForeignKey('Filter', null=True, blank=True, db_column='parentFilterId', related_name='+', to_field='fews_id')
     # since 'id' is already used, we remap 'id' to 'fews_id'.
     fews_id                = models.CharField(max_length=64, unique=True, null=False, blank=False, db_column='id')
     name                   = Nullable64CharField()
@@ -417,10 +417,6 @@ class FilterTimeSeriesKey(models.Model):
         db_table = u'FilterTimeSeriesKeys'
         is_fews_model = True
         managed = True
-
-
-class Timeserie(models.Model):
-    pass
 
 
 # queries defined here, to make an improvised data access layer,
