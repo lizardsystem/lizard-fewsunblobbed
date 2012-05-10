@@ -17,7 +17,12 @@ from lizard_fewsunblobbed.models_dummy import IconStyle
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Parameter
 from lizard_fewsunblobbed.models import TimeSeriesKey
-from lizard_fewsunblobbed.models import query_locations_for_filter, query_timeseries_for_parameter, query_timeseries_for_location
+from lizard_fewsunblobbed.models import (
+    query_locations_for_filter,
+    query_timeseries_for_parameter,
+    query_timeseries_for_location,
+    query_timeseriedata_for_timeserie
+)
 
 from lizard_map import coordinates
 from lizard_map import workspace
@@ -424,15 +429,13 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             self.filterkey,
             identifier['locationkey'],
             self.parameterkey)
-        timeseriedata = timeserie.timeseriedata.order_by("tsd_time").filter(
-            tsd_time__gte=start_date,
-            tsd_time__lte=end_date)
+        timeseriedata = query_timeseriedata_for_timeserie(timeserie, start_date, end_date)
 
         result = []
         for timeserie_row in timeseriedata:
             result.append({
-                    'value': timeserie_row.tsd_value,
-                    'datetime': timeserie_row.tsd_time,
+                    'value': timeserie_row.scalarvalue,
+                    'datetime': timeserie_row.datetime,
                     'unit': '',  # We don't know the unit.
                     })
         return result
@@ -520,27 +523,27 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
             if "line_min" in layout:
                 aggregated = timeseriedata.aggregate(
-                    Min('tsd_value'))
+                    Min('scalarvalue'))
                 graph.axes.axhline(
-                    aggregated['tsd_value__min'],
+                    aggregated['scalarvalue__min'],
                     color=line_styles[str(identifier)]['color'],
                     lw=line_styles[str(identifier)]['min_linewidth'],
                     ls=line_styles[str(identifier)]['min_linestyle'],
                     label='Minimum')
             if "line_max" in layout:
                 aggregated = timeseriedata.aggregate(
-                    Max('tsd_value'))
+                    Max('scalarvalue'))
                 graph.axes.axhline(
-                    aggregated['tsd_value__max'],
+                    aggregated['scalarvalue__max'],
                     color=line_styles[str(identifier)]['color'],
                     lw=line_styles[str(identifier)]['max_linewidth'],
                     ls=line_styles[str(identifier)]['max_linestyle'],
                     label='Maximum')
             if "line_avg" in layout:
                 aggregated = timeseriedata.aggregate(
-                    Avg('tsd_value'))
+                    Avg('scalarvalue'))
                 graph.axes.axhline(
-                    aggregated['tsd_value__avg'],
+                    aggregated['scalarvalue__avg'],
                     color=line_styles[str(identifier)]['color'],
                     lw=line_styles[str(identifier)]['avg_linewidth'],
                     ls=line_styles[str(identifier)]['avg_linestyle'],
@@ -563,17 +566,14 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 self.filterkey,
                 identifier['locationkey'],
                 self.parameterkey)
-            timeseriedata = timeserie.timeseriedata.order_by(
-                "tsd_time").filter(
-                tsd_time__gte=start_date,
-                tsd_time__lte=end_date)
+            timeseriedata = query_timeseriedata_for_timeserie(timeserie, start_date, end_date)
 
             # Plot data.
             dates = []
             values = []
             for series_row in timeseriedata:
-                dates.append(series_row.tsd_time)
-                values.append(series_row.tsd_value)
+                dates.append(series_row.datetime)
+                values.append(series_row.scalarvalue)
             if len(values) < 30:
                 plot_style = 'o-'
             else:
@@ -582,7 +582,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                             lw=1,
                             color=line_styles[str(identifier)]['color'],
                             label=timeserie.name)
-            graph.axes.set_ylabel(timeserie.parameterkey.unit)
+            graph.axes.set_ylabel(timeserie.parameter.group.displayunit)
 
             # Apply custom layout parameters.
             if 'layout' in identifier:

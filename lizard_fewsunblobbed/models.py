@@ -679,3 +679,9 @@ def query_timeseries_for_parameter(filterkey, parameterkey):
 def query_timeseries_for_location(filterkey, parameterkey, locationkey):
     #Timeserie.objects.filter(filterkey=filterkey, locationkey=locationkey, parameterkey=parameterkey)
     return TimeSeriesKey.objects.filter(filtertimeserieskey__filter=filterkey, parameter=parameterkey, location=locationkey)
+
+def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
+    return timeserie.timeseriesvaluesandflag_set.order_by(
+                "datetime").filter(
+                datetime__gte=start_date,
+                datetime__lte=end_date)
