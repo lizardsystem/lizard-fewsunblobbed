@@ -300,7 +300,7 @@
     "model": "lizard_fewsunblobbed.timeseriesvaluesandflag",
     "fields": {
       "series": 1,
-      "datetime": "2012-05-10 12:02",
+      "datetime": "2012-05-09 23:59",
       "scalarvalue": 3.0,
       "flags": 1
     }

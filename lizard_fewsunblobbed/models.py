@@ -281,14 +281,14 @@ class Filter(AL_Node):
     # treebeard expects (hardcoded) fields 'id' and 'parent', while
     # fews exposes fkey and parentfkey.
     id                     = models.IntegerField(primary_key=True, db_column='filterKey')
-    parent                 = models.ForeignKey('Filter', null=True, blank=True, db_column='parentFilterKey') # TODO: NOTE: not in FEWSNORM-ZZL
-    isendnode              = models.BooleanField() # TODO: NOTE: not in FEWSNORM-ZZL
-    issubfilter            = models.BooleanField() # TODO: NOTE: not in FEWSNORM-ZZL
+    parent                 = models.ForeignKey('Filter', null=True, db_column='parentFilterId', related_name='+', to_field='id')
+    #parent                 = models.ForeignKey('Filter', null=True, blank=True, db_column='parentFilterKey') # TODO: NOTE: not in FEWSNORM-ZZL
+    #isendnode              = models.BooleanField() # TODO: NOTE: not in FEWSNORM-ZZL
+    #issubfilter            = models.BooleanField() # TODO: NOTE: not in FEWSNORM-ZZL
     # since 'id' is already used, we remap 'id' to 'fews_id'.
     fews_id                = models.CharField(max_length=64, unique=True, null=False, blank=False, db_column='id')
     name                   = Nullable64CharField()
     description            = models.CharField(max_length=255, null=True, blank=True)
-    parentfilterid         = Nullable64CharField(db_column='parentFilterId')
     validationiconsvisible = models.IntegerField(null=False, default=0, db_column='validationIconsVisible')
     mapextentid            = Nullable64CharField(db_column='mapExtentId')
     viewpermission         = Nullable64CharField(db_column='viewPermission')
@@ -305,12 +305,26 @@ class Filter(AL_Node):
     def __unicode__(self):
         return u'%s (id=%s)' % (self.name, self.fews_id)
 
+    __isendnode = None
+    @property
+    def isendnode(self):
+        if not self.__isendnode:
+            self.__isendnode = self.parent != None
+        return self.__isendnode
+
+    __issubfilter = None
+    @property
+    def issubfilter(self):
+        if not self.__issubfilter:
+            self.__issubfilter = self.parent == None
+        return self.__issubfilter
+
     @property
     def has_parameters(self):
         """Return whether there is at least one connected timeserie.
 
         Note: parameters of descendants are not counted."""
-        return query_parameters_exists_for_filter(self)
+        return query_parameters_exist_for_filter(self)
 
     def parameters(self, ignore_cache=True):
         """Return parameters for this filter and the filters children.
@@ -347,7 +361,8 @@ class Filter(AL_Node):
     def dump_bulk(cls, parent=None, keep_ids=True):
         '''Dumps a tree branch to a python data structure.
         NOTE: Bugfix for sib_order already in treebeard 1.61.
-        Overridden from treebeard to retain "has_parameters".
+        Overridden from treebeard to retain has_parameters, isendnode.
+        Also uses 'fews_id' to build the parent->child relations, unlike treebeard.
         '''
         serializable_cls = cls._get_serializable_model()
         if parent and serializable_cls != cls and \
@@ -372,6 +387,7 @@ class Filter(AL_Node):
                 del fields['id']
 
             fields['has_parameters'] = node.has_parameters
+            fields['isendnode'] = node.isendnode
             newobj = {'data': fields}
             if keep_ids:
                 newobj['id'] = pyobj['pk']
@@ -384,7 +400,7 @@ class Filter(AL_Node):
                 if 'children' not in parentobj:
                     parentobj['children'] = []
                 parentobj['children'].append(newobj)
-            lnk[node.id] = newobj
+            lnk[node.fews_id] = newobj
         return ret
 
 
@@ -629,6 +645,7 @@ class TimeSeriesValuesAndFlag(models.Model):
     flags = models.IntegerField(db_column='flags', null=False)
 
     class Meta:
+        unique_together = ['series', 'datetime']
         verbose_name = "TimeSeriesValuesAndFlag"
         verbose_name_plural = "TimeSeriesValuesAndFlags"
         db_table = u'TimeSeriesValuesAndFlags'
@@ -664,7 +681,7 @@ class Timeserie(models.Model):
 def query_distinct_parameters_for_filter(filter):
     return Parameter.objects.filter(timeserieskey__filtertimeserieskey__filter=filter).distinct()
 
-def query_parameters_exists_for_filter(filter):
+def query_parameters_exist_for_filter(filter):
     #return Timeserie.objects.filter(filterkey=self.id).exists()
     return FilterTimeSeriesKey.objects.filter(filter=filter).exists()
 
