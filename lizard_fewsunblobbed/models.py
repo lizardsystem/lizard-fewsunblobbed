@@ -447,7 +447,7 @@ def query_timeseries_for_location(filterkey, parameterkey, locationkey):
 
 def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
     return timeserie.timeseriesvaluesandflag_set.order_by(
-        "datetime").filter(datetime__range=(start, end))
+        "datetime").filter(datetime__range=(start_date, end_date))
         #"datetime").filter(
         #datetime__gte=start_date,
         #datetime__lte=end_date)
