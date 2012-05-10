@@ -174,7 +174,7 @@ class ParameterGroup(models.Model):
 
 class Parameter(models.Model):
     parameterkey         = models.IntegerField(primary_key=True, db_column='parameterKey')
-    group                = models.ForeignKey(ParameterGroup, null=False, db_column='groupKey')
+    group                = models.ForeignKey('ParameterGroup', null=False, db_column='groupKey')
     id                   = models.CharField(max_length=64, unique=True, null=False, blank=False)
     name                 = models.CharField(max_length=64)
     shortname            = models.CharField(max_length=64, db_column='shortName')
@@ -306,10 +306,10 @@ class Qualifier(models.Model):
 class QualifierSet(models.Model):
     qualifiersetkey = models.IntegerField(primary_key=True, db_column='qualifierSetKey')
     id              = models.CharField(unique=True, null=False, blank=False, max_length=64)
-    qualifier1      = models.ForeignKey(Qualifier, null=False, db_column='qualifierKey1', related_name='+')
-    qualifier2      = models.ForeignKey(Qualifier, null=True, db_column='qualifierKey2', related_name='+')
-    qualifier3      = models.ForeignKey(Qualifier, null=True, db_column='qualifierKey3', related_name='+')
-    qualifier4      = models.ForeignKey(Qualifier, null=True, db_column='qualifierKey4', related_name='+')
+    qualifier1      = models.ForeignKey('Qualifier', null=False, db_column='qualifierKey1', related_name='+')
+    qualifier2      = models.ForeignKey('Qualifier', null=True, db_column='qualifierKey2', related_name='+')
+    qualifier3      = models.ForeignKey('Qualifier', null=True, db_column='qualifierKey3', related_name='+')
+    qualifier4      = models.ForeignKey('Qualifier', null=True, db_column='qualifierKey4', related_name='+')
 
     class Meta:
         verbose_name = "QualifierSet"
@@ -324,12 +324,12 @@ class QualifierSet(models.Model):
 
 class TimeSeriesKey(models.Model):
     series            = models.IntegerField(primary_key=True, db_column='seriesKey')
-    location          = models.ForeignKey(Location, null=False, db_column='locationKey')
-    parameter         = models.ForeignKey(Parameter, null=False, db_column='parameterKey')
-    qualifierset      = models.ForeignKey(QualifierSet, null=True, db_column='qualifierSetKey')
-    moduleinstance    = models.ForeignKey(ModuleInstance, null=False, db_column='moduleInstanceKey')
-    timestep          = models.ForeignKey(TimeStep, null=False, db_column='timeStepKey')
-    aggregationperiod = models.ForeignKey(AggregationPeriod, null=True, db_column='aggregationPeriodKey')
+    location          = models.ForeignKey('Location', null=False, db_column='locationKey')
+    parameter         = models.ForeignKey('Parameter', null=False, db_column='parameterKey')
+    qualifierset      = models.ForeignKey('QualifierSet', null=True, db_column='qualifierSetKey')
+    moduleinstance    = models.ForeignKey('ModuleInstance', null=False, db_column='moduleInstanceKey')
+    timestep          = models.ForeignKey('TimeStep', null=False, db_column='timeStepKey')
+    aggregationperiod = models.ForeignKey('AggregationPeriod', null=True, db_column='aggregationPeriodKey')
     valuetype         = models.IntegerField(null=False, default=0, db_column='valueType')
     modificationtime  = models.DateTimeField(db_column='modificationTime')
 
@@ -387,7 +387,7 @@ class TimeSeriesKey(models.Model):
 
 class TimeSeriesValuesAndFlag(models.Model):
     id = models.IntegerField(primary_key=True, db_column='id') # TODO: NOTE: not in FEWSNORM-ZZL
-    series = models.ForeignKey(TimeSeriesKey, db_column='seriesKey')
+    series = models.ForeignKey('TimeSeriesKey', db_column='seriesKey')
     datetime = models.DateTimeField(db_column='dateTime')
     scalarvalue = models.FloatField(db_column='scalarValue', null=True)
     flags = models.IntegerField(db_column='flags', null=False)
@@ -408,8 +408,8 @@ class TimeSeriesValuesAndFlag(models.Model):
 
 
 class FilterTimeSeriesKey(models.Model):
-    filter = models.ForeignKey(Filter, null=False, db_column='filterKey')
-    series = models.ForeignKey(TimeSeriesKey, null=False, db_column='seriesKey')
+    filter = models.ForeignKey('Filter', null=False, db_column='filterKey')
+    series = models.ForeignKey('TimeSeriesKey', null=False, db_column='seriesKey')
 
     class Meta:
         verbose_name = "FilterTimeSeriesKey"
@@ -447,6 +447,7 @@ def query_timeseries_for_location(filterkey, parameterkey, locationkey):
 
 def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
     return timeserie.timeseriesvaluesandflag_set.order_by(
-        "datetime").filter(
-        datetime__gte=start_date,
-        datetime__lte=end_date)
+        "datetime").filter(datetime__range=(start, end))
+        #"datetime").filter(
+        #datetime__gte=start_date,
+        #datetime__lte=end_date)
