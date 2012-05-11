@@ -316,13 +316,13 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         layers = [layer_nodata, layer]  # TODO: the layer WITH data on top
         return layers, styles
 
-    def _timeseries(self):
+    def _timeseries(self, ignore_cache=False):
         """
         Get list of dicts of all timeseries. Optimized for performance.
         """
         cache_key = TIMESERIES_CACHE_KEY % (self.filterkey, self.parameterkey)
         result = cache.get(cache_key)
-        if result is None:
+        if result is None or ignore_cache:
             # fetching locationkey and parameterkey seems to be very expensive
             parameter = Parameter.objects.get(pk=self.parameterkey)
 

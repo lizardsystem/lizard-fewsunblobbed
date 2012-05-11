@@ -22,7 +22,11 @@ options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('is_fews_model',)
 
 TSK_HAS_DATA_CACHE_KEY = 'lizard_fewsunblobbed.models.timeserieskey_hasdata'
 PARAMETER_CACHE_KEY = 'lizard_fewsunblobbed.models.parameter_cache_key::%s'
+RELATED_FILTERS_CACHE_KEY = 'lizard_fewsunblobbed.models.filter.related::%s'
 
+FEWS_MANAGED = False
+if hasattr(settings, 'FEWS_MANAGED'):
+    FEWS_MANAGED = settings.FEWS_MANAGED
 
 Nullable64CharField = partial(models.CharField, max_length=64, null=True, blank=True)
 
@@ -47,7 +51,7 @@ class Filter(AL_Node):
         verbose_name_plural = "Filters"
         db_table = u'Filters'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s (id=%s)' % (self.name, self.fews_id)
@@ -151,6 +155,23 @@ class Filter(AL_Node):
             lnk[node.fews_id] = newobj
         return ret
 
+    @classmethod
+    def get_related_filters_for(cls, filterkey, ignore_cache=False):
+        node = cls.objects.get(pk=filterkey)
+        cache_key = RELATED_FILTERS_CACHE_KEY % str(node)
+        related_filters = cache.get(cache_key)
+        if related_filters is None or ignore_cache:
+            related_filters = set([node.pk])
+            #while node.parent != None:
+            #    node = node.parent
+            #    if node.pk in related_filters:
+            #        # pk already in set, so circular parent->child reference
+            #        raise Exception("circular relation for filters %s" % node)
+            #    related_filters.add(node.pk)
+            for childnode in node.get_descendants():
+                related_filters.add(childnode.pk)
+            cache.set(cache_key, related_filters, 8 * 60 * 60)
+        return related_filters
 
 class ParameterGroup(models.Model):
     groupkey      = models.IntegerField(primary_key=True, db_column='groupKey')
@@ -166,7 +187,7 @@ class ParameterGroup(models.Model):
         verbose_name_plural = "ParameterGroups"
         db_table = u'ParameterGroups'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s' % self.id
@@ -191,7 +212,7 @@ class Parameter(models.Model):
         verbose_name_plural = "Parameters"
         db_table = u'Parameters'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return '%s' % self.id
@@ -207,7 +228,7 @@ class TimeStep(models.Model):
         verbose_name_plural = "TimeSteps"
         db_table = u'Timesteps'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s' % self.id
@@ -241,7 +262,7 @@ class Location(models.Model):
         verbose_name_plural = "Locations"
         db_table = u'Locations'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s' % self.id
@@ -263,7 +284,7 @@ class ModuleInstance(models.Model):
         verbose_name_plural = "ModuleInstances"
         db_table = u'ModuleInstances'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s' % self.id
@@ -279,7 +300,7 @@ class AggregationPeriod(models.Model):
         verbose_name_plural = "AggregationPeriods"
         db_table = u'AggregationPeriods'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s' % self.id
@@ -297,7 +318,7 @@ class Qualifier(models.Model):
         verbose_name_plural = "Qualifiers"
         db_table = u'Qualifiers'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s' % self.id
@@ -316,7 +337,7 @@ class QualifierSet(models.Model):
         verbose_name_plural = "QualifierSets"
         db_table = u'QualifierSets'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s' % self.id
@@ -338,7 +359,7 @@ class TimeSeriesKey(models.Model):
         verbose_name_plural = "TimeSeriesKeys"
         db_table = u'TimeSeriesKeys'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def hash(self):
         return '%s::%s::%s::%s::%s' % (
@@ -398,7 +419,7 @@ class TimeSeriesValuesAndFlag(models.Model):
         verbose_name_plural = "TimeSeriesValuesAndFlags"
         db_table = u'TimeSeriesValuesAndFlags'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
     def __unicode__(self):
         return u'%s value=%s %s' % (
@@ -416,7 +437,7 @@ class FilterTimeSeriesKey(models.Model):
         verbose_name_plural = "FilterTimeSeriesKeys"
         db_table = u'FilterTimeSeriesKeys'
         is_fews_model = True
-        managed = True
+        managed = FEWS_MANAGED
 
 
 # queries defined here, to make an improvised data access layer,
@@ -431,15 +452,18 @@ def query_parameters_exist_for_filter(filter):
 
 def query_locations_for_filter(filterkey):
     #Location.objects.filter(timeserie__filterkey=self.filterkey)])
-    return Location.objects.filter(timeserieskey__filtertimeserieskey__filter=filterkey)
+    related_filters = Filter.get_related_filters_for(filterkey)
+    return Location.objects.filter(timeserieskey__filtertimeserieskey__filter__in=related_filters)
 
 def query_timeseries_for_parameter(filterkey, parameterkey):
     #Timeserie.objects.filter(filterkey=self.filterkey, parameterkey=self.parameterkey)
-    return TimeSeriesKey.objects.filter(filtertimeserieskey__filter=filterkey, parameter=parameterkey)
+    related_filters = Filter.get_related_filters_for(filterkey)
+    return TimeSeriesKey.objects.filter(filtertimeserieskey__filter__in=related_filters, parameter=parameterkey)
 
 def query_timeseries_for_location(filterkey, parameterkey, locationkey):
     #Timeserie.objects.filter(filterkey=filterkey, locationkey=locationkey, parameterkey=parameterkey)
-    return TimeSeriesKey.objects.filter(filtertimeserieskey__filter=filterkey, parameter=parameterkey, location=locationkey)
+    related_filters = Filter.get_related_filters_for(filterkey)
+    return TimeSeriesKey.objects.filter(filtertimeserieskey__filter__in=related_filters, parameter=parameterkey, location=locationkey)
 
 def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
     return timeserie.timeseriesvaluesandflag_set.order_by(
