@@ -407,7 +407,7 @@ class TimeSeriesKey(models.Model):
 
 
 class TimeSeriesValuesAndFlag(models.Model):
-    id = models.IntegerField(primary_key=True, db_column='id') # TODO: NOTE: not in FEWSNORM-ZZL
+    #id = models.IntegerField(primary_key=True, db_column='id') # TODO: NOTE: not in FEWSNORM-ZZL
     series = models.ForeignKey('TimeSeriesKey', db_column='seriesKey')
     datetime = models.DateTimeField(db_column='dateTime')
     scalarvalue = models.FloatField(db_column='scalarValue', null=True)
