@@ -39,11 +39,11 @@ class Filter(AL_Node):
     # since 'id' is already used, we remap 'id' to 'fews_id'.
     fews_id                = models.CharField(max_length=64, unique=True, null=False, blank=False, db_column='id')
     name                   = Nullable64CharField()
-    description            = models.CharField(max_length=255, null=True, blank=True)
-    validationiconsvisible = models.IntegerField(null=False, default=0, db_column='validationIconsVisible')
+    #description            = models.CharField(max_length=255, null=True, blank=True)
+    #validationiconsvisible = models.IntegerField(null=False, default=0, db_column='validationIconsVisible')
     mapextentid            = Nullable64CharField(db_column='mapExtentId')
     viewpermission         = Nullable64CharField(db_column='viewPermission')
-    editpermission         = Nullable64CharField(db_column='editPermission')
+    #editpermission         = Nullable64CharField(db_column='editPermission')
     node_order_by = ['name']
 
     class Meta:
@@ -177,8 +177,8 @@ class ParameterGroup(models.Model):
     groupkey      = models.IntegerField(primary_key=True, db_column='groupKey')
     id            = models.CharField(unique=True, null=False, blank=False, max_length=64)
     name          = models.CharField(max_length=64)
-    description   = models.CharField(max_length=255)
-    parametertype = models.CharField(max_length=64, null=False, blank=False, db_column='parameterType')
+    #description   = models.CharField(max_length=255)
+    #parametertype = models.CharField(max_length=64, null=False, blank=False, db_column='parameterType')
     unit          = models.CharField(max_length=64)
     displayunit   = models.CharField(max_length=64, db_column='displayUnit')
 
@@ -195,17 +195,17 @@ class ParameterGroup(models.Model):
 
 class Parameter(models.Model):
     parameterkey         = models.IntegerField(primary_key=True, db_column='parameterKey')
-    group                = models.ForeignKey('ParameterGroup', null=False, db_column='groupKey')
+    #group                = models.ForeignKey('ParameterGroup', null=False, db_column='groupKey')
     id                   = models.CharField(max_length=64, unique=True, null=False, blank=False)
     name                 = models.CharField(max_length=64)
     shortname            = models.CharField(max_length=64, db_column='shortName')
-    description          = models.CharField(max_length=255)
+    #description          = models.CharField(max_length=255)
     valueresolution      = models.FloatField(db_column='valueResolution')
     allowmissing         = models.IntegerField(null=False, default=0, db_column='allowMissing')
-    standardname         = models.CharField(max_length=128, db_column='standardName')
-    standardnamemodifier = models.CharField(max_length=64, db_column='standardNameModifier')
-    attributea           = models.CharField(max_length=64, db_column='attributeA')
-    attributeb           = models.FloatField(db_column='attributeB')
+    #standardname         = models.CharField(max_length=128, db_column='standardName')
+    #standardnamemodifier = models.CharField(max_length=64, db_column='standardNameModifier')
+    #attributea           = models.CharField(max_length=64, db_column='attributeA')
+    #attributeb           = models.FloatField(db_column='attributeB')
 
     class Meta:
         verbose_name = "Parameter"
@@ -241,21 +241,21 @@ class Location(models.Model):
     locationkey         = models.IntegerField(primary_key=True, db_column='locationKey')
     id                  = models.CharField(unique=True, null=False, blank=False, max_length=64)
     name                = models.CharField(max_length=64)
-    shortname           = models.CharField(max_length=64, db_column='shortName')
+    #shortname           = models.CharField(max_length=64, db_column='shortName')
     description         = models.CharField(max_length=255)
     icon                = models.CharField(max_length=64)
     tooltip             = models.CharField(max_length=64, db_column='toolTip')
     parentlocationid    = models.CharField(max_length=64, db_column='parentLocationId')
-    visibilitystarttime = models.DateTimeField(db_column='visibilityStartTime')
-    visibilityendtime   = models.DateTimeField(db_column='visibilityEndTime')
+    #visibilitystarttime = models.DateTimeField(db_column='visibilityStartTime')
+    #visibilityendtime   = models.DateTimeField(db_column='visibilityEndTime')
     x                   = models.FloatField(null=False)
     y                   = models.FloatField(null=False)
-    z                   = models.FloatField()
-    area                = models.FloatField()
-    relationalocationid = models.CharField(max_length=64, db_column='relationALocationId')
-    relationblocationid = models.CharField(max_length=64, db_column='relationBLocationId')
-    attributea          = models.CharField(max_length=64, db_column='attributeA')
-    attributeb          = models.FloatField(db_column='attributeB')
+    #z                   = models.FloatField()
+    #area                = models.FloatField()
+    #relationalocationid = models.CharField(max_length=64, db_column='relationALocationId')
+    #relationblocationid = models.CharField(max_length=64, db_column='relationBLocationId')
+    #attributea          = models.CharField(max_length=64, db_column='attributeA')
+    #attributeb          = models.FloatField(db_column='attributeB')
 
     class Meta:
         verbose_name = "Location"
@@ -309,8 +309,8 @@ class AggregationPeriod(models.Model):
 class Qualifier(models.Model):
     qualifierkey = models.IntegerField(primary_key=True, db_column='qualifierKey')
     id           = models.CharField(null=False, unique=True, max_length=64)
-    name         = models.CharField(max_length=64)
-    shortname    = models.CharField(max_length=64, db_column='shortName')
+    #name         = models.CharField(max_length=64)
+    #shortname    = models.CharField(max_length=64, db_column='shortName')
     description  = models.CharField(max_length=255)
 
     class Meta:
@@ -351,8 +351,8 @@ class TimeSeriesKey(models.Model):
     moduleinstance    = models.ForeignKey('ModuleInstance', null=False, db_column='moduleInstanceKey')
     timestep          = models.ForeignKey('TimeStep', null=False, db_column='timeStepKey')
     aggregationperiod = models.ForeignKey('AggregationPeriod', null=True, db_column='aggregationPeriodKey')
-    valuetype         = models.IntegerField(null=False, default=0, db_column='valueType')
-    modificationtime  = models.DateTimeField(db_column='modificationTime')
+    #valuetype         = models.IntegerField(null=False, default=0, db_column='valueType')
+    #modificationtime  = models.DateTimeField(db_column='modificationTime')
 
     class Meta:
         verbose_name = "TimeSeriesKey"
