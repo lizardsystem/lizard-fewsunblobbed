@@ -195,7 +195,7 @@ class ParameterGroup(models.Model):
 
 class Parameter(models.Model):
     parameterkey         = models.IntegerField(primary_key=True, db_column='parameterKey')
-    #group                = models.ForeignKey('ParameterGroup', null=False, db_column='groupKey')
+    group                = models.ForeignKey('Parameter`', null=False, db_column='groupKey')
     id                   = models.CharField(max_length=64, unique=True, null=False, blank=False)
     name                 = models.CharField(max_length=64)
     shortname            = models.CharField(max_length=64, db_column='shortName')
@@ -377,7 +377,7 @@ class TimeSeriesKey(models.Model):
     def name(self):
         """Return name for use in graph legends"""
         return u'%s (%s): %s' % (self.parameter.name,
-                                self.parameter.group.displayunit,
+                                self.parameter.group.unit,
                                 self.location.name)
 
     @property
