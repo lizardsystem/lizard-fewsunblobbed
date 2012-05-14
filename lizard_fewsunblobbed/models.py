@@ -195,13 +195,13 @@ class ParameterGroup(models.Model):
 
 class Parameter(models.Model):
     parameterkey         = models.IntegerField(primary_key=True, db_column='parameterKey')
-    group                = models.ForeignKey('Parameter`', null=False, db_column='groupKey')
+    group                = models.ForeignKey('ParameterGroup', null=False, db_column='groupKey')
     id                   = models.CharField(max_length=64, unique=True, null=False, blank=False)
     name                 = models.CharField(max_length=64)
     shortname            = models.CharField(max_length=64, db_column='shortName')
     #description          = models.CharField(max_length=255)
     valueresolution      = models.FloatField(db_column='valueResolution')
-    allowmissing         = models.IntegerField(null=False, default=0, db_column='allowMissing')
+    #allowmissing         = models.IntegerField(null=False, default=0, db_column='allowMissing')
     #standardname         = models.CharField(max_length=128, db_column='standardName')
     #standardnamemodifier = models.CharField(max_length=64, db_column='standardNameModifier')
     #attributea           = models.CharField(max_length=64, db_column='attributeA')
