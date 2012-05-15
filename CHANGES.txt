@@ -7,6 +7,10 @@ Changelog of lizard-fewsunblobbed
 
 - Add .gitignore and MANIFEST.in
 
+- Remove various dumpfiles
+
+- Add bare tasks.py
+
 
 1.25 (2011-11-21)
 -----------------
@@ -16,7 +20,6 @@ Changelog of lizard-fewsunblobbed
   for this is that the current IconStyle implementation doesn't work
   (it wants to put data into the fews-unblobbed database, which is
   readonly and not under our control), but should be fixed soonish.
-
 
 
 1.24 (2011-11-04)
