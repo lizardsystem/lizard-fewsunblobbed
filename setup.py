@@ -20,6 +20,7 @@ install_requires = [
     'django-treebeard >= 1.61',
     'lizard-map >= 3.3',
     'lizard-ui >= 3.6',
+    'lizard-task',
     ],
 
 tests_require = [
