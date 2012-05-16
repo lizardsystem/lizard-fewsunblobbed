@@ -13,6 +13,8 @@ Changelog of lizard-fewsunblobbed
 
 - Added edit link
 
+- Updated layout for bootstrap.
+
 
 1.25 (2011-11-21)
 -----------------
