@@ -9,7 +9,9 @@ Changelog of lizard-fewsunblobbed
 
 - Remove various dumpfiles
 
-- Add bare tasks.py
+- Move fews_unblobbed_cache management command to tasks.py
+
+- Add dependency on lizard-task to setup.py
 
 
 1.25 (2011-11-21)
