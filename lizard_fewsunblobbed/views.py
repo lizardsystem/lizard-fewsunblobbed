@@ -60,6 +60,7 @@ class FewsBrowserView(AppView):
     """Class based view for fews-unblobbed. TODO: Crumbs."""
 
     template_name = 'lizard_fewsunblobbed/fews_browser.html'
+    edit_link = '/admin/lizard_fewsunblobbed/'
 
     def get(self, request, *args, **kwargs):
         """Overriden to get self.filterkey from the GET parameters.

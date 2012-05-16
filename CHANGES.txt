@@ -11,6 +11,8 @@ Changelog of lizard-fewsunblobbed
 
 - Add bare tasks.py
 
+- Added edit link
+
 
 1.25 (2011-11-21)
 -----------------
