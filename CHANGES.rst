@@ -5,7 +5,11 @@ Changelog of lizard-fewsunblobbed
 1.26 (unreleased)
 -----------------
 
+- Some technical fixes.
+
 - Add .gitignore and MANIFEST.in
+
+- Fix path in manifest.in.
 
 - Remove various dumpfiles
 
