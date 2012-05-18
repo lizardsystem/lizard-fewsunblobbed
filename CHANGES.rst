@@ -5,13 +5,23 @@ Changelog of lizard-fewsunblobbed
 1.26 (unreleased)
 -----------------
 
+- Some technical fixes.
+
 - Add .gitignore and MANIFEST.in
+
+- Fix path in manifest.in.
 
 - Remove various dumpfiles
 
 - Move fews_unblobbed_cache management command to tasks.py
 
 - Add dependency on lizard-task to setup.py
+
+- Added edit link
+
+- Updated layout for bootstrap.
+
+- Changed .txt extensions to .rst.
 
 
 1.25 (2011-11-21)
