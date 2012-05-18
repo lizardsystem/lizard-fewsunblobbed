@@ -4,11 +4,11 @@ import os.path
 version = '1.26dev'
 
 long_description = '\n\n'.join([
-    open('README.txt').read(),
-    open('USAGE.txt').read(),
-    open('TODO.txt').read(),
-    open('CREDITS.txt').read(),
-    open('CHANGES.txt').read(),
+    open('README.rst').read(),
+    open('USAGE.rst').read(),
+    open('TODO.rst').read(),
+    open('CREDITS.rst').read(),
+    open('CHANGES.rst').read(),
     ])
 
 install_requires = [

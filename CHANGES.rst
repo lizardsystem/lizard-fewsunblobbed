@@ -17,6 +17,8 @@ Changelog of lizard-fewsunblobbed
 
 - Updated layout for bootstrap.
 
+- Changed .txt extensions to .rst.
+
 
 1.25 (2011-11-21)
 -----------------
