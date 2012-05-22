@@ -2,8 +2,14 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-1.26 (unreleased)
------------------
+2.1 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
+2.0 (2012-05-18)
+----------------
 
 - Some technical fixes.
 

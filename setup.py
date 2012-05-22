@@ -1,7 +1,7 @@
 from setuptools import setup
 import os.path
 
-version = '1.26dev'
+version = '2.1.dev0'
 
 long_description = '\n\n'.join([
     open('README.rst').read(),
@@ -18,8 +18,8 @@ install_requires = [
     'django-nose',
     'django-staticfiles',
     'django-treebeard >= 1.61',
-    'lizard-map >= 3.3',
-    'lizard-ui >= 3.6',
+    'lizard-map >= 4.0a1',
+    'lizard-ui >= 4.0a1',
     'lizard-task',
     ],
 
