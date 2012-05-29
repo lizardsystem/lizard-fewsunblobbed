@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-2.1 (unreleased)
+2.1 (2012-05-29)
 ----------------
 
 - Popup styling.
