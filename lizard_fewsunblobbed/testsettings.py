@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'lizard_fewsunblobbed',
     'lizard_map',
     'lizard_ui',
+    'lizard_security',
     'django_extensions',
     'compressor',
     'staticfiles',
@@ -57,7 +58,7 @@ STATICFILES_FINDERS = STATICFILES_FINDERS
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     # Default items.
-    "django.core.context_processors.auth",
+    "django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
