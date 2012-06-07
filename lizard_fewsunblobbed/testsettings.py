@@ -48,6 +48,8 @@ ROOT_URLCONF = 'lizard_fewsunblobbed.urls'
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+CACHE_BACKEND = 'file://%s' % os.path.join(BUILDOUT_DIR, 'var', 'cache')
+
 # Used for django-staticfiles
 STATIC_URL = '/static_media/'
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
