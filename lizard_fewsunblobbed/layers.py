@@ -645,3 +645,16 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             snippet_group=snippet_group,
             identifiers=identifiers,
             layout_options=layout_options)
+
+    def legend_image_urls(self):
+        """
+        returns symbol
+
+        TODO: the identifier is always None, so individual symbols
+        cannot be retrieved.
+        """
+        point_style_name, output_filename = fews_symbol_name(
+            self.filterkey, None, self.parameterkey,
+            nodata=False)
+        icon = '%sgenerated_icons/%s' % (settings.MEDIA_URL, output_filename)
+        return [icon]
