@@ -697,3 +697,27 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             nodata=False)
         icon = '%sgenerated_icons/%s' % (settings.MEDIA_URL, output_filename)
         return [icon]
+
+    def location_list(self, name):
+        '''
+        Search locations by given name.
+        Case insensitive wildcard matching is used.
+        '''
+        if not name:
+            return []
+#        locations = Location.objects \
+#            .filter(name__icontains=name) \
+#            .filter(timeserie__filterkey=self.filterkey, timeserie__parameterkey=self.parameterkey)
+#        import pdb; pdb.set_trace()
+#        locations = [
+#            ({'locationkey': location.pk}, location.timeserie.name)
+#            for location in locations
+#        ]
+        timeseries = Timeserie.objects \
+            .filter(filterkey=self.filterkey, parameterkey=self.parameterkey) \
+            .filter(locationkey__name__icontains=name)
+        locations = [
+            ({'locationkey': timeserie.locationkey.pk}, timeserie.name)
+            for timeserie in timeseries
+        ]
+        return locations
