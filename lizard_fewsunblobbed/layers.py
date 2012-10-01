@@ -19,7 +19,7 @@ from lizard_fewsunblobbed.models import Parameter
 from lizard_fewsunblobbed.models import Timeserie
 from lizard_map import coordinates
 from lizard_map import workspace
-from lizard_map.adapter import Graph
+from lizard_map.adapter import Graph, FlotGraph
 from lizard_map.models import ICON_ORIGINALS
 from lizard_map.models import WorkspaceItemError
 from lizard_map.symbol_manager import SymbolManager
@@ -228,6 +228,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     """
     Should be registered as adapter_fews
     """
+    support_flot_graph = True # set this once flot graphs are supported by the adapter
 
     def __init__(self, *args, **kwargs):
         perform_existence_verification = kwargs.pop(
@@ -471,13 +472,35 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             'google_coords': timeserie.locationkey.google_coords(),
             }
 
-    def image(self,
+    def image(
+        self,
+        identifiers,
+        start_date,
+        end_date,
+        width=380.0,
+        height=250.0,
+        layout_extra=None,
+        raise_404_if_empty=False
+    ):
+        return self._render_graph(
+            identifiers,
+            start_date,
+            end_date,
+            width=width,
+            height=height,
+            layout_extra=layout_extra,
+            raise_404_if_empty=raise_404_if_empty,
+            GraphClass=Graph
+        )
+
+    def _render_graph(self,
               identifiers,
               start_date,
               end_date,
-              width=380.0,
-              height=250.0,
-              layout_extra=None):
+              layout_extra=None,
+              raise_404_if_empty=False,
+              GraphClass=Graph,
+              **extra_params):
         """
         Visualizes (timeserie) ids in a graph
 
@@ -551,8 +574,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         line_styles = self.line_styles(identifiers)
 
         today = datetime.datetime.now()
-        graph = Graph(start_date, end_date,
-                      width=width, height=height, today=today)
+        graph = GraphClass(start_date, end_date, today=today)
         graph.axes.grid(True)
 
         # Draw graph lines with extra's
@@ -576,11 +598,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             for series_row in timeseriedata:
                 dates.append(series_row.tsd_time)
                 values.append(series_row.tsd_value)
-            if len(values) < 30:
-                plot_style = 'o-'
-            else:
-                plot_style = '-'
-            graph.axes.plot(dates, values, plot_style,
+            graph.axes.plot(dates, values,
                             lw=1,
                             color=line_styles[str(identifier)]['color'],
                             label=timeserie.name)
@@ -622,7 +640,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                     label=horizontal_line['name'])
 
         graph.add_today()
-        return graph.http_png()
+        return graph.render()
 
     def symbol_url(self, identifier=None, start_date=None, end_date=None):
         """
@@ -645,6 +663,27 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             snippet_group=snippet_group,
             identifiers=identifiers,
             layout_options=layout_options)
+
+    ##
+    # New for flot graphs
+    ##
+
+    def flot_graph_data(
+        self,
+        identifiers,
+        start_date,
+        end_date,
+        layout_extra=None,
+        raise_404_if_empty=False
+    ):
+        return self._render_graph(
+            identifiers,
+            start_date,
+            end_date,
+            layout_extra=layout_extra,
+            raise_404_if_empty=raise_404_if_empty,
+            GraphClass=FlotGraph
+        )
 
     def legend_image_urls(self):
         """
