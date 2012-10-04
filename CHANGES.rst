@@ -5,7 +5,11 @@ Changelog of lizard-fewsunblobbed
 2.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add flot graph support.
+
+- Add location search support.
+
+- Add icon to legend.
 
 
 2.1 (2012-05-29)
