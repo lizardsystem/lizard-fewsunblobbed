@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-2.2 (unreleased)
+2.2 (2012-10-04)
 ----------------
 
 - Add flot graph support.
