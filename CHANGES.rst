@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-2.3 (unreleased)
+2.3 (2012-10-18)
 ----------------
 
 - Add location search button.
