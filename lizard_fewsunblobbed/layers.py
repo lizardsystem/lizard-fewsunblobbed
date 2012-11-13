@@ -698,13 +698,19 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         icon = '%sgenerated_icons/%s' % (settings.MEDIA_URL, output_filename)
         return [icon]
 
-    def location_list(self, name):
+    def location_list(self, name=''):
         '''
         Search locations by given name.
         Case insensitive wildcard matching is used.
         '''
-        if not name:
-            return []
+        try:
+            filter = Filter.objects.get(pk=self.filterkey)
+        except Filter.DoesNotExist:
+            raise WorkspaceItemError("Filter %s not found" % self.filterkey)
+        try:
+            parameter = Parameter.objects.get(pk=self.parameterkey)
+        except Parameter.DoesNotExist:
+            raise WorkspaceItemError("Parameter %s not found" % self.parameterkey)
 #        locations = Location.objects \
 #            .filter(name__icontains=name) \
 #            .filter(timeserie__filterkey=self.filterkey, timeserie__parameterkey=self.parameterkey)
@@ -717,7 +723,11 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             .filter(filterkey=self.filterkey, parameterkey=self.parameterkey) \
             .filter(locationkey__name__icontains=name)
         locations = [
-            ({'locationkey': timeserie.locationkey.pk}, timeserie.name)
+            (
+                {'locationkey': timeserie.locationkey.pk},
+                '{}, {}'.format(timeserie.name, parameter.name),
+                '{} ({}, {})'.format(timeserie.name, parameter.name, filter.name)
+            )
             for timeserie in timeseries
         ]
         return locations
