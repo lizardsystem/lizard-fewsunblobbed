@@ -76,6 +76,8 @@ COMPRESS_ROOT = STATIC_URL
 
 DATABASE_ROUTERS = ['lizard_fewsunblobbed.routers.FewsUnblobbedRouter', ]
 
+LIZARD_FEWSUNBLOBBED_STANDALONE = True
+
 try:
     # Import local settings that aren't stored in svn.
     from lizard_fewsunblobbed.local_testsettings import *

@@ -5,7 +5,8 @@ Changelog of lizard-fewsunblobbed
 2.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fixed urls.py, so it won't recusively include other lizard-* URLs when
+  running as part of a site.
 
 
 2.3 (2012-10-18)
