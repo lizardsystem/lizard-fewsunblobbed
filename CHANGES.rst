@@ -2,7 +2,7 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-2.4 (unreleased)
+2.4 (2012-12-19)
 ----------------
 
 - Fixed urls.py, so it won't recusively include other lizard-* URLs when
