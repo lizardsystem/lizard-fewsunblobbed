@@ -25,7 +25,7 @@ from lizard_fewsunblobbed.models import (
 
 from lizard_map import coordinates
 from lizard_map import workspace
-from lizard_map.adapter import Graph
+from lizard_map.adapter import Graph, FlotGraph
 from lizard_map.models import ICON_ORIGINALS
 from lizard_map.models import WorkspaceItemError
 from lizard_map.symbol_manager import SymbolManager
