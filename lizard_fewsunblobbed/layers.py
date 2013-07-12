@@ -234,7 +234,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     """
     Should be registered as adapter_fews
     """
-
+    support_flot_graph = True # set this once flot graphs are supported by the adapter
+    
     def __init__(self, *args, **kwargs):
         perform_existence_verification = kwargs.pop(
             'perform_existence_verification', True)
@@ -640,3 +641,63 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             snippet_group=snippet_group,
             identifiers=identifiers,
             layout_options=layout_options)
+
+    ##
+    # New for flot graphs
+    ##
+
+    def flot_graph_data(
+        self,
+        identifiers,
+        start_date,
+        end_date,
+        layout_extra=None,
+        raise_404_if_empty=False
+    ):
+        return self._render_graph(
+            identifiers,
+            start_date,
+            end_date,
+            layout_extra=layout_extra,
+            raise_404_if_empty=raise_404_if_empty,
+            GraphClass=FlotGraph
+        )
+
+    def legend_image_urls(self):
+        """
+        returns symbol
+
+        TODO: the identifier is always None, so individual symbols
+        cannot be retrieved.
+        """
+        point_style_name, output_filename = fews_symbol_name(
+            self.filterkey, None, self.parameterkey,
+            nodata=False)
+        icon = '%sgenerated_icons/%s' % (settings.MEDIA_URL, output_filename)
+        return [icon]
+
+    def location_list(self, name=''):
+        '''
+        Search locations by given name.
+        Case insensitive wildcard matching is used.
+        '''
+        try:
+            filter = Filter.objects.get(pk=self.filterkey)
+        except Filter.DoesNotExist:
+            raise WorkspaceItemError("Filter %s not found" % self.filterkey)
+        try:
+            parameter = Parameter.objects.get(pk=self.parameterkey)
+        except Parameter.DoesNotExist:
+            raise WorkspaceItemError("Parameter %s not found" % self.parameterkey)
+        timeseries = Timeserie.objects \
+            .filter(filterkey=self.filterkey, parameterkey=self.parameterkey) \
+            .filter(locationkey__name__icontains=name)
+        locations = [
+            (
+                {'locationkey': timeserie.locationkey.pk},
+                '{}, {}'.format(timeserie.name, parameter.name),
+                '{} ({}, {})'.format(timeserie.name, parameter.name, filter.name)
+            )
+            for timeserie in timeseries
+        ]
+        return locations
