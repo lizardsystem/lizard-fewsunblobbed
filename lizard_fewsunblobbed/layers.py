@@ -214,8 +214,11 @@ def fews_point_style(
 def fews_timeserie(filterkey, locationkey, parameterkey):
     """Get fews timeserie from filter, location, parameter. Beware:
     sometimes multiple items are returned."""
-
-    result = query_timeseries_for_location(filterkey, locationkey, parameterkey)
+    
+    result = query_timeseries_for_location(
+		filterkey=filterkey, 
+		locationkey=locationkey, 
+		parameterkey=parameterkey)
     if len(result) == 0:
         raise Http404(
             "Timeserie for filter %s, location %s, param %s not found." % (
