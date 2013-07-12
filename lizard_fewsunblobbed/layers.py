@@ -214,11 +214,11 @@ def fews_point_style(
 def fews_timeserie(filterkey, locationkey, parameterkey):
     """Get fews timeserie from filter, location, parameter. Beware:
     sometimes multiple items are returned."""
-    
+
     result = query_timeseries_for_location(
-		filterkey=filterkey, 
-		locationkey=locationkey, 
-		parameterkey=parameterkey)
+        filterkey=filterkey,
+        locationkey=locationkey,
+        parameterkey=parameterkey)
     if len(result) == 0:
         raise Http404(
             "Timeserie for filter %s, location %s, param %s not found." % (
@@ -235,7 +235,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
     Should be registered as adapter_fews
     """
     support_flot_graph = True # set this once flot graphs are supported by the adapter
-    
+
     def __init__(self, *args, **kwargs):
         perform_existence_verification = kwargs.pop(
             'perform_existence_verification', True)
@@ -470,13 +470,35 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             'google_coords': timeserie.location.google_coords(),
             }
 
-    def image(self,
+    def image(
+            self,
+            identifiers,
+            start_date,
+            end_date,
+            width=380.0,
+            height=250.0,
+            layout_extra=None,
+            raise_404_if_empty=False
+        ):
+            return self._render_graph(
+                identifiers,
+                start_date,
+                end_date,
+                width=width,
+                height=height,
+                layout_extra=layout_extra,
+                raise_404_if_empty=raise_404_if_empty,
+                GraphClass=Graph
+            )
+
+    def _render_graph(self,
               identifiers,
               start_date,
               end_date,
-              width=380.0,
-              height=250.0,
-              layout_extra=None):
+              layout_extra=None,
+              raise_404_if_empty=False,
+              GraphClass=Graph,
+              **extra_params):
         """
         Visualizes (timeserie) ids in a graph
 
