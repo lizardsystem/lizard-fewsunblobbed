@@ -446,8 +446,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         result = []
         for timeserie_row in timeseriedata:
             result.append({
-                    'value': timeserie_row.scalarvalue,
-                    'datetime': timeserie_row.datetime,
+                    'datetime': timeserie_row[0],
+                    'value': timeserie_row[1],
                     'unit': '',  # We don't know the unit.
                     })
         return result
@@ -605,8 +605,8 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             dates = []
             values = []
             for series_row in timeseriedata:
-                dates.append(series_row.datetime)
-                values.append(series_row.scalarvalue)
+                dates.append(series_row[0])
+                values.append(series_row[1])
             if len(values) < 30:
                 plot_style = 'o-'
             else:

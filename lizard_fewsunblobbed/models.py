@@ -8,9 +8,9 @@ from django.conf import settings
 from django.core import serializers
 from django.core.cache import cache
 from django.db import models
+from django.db import connection
 from django.utils.translation import ugettext as _
 
-from composite_pk import composite
 from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
 
@@ -466,8 +466,19 @@ def query_timeseries_for_location(filterkey, parameterkey, locationkey):
     return TimeSeriesKey.objects.filter(filtertimeserieskey__filter__in=related_filters, parameter=parameterkey, location=locationkey)
 
 def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
-    return timeserie.timeseriesvaluesandflag_set.order_by(
-        "datetime").filter(datetime__range=(start_date, end_date))
-        #"datetime").filter(
-        #datetime__gte=start_date,
-        #datetime__lte=end_date)
+    cursor = connection.cursor()
+    q = '''
+        SELECT
+            "TIMESERIESVALUESANDFLAGS"."DATETIME", "TIMESERIESVALUESANDFLAGS"."SCALARVALUE",
+        FROM
+            "TIMESERIESVALUESANDFLAGS"
+        WHERE 
+            "TIMESERIESVALUESANDFLAGS"."SERIESKEY" = %s
+        AND
+            "TIMESERIESVALUESANDFLAGS"."DATETIME" BETWEEN %s and %s
+        ORDER BY
+            "TIMESERIESVALUESANDFLAGS"."DATETIME" ASC
+    '''
+    cursor.execute(q, [timeserie.series, start_date, end_date])
+    result = cursor.fetchall()
+    return result
