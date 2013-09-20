@@ -29,7 +29,7 @@ from lizard_map.adapter import Graph, FlotGraph
 from lizard_map.models import ICON_ORIGINALS
 from lizard_map.models import WorkspaceItemError
 from lizard_map.symbol_manager import SymbolManager
-from lizard_map.mapnik_helper import add_datasource_point
+from lizard_map.mapnik_helper import add_datasource_point, add_datasource_point_mapnik2
 
 
 logger = logging.getLogger('lizard_fewsunblobbed.layers')  # pylint: disable=C0103, C0301
@@ -279,18 +279,23 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
 
         fews_styles, fews_style_lookup = IconStyle._styles_lookup()
 
-        for info in self._timeseries():
+        context = mapnik.Context()
+
+        for i, info in enumerate(self._timeseries()):
             # Due to mapnik bug, we render the very same point 10cm to the top
             # right, bottom left, etc.
-            add_datasource_point(
-                layer.datasource, info['longitude'], info['latitude'],
-                'Name', info['location_name'])
+            dst_datasource = layer_nodata.datasource if not info['has_data'] else layer.datasource
 
-            if not info['has_data']:
+            # Put style in point, filters work on these styles.
+            if mapnik.mapnik_version() < 800:
                 add_datasource_point(
-                    layer_nodata.datasource,
-                    info['longitude'], info['latitude'],
-                    'Name', info['location_name'])
+                    dst_datasource, info['longitude'],
+                    info['latitude'], 'Name', info['location_name'])
+            else:
+                add_datasource_point_mapnik2(
+                    dst_datasource, info['longitude'],
+                    info['latitude'], 'Name',
+                    info['location_name'], _id=i, context=context)
 
             point_style_name, point_style = fews_point_style(
                 None, None, None, nodata=False, styles=fews_styles,
