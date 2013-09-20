@@ -607,11 +607,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             for series_row in timeseriedata:
                 dates.append(series_row[0])
                 values.append(series_row[1])
-            if len(values) < 30:
-                plot_style = 'o-'
-            else:
-                plot_style = '-'
-            graph.axes.plot(dates, values, plot_style,
+            graph.axes.plot(dates, values,
                             lw=1,
                             color=line_styles[str(identifier)]['color'],
                             label=timeserie.name)
