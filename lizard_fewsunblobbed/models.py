@@ -469,7 +469,7 @@ def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
     cursor = connection.cursor()
     q = '''
         SELECT
-            "TIMESERIESVALUESANDFLAGS"."DATETIME", "TIMESERIESVALUESANDFLAGS"."SCALARVALUE",
+            "TIMESERIESVALUESANDFLAGS"."DATETIME", "TIMESERIESVALUESANDFLAGS"."SCALARVALUE"
         FROM
             "TIMESERIESVALUESANDFLAGS"
         WHERE 
