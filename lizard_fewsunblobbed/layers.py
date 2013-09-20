@@ -586,8 +586,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         line_styles = self.line_styles(identifiers)
 
         today = datetime.datetime.now()
-        graph = Graph(start_date, end_date,
-                      width=width, height=height, today=today)
+        graph = GraphClass(start_date, end_date, today=today, **extra_params)
         graph.axes.grid(True)
 
         # Draw graph lines with extra's
@@ -654,7 +653,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                     label=horizontal_line['name'])
 
         graph.add_today()
-        return graph.http_png()
+        return graph.render()
 
     def symbol_url(self, identifier=None, start_date=None, end_date=None):
         """
