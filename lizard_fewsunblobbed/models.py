@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core import serializers
 from django.core.cache import cache
 from django.db import models
-from django.db import connection
+from django import db
 from django.utils.translation import ugettext as _
 
 from treebeard.al_tree import AL_Node
@@ -466,7 +466,7 @@ def query_timeseries_for_location(filterkey, parameterkey, locationkey):
     return TimeSeriesKey.objects.filter(filtertimeserieskey__filter__in=related_filters, parameter=parameterkey, location=locationkey)
 
 def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
-    cursor = connection.cursor()
+    cursor = db.connections['fewsnorm'].cursor()
     q = '''
         SELECT
             "TIMESERIESVALUESANDFLAGS"."DATETIME", "TIMESERIESVALUESANDFLAGS"."SCALARVALUE"
