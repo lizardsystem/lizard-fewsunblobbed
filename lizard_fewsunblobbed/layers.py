@@ -199,8 +199,13 @@ def fews_point_style(
         settings.MEDIA_ROOT, 'generated_icons', output_filename)
 
     # use filename in mapnik pointsymbolizer
-    point_looks = mapnik.PointSymbolizer(
-        str(output_filename_abs), 'png', 16, 16)
+    if mapnik.mapnik_version() < 800:
+        point_looks = mapnik.PointSymbolizer(
+            str(output_filename_abs), 'png', 16, 16)
+    else:
+        point_looks = mapnik.PointSymbolizer(
+            mapnik.PathExpression(str(output_filename_abs)))
+
     point_looks.allow_overlap = True
     layout_rule = mapnik.Rule()
     layout_rule.symbols.append(point_looks)
@@ -274,12 +279,16 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         #fews_filter = Filter.objects.get(pk=filterkey)
         #fews_parameter = Parameter.objects.get(pk=parameterkey)
 
-        layer.datasource = mapnik.PointDatasource()
-        layer_nodata.datasource = mapnik.PointDatasource()
+
+        if mapnik.mapnik_version() < 800:
+            layer.datasource = mapnik.PointDatasource()
+            layer_nodata.datasource = mapnik.PointDatasource()
+        else:
+            layer.datasource = mapnik.MemoryDatasource()
+            layer_nodata.datasource = mapnik.MemoryDatasource()
+            context = mapnik.Context()
 
         fews_styles, fews_style_lookup = IconStyle._styles_lookup()
-
-        context = mapnik.Context()
 
         for i, info in enumerate(self._timeseries()):
             # Due to mapnik bug, we render the very same point 10cm to the top
