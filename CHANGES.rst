@@ -2,10 +2,10 @@ Changelog of lizard-fewsunblobbed
 =================================
 
 
-2.5 (unreleased)
-----------------
+SPECIAL BASISIMS BRANCH
+-----------------------
 
-- Nothing changed yet.
+- Added lizard-security for the ``Filter`` model.
 
 
 2.4 (2012-12-19)
