@@ -36,9 +36,9 @@ class Filter(AL_Node):
     parent = models.ForeignKey('Filter', null=True, blank=True,
                                db_column='parentfkey')
     isendnode = models.BooleanField()
-    # data_set = models.ForeignKey(DataSet,
-    #                              null=True,
-    #                              blank=True)
+    data_set = models.ForeignKey(DataSet,
+                                 null=True,
+                                 blank=True)
 
     node_order_by = ['name']
     objects = FilteredManager()
