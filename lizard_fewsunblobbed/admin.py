@@ -1,4 +1,6 @@
 from django.contrib import admin
+from lizard_security.admin import SecurityFilteredAdmin
+
 #from lizard_fewsunblobbed.models import IconStyle
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
@@ -26,7 +28,7 @@ class TimeserieAdmin(admin.ModelAdmin):
 
 
 #admin.site.register(IconStyle, IconStyleAdmin)
-admin.site.register(Filter)
+admin.site.register(Filter, SecurityFilteredAdmin)
 admin.site.register(Location)
 admin.site.register(Parameter)
 admin.site.register(Timeserie, TimeserieAdmin)

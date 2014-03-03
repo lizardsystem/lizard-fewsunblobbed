@@ -11,6 +11,9 @@ from django.utils.translation import ugettext as _
 from composite_pk import composite
 from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
+from lizard_security.manager import FilteredManager
+from lizard_security.models import DataSet
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +36,12 @@ class Filter(AL_Node):
     parent = models.ForeignKey('Filter', null=True, blank=True,
                                db_column='parentfkey')
     isendnode = models.BooleanField()
+    data_set = models.ForeignKey(DataSet,
+                                 null=True,
+                                 blank=True)
+
     node_order_by = ['name']
+    objects = FilteredManager()
 
     class Meta:
         verbose_name = _("Filter")
