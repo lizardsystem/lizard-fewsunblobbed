@@ -7,9 +7,12 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("lizard_security", "0002_auto__add_usergroup__add_permissionmapper__add_dataset"),
+    )
+
     def forwards(self, orm):
-        # Removing unique constraint on 'Timeseriedata', fields ['tsd_time']
-        db.delete_unique(u'timeseriedata', ['tsd_time'])
+
 
         # Adding field 'Filter.data_set'
         db.add_column(u'filter', 'data_set',
@@ -20,9 +23,6 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Deleting field 'Filter.data_set'
         db.delete_column(u'filter', 'data_set_id')
-
-        # Adding unique constraint on 'Timeseriedata', fields ['tsd_time']
-        db.create_unique(u'timeseriedata', ['tsd_time'])
 
 
     models = {
