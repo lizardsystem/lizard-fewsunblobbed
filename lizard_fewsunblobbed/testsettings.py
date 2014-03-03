@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'compressor',
     'staticfiles',
+    'south',
     'django_nose',
     'django.contrib.admin',
     'django.contrib.auth',

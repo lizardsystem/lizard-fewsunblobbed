@@ -22,6 +22,7 @@ install_requires = [
     'lizard-security',
     'lizard-ui >= 4.0a1',
     'lizard-task',
+    'South',
     ],
 
 tests_require = [
