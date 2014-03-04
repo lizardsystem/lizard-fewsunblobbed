@@ -8,7 +8,6 @@ from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from composite_pk import composite
 from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
 from lizard_security.manager import FilteredManager
@@ -260,7 +259,7 @@ class Timeserie(models.Model):
         #return self.timeseriedata.exists()
 
 
-class Timeseriedata(composite.CompositePKModel):
+class Timeseriedata(models.Model):
     """Fews timeseriedata object. Specifies the value of a parameter at
     a specific time.
 
@@ -297,13 +296,12 @@ class Timeseriedata(composite.CompositePKModel):
 
     """
     tkey = models.ForeignKey(Timeserie,
-                             primary_key=True,
                              db_column='tkey',
                              related_name='timeseriedata')
 
     # ^^^ TODO: this is mighty slow in the django admin.  It grabs all the
     # timeserie names/ids.
-    tsd_time = models.DateTimeField(primary_key=True, db_column='tsd_time')
+    tsd_time = models.DateTimeField(db_column='tsd_time')
     tsd_value = models.FloatField(blank=True)
     tsd_flag = models.IntegerField(blank=True)
     tsd_detection = models.BooleanField()
