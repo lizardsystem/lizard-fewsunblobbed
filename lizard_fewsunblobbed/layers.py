@@ -408,11 +408,11 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         <timeserie>} of closest fews point that matches x, y, radius.
 
         """
-        x, y = coordinates.google_to_rd(google_x, google_y)
+        x, y = coordinates.google_to_wgs84(google_x, google_y)
         timeseries_info = self._timeseries()
         for info in timeseries_info:
-            info['distance'] = sqrt((info['rd_x'] - x) ** 2 +
-                                    (info['rd_y'] - y) ** 2)
+            info['distance'] = sqrt((info['longitude'] - x) ** 2 +
+                                    (info['latitude'] - y) ** 2)
         # Filter out correct distances.
         result = []
         for found_result in timeseries_info:
