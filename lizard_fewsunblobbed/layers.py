@@ -413,6 +413,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         for info in timeseries_info:
             info['distance'] = sqrt((info['longitude'] - x) ** 2 +
                                     (info['latitude'] - y) ** 2)
+
+        radius = radius / 30000.0
+
         # Filter out correct distances.
         result = []
         for found_result in timeseries_info:
@@ -420,6 +423,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 result.append(found_result)
 
         result.sort(key=lambda item: item['distance'])
+        # return result[:3]  # Max 3 results
         return result
 
     def values(self, identifier, start_date, end_date):
