@@ -27,7 +27,7 @@ class Filter(AL_Node):
     # fews exposes fkey and parentfkey.
     id = models.IntegerField(primary_key=True, db_column='fkey')
     # since 'id' is already used, we remap 'id' to 'fews_id'.
-    fews_id = models.CharField(max_length=64, unique=True, db_column='id')
+    fews_id = models.CharField(max_length=64, db_column='id')
     name = models.CharField(max_length=256, blank=True)
     description = models.CharField(max_length=256, blank=True)
     issubfilter = models.BooleanField()
