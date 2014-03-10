@@ -4,7 +4,7 @@ import copy
 import logging
 from math import sqrt
 
-import mapnik
+import mapnik2
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Avg
@@ -193,13 +193,15 @@ def fews_point_style(
         settings.MEDIA_ROOT, 'generated_icons', output_filename)
 
     # use filename in mapnik pointsymbolizer
-    point_looks = mapnik.PointSymbolizer(
-        str(output_filename_abs), 'png', 16, 16)
+    point_looks = mapnik2.PointSymbolizer(
+        mapnik2.PathExpression(str(output_filename_abs)))
+    #   'png', 16, 16)
+    # ^^^ no more type, x-size, y-size in mapnik 2
     point_looks.allow_overlap = True
-    layout_rule = mapnik.Rule()
+    layout_rule = mapnik2.Rule()
     layout_rule.symbols.append(point_looks)
 
-    point_style = mapnik.Style()
+    point_style = mapnik2.Style()
     point_style.rules.append(layout_rule)
 
     return point_style_name, point_style
@@ -260,16 +262,16 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         styles = {}
         styles_nodata = {}
         styles_data = {}
-        layer = mapnik.Layer("FEWS points layer", coordinates.WGS84)
-        layer_nodata = mapnik.Layer("FEWS points layer (no data)",
+        layer = mapnik2.Layer("FEWS points layer", coordinates.WGS84)
+        layer_nodata = mapnik2.Layer("FEWS points layer (no data)",
                                     coordinates.WGS84)
         #filterkey = self.filterkey
         #parameterkey = self.parameterkey
         #fews_filter = Filter.objects.get(pk=filterkey)
         #fews_parameter = Parameter.objects.get(pk=parameterkey)
 
-        layer.datasource = mapnik.PointDatasource()
-        layer_nodata.datasource = mapnik.PointDatasource()
+        layer.datasource = mapnik2.PointDatasource()
+        layer_nodata.datasource = mapnik2.PointDatasource()
 
         fews_styles, fews_style_lookup = IconStyle._styles_lookup()
 
@@ -376,26 +378,22 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         east = None
         west = None
 
-        wgs0coord_x, wgs0coord_y = coordinates.rd_to_wgs84(0.0, 0.0)
         for info in self._timeseries():
-            x = info['rd_x']
-            y = info['rd_y']
-            # Ignore rd coordinates (0, 0).
-            if (abs(x - wgs0coord_x) > EPSILON or
-                abs(y - wgs0coord_y) > EPSILON):
+            x = info['longitude']
+            y = info['latitude']
 
-                if x > east or east is None:
-                    east = x
-                if x < west or west is None:
-                    west = x
-                if y < south or south is None:
-                    south = y
-                if y > north or north is None:
-                    north = y
+            if x > east or east is None:
+                east = x
+            if x < west or west is None:
+                west = x
+            if y < south or south is None:
+                south = y
+            if y > north or north is None:
+                north = y
 
-        west_transformed, north_transformed = coordinates.rd_to_google(
+        west_transformed, north_transformed = coordinates.wgs84_to_google(
             west, north)
-        east_transformed, south_transformed = coordinates.rd_to_google(
+        east_transformed, south_transformed = coordinates.wgs84_to_google(
             east, south)
         return {
             'north': north_transformed,
