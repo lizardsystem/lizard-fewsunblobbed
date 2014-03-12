@@ -1,11 +1,8 @@
 <li>
-  <a href="{% url fews_browser %}?filterkey={{ node.id }}"
-     class="file">
-    <span class="folder">{{node.data.name}}</span>
-  </a>
+  <span class="folder">{{node.data.name}}</span>
   <ul>
     {% for child in node.children %}
-      {% if child.data.isendnode %}
+      {% if not child.children %}
         <li>
           {% if child.data.has_parameters %}
           <a href="{% url fews_browser %}?filterkey={{ child.id }}"
