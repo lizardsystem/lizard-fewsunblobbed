@@ -97,7 +97,6 @@ class Filter(AL_Node):
         parameters = cache.get(parameter_cache_key)
         if parameters is None:
             parameters = []  # Start new one
-            # import pdb;pdb.set_trace()
             timeseries_with_data = Timeserie.has_data_dict().keys()
             for p in Parameter.objects.filter(
                     timeserie__filterkey=self,
