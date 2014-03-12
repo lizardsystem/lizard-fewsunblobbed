@@ -421,8 +421,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                 result.append(found_result)
 
         result.sort(key=lambda item: item['distance'])
-        # return result[:3]  # Max 3 results
-        return result
+        return result[:3]  # Max 3 results
 
     def values(self, identifier, start_date, end_date):
         timeserie = fews_timeserie(
