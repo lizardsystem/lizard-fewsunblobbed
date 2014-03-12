@@ -4,13 +4,13 @@
     {% for child in node.children %}
       {% if not child.children %}
         <li>
-          {% if child.data.has_parameters %}
-          <a href="{% url fews_browser %}?filterkey={{ child.id }}"
-             class="file">
-            {{ child.data.name }}
-          </a>
+          {% if child.data.has_data %}
+            <a href="{% url fews_browser %}?filterkey={{ child.id }}"
+               class="file">
+              {{ child.data.name }}
+            </a>
           {% else %}
-          <span class="quiet">{{ child.data.name }}</span>
+            <span class="quiet">{{ child.data.name }}</span>
           {% endif %}
         </li>
       {% else %}

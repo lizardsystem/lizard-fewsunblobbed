@@ -83,6 +83,36 @@ class Filter(AL_Node):
 
         return parameters
 
+    def used_parameters(self):
+        """Return parameters for this filter and the filters children.
+
+        But... only those parameters that actually have data attached to them.
+
+        And... we only want end notes to work, so grabbing descentants isn't needed.
+
+        The parameters returned have an added property 'filterkey'.
+        """
+        parameter_cache_key = PARAMETER_CACHE_KEY % str(self.id)
+        parameter_cache_key += '_used'
+        parameters = cache.get(parameter_cache_key)
+        if parameters is None:
+            parameters = []  # Start new one
+            # import pdb;pdb.set_trace()
+            timeseries_with_data = Timeserie.has_data_dict().keys()
+            for p in Parameter.objects.filter(
+                    timeserie__filterkey=self,
+                    timeserie__tkey__in=timeseries_with_data).distinct():
+
+                # Add filterkey for use in template (it's a m2m).
+                p.filterkey = self
+                parameters.append(p)
+
+            # parameters = param_dict.values()
+            parameters.sort(key=lambda p: p.name)
+            cache.set(parameter_cache_key, parameters, 8 * 60 * 60)
+
+        return parameters
+
     @classmethod
     def get_database_engine(cls):
         """Overriding treebeard: it grabs the 'default' database engine."""
@@ -107,6 +137,10 @@ class Filter(AL_Node):
 
         ret, lnk = [], {}
         pos = 0
+        timeseries_with_data = Timeserie.has_data_dict().keys()
+        filters_with_data = Filter.objects.filter(
+            timeserie__tkey__in=timeseries_with_data).distinct().values_list(
+                'id', flat=True)
         for pyobj in serializers.serialize('python', qset):
             node = qset[pos]
             depth = node.get_depth()
@@ -118,6 +152,7 @@ class Filter(AL_Node):
             if 'id' in fields:
                 del fields['id']
             fields['has_parameters'] = node.has_parameters
+            fields['has_data'] = node.id in filters_with_data
             newobj = {'data': fields}
             if keep_ids:
                 newobj['id'] = pyobj['pk']

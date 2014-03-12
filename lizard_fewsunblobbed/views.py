@@ -36,21 +36,21 @@ def fews_filters(ignore_cache=False):
         filters = Filter.dump_bulk()  # Optional: parent
 
         # Filter out some root filters: get settings.
-        try:
-            exclude_filters = settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS
-            logger.info('Excluding filters: %r.' % exclude_filters)
-        except AttributeError:
-            exclude_filters = ['ZZL_Meteo', 'ZZL_ZUIV_RUW', ]
-            logger.warning(
-                'No setting FEWS_UNBLOBBED_EXCLUDE_FILTERS.'
-                'By default ZZL_Meteo and ZZL_ZUIV_RUW are excluded.')
+        # try:
+        #     exclude_filters = settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS
+        #     logger.info('Excluding filters: %r.' % exclude_filters)
+        # except AttributeError:
+        #     exclude_filters = ['ZZL_Meteo', 'ZZL_ZUIV_RUW', ]
+        #     logger.warning(
+        #         'No setting FEWS_UNBLOBBED_EXCLUDE_FILTERS.'
+        #         'By default ZZL_Meteo and ZZL_ZUIV_RUW are excluded.')
         # ^^^ Who on earth added these hardcoded items in the basic app?
         # a) settings.get(..., some_default) works fine.
         # b) Hardcoded settings for zzl? Just add them in the settings.py,
         #    then, if you're reading from it anyway!
 
         # Filter the filters.
-        filters = filter_exclude(filters, exclude_filters)
+        # filters = filter_exclude(filters, exclude_filters)
 
         cache.set(FILTER_CACHE_KEY, filters, 8 * 60 * 60)  # 8 hours
     return filters
@@ -88,4 +88,4 @@ class FewsBrowserView(AppView):
     def parameters(self):
         filter = self.found_filter()
         if filter:
-            return filter.parameters()
+            return filter.used_parameters()
