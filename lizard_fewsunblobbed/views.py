@@ -4,7 +4,6 @@ from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from lizard_map.views import AppView
 from lizard_security.middleware import ALLOWED_DATA_SET_IDS
-from tls import request as tls_request
 
 from lizard_fewsunblobbed.models import Filter
 
@@ -24,13 +23,13 @@ def filter_exclude(filters, exclude_filters):
         lambda f: f['data']['fews_id'] not in exclude_filters, filters)
 
 
-def fews_filters(ignore_cache=False):
+def fews_filters(request, ignore_cache=False):
     """
     Return fews filter tree.
 
     Exclude filters from settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS.
     """
-    data_set_ids = getattr(tls_request, ALLOWED_DATA_SET_IDS, None)
+    data_set_ids = getattr(request, ALLOWED_DATA_SET_IDS, None)
     cache_key = FILTER_CACHE_KEY
     if data_set_ids:
         cache_key += ';'.join(data_set_ids)
@@ -65,7 +64,7 @@ class FewsBrowserView(AppView):
         if self.filterkey:
             return []
         else:
-            return fews_filters()
+            return fews_filters(self.request)
 
     def found_filter(self):
         if self.filterkey:
