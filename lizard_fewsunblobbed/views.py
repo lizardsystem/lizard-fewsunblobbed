@@ -3,6 +3,8 @@ import logging
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from lizard_map.views import AppView
+from lizard_security.middleware import ALLOWED_DATA_SET_IDS
+from tls import request as tls_request
 
 from lizard_fewsunblobbed.models import Filter
 
@@ -28,30 +30,17 @@ def fews_filters(ignore_cache=False):
 
     Exclude filters from settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS.
     """
-    filters = cache.get(FILTER_CACHE_KEY)
+    data_set_ids = getattr(tls_request, ALLOWED_DATA_SET_IDS, None)
+    cache_key = FILTER_CACHE_KEY
+    if data_set_ids:
+        cache_key += ';'.join(data_set_ids)
+    filters = cache.get(cache_key)
     # Filters is a list of dicts (keys: 'data', 'id', 'children')
     # In data, there's a key 'fews_id'
     if filters is None or ignore_cache:
         filters = Filter.dump_bulk()  # Optional: parent
 
-        # Filter out some root filters: get settings.
-        # try:
-        #     exclude_filters = settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS
-        #     logger.info('Excluding filters: %r.' % exclude_filters)
-        # except AttributeError:
-        #     exclude_filters = ['ZZL_Meteo', 'ZZL_ZUIV_RUW', ]
-        #     logger.warning(
-        #         'No setting FEWS_UNBLOBBED_EXCLUDE_FILTERS.'
-        #         'By default ZZL_Meteo and ZZL_ZUIV_RUW are excluded.')
-        # ^^^ Who on earth added these hardcoded items in the basic app?
-        # a) settings.get(..., some_default) works fine.
-        # b) Hardcoded settings for zzl? Just add them in the settings.py,
-        #    then, if you're reading from it anyway!
-
-        # Filter the filters.
-        # filters = filter_exclude(filters, exclude_filters)
-
-        cache.set(FILTER_CACHE_KEY, filters, 8 * 60 * 60)  # 8 hours
+        cache.set(cache_key, filters, 1 * 60 * 60)  # 1 hour
     return filters
 
 
