@@ -1,12 +1,11 @@
 import logging
 
-from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
+from lizard_map.views import AppView
 
 from lizard_fewsunblobbed.models import Filter
 
-from lizard_map.views import AppView
 
 FILTER_CACHE_KEY = 'lizard.fewsunblobbed.views.filter_cache_key'
 logger = logging.getLogger(__name__)
