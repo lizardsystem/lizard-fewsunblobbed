@@ -1,16 +1,14 @@
 from django.contrib import admin
 from lizard_security.admin import SecurityFilteredAdmin
 
-#from lizard_fewsunblobbed.models import IconStyle
 from lizard_fewsunblobbed.models import Filter
 from lizard_fewsunblobbed.models import Location
 from lizard_fewsunblobbed.models import Parameter
 from lizard_fewsunblobbed.models import Timeserie
-# from lizard_fewsunblobbed.models import Timeseriedata
 
 
-# class TimeseriedataAdmin(admin.ModelAdmin):
-#     fields = ['tsd_value', 'tsd_flag', 'tsd_detection', 'tsd_comments', ]
+class FilterAdmin(SecurityFilteredAdmin):
+    list_display = ['__unicode__', 'fews_id', 'data_set']
 
 
 class TimeserieAdmin(admin.ModelAdmin):
@@ -18,18 +16,7 @@ class TimeserieAdmin(admin.ModelAdmin):
     list_filter = ('filterkey', 'parameterkey', )
 
 
-#class IconStyleAdmin(admin.ModelAdmin):
-#    list_display = (
-#        '__unicode__', 'fews_filter', 'fews_location',
-#        'fews_parameter', 'icon', 'color')
-#    list_filter = (
-#        'fews_filter', 'fews_location',
-#        'fews_parameter', 'icon', 'color')
-
-
-#admin.site.register(IconStyle, IconStyleAdmin)
-admin.site.register(Filter, SecurityFilteredAdmin)
+admin.site.register(Filter, FilterAdmin)
 admin.site.register(Location)
 admin.site.register(Parameter)
 admin.site.register(Timeserie, TimeserieAdmin)
-# admin.site.register(Timeseriedata, TimeseriedataAdmin)
