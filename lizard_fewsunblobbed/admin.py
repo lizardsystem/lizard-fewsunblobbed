@@ -8,7 +8,7 @@ from lizard_fewsunblobbed.models import Timeserie
 
 
 class FilterAdmin(SecurityFilteredAdmin):
-    list_display = ['__unicode__', 'parent', 'data_set']
+    list_display = ['__unicode__', 'parent', 'data_set', 'has_parameters']
 
 
 class TimeserieAdmin(admin.ModelAdmin):
