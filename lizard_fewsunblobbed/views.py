@@ -29,6 +29,9 @@ def fews_filters(request, ignore_cache=False):
 
     Exclude filters from settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS.
     """
+    if True:
+        # Temp override
+        return Filter.dump_bulk()
     data_set_ids = getattr(request, ALLOWED_DATA_SET_IDS, None)
     cache_key = FILTER_CACHE_KEY
     if data_set_ids:
