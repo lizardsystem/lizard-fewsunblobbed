@@ -1,9 +1,7 @@
 import logging
 
-from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from lizard_map.views import AppView
-from lizard_security.middleware import ALLOWED_DATA_SET_IDS
 
 from lizard_fewsunblobbed.models import Filter
 
@@ -23,27 +21,16 @@ def filter_exclude(filters, exclude_filters):
         lambda f: f['data']['fews_id'] not in exclude_filters, filters)
 
 
-def fews_filters(request, ignore_cache=False):
+def fews_filters(ignore_cache=False):
     """
     Return fews filter tree.
 
     Exclude filters from settings.FEWS_UNBLOBBED_EXCLUDE_FILTERS.
     """
-    if True:
-        # Temp override
-        return Filter.dump_bulk()
-    data_set_ids = getattr(request, ALLOWED_DATA_SET_IDS, None)
-    cache_key = FILTER_CACHE_KEY
-    if data_set_ids:
-        cache_key += ';'.join(data_set_ids)
-    filters = cache.get(cache_key)
-    # Filters is a list of dicts (keys: 'data', 'id', 'children')
-    # In data, there's a key 'fews_id'
-    if filters is None or ignore_cache:
-        filters = Filter.dump_bulk()  # Optional: parent
-
-        cache.set(cache_key, filters, 1 * 60 * 60)  # 1 hour
-    return filters
+    # Originally something was cached here. That didn't play well with
+    # lizard-security. Performance is good enough without filter caching,
+    # so we just dump it without caching.
+    return Filter.dump_bulk()
 
 
 class FewsBrowserView(AppView):
@@ -67,7 +54,7 @@ class FewsBrowserView(AppView):
         if self.filterkey:
             return []
         else:
-            return fews_filters(self.request)
+            return fews_filters()
 
     def found_filter(self):
         if self.filterkey:
