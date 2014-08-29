@@ -6,6 +6,7 @@ from functools import partial
 from django.conf import settings
 from django.core import serializers
 from django.core.cache import cache
+from django.core.cache import get_cache
 from django.db import models
 from django import db
 from django.utils.translation import ugettext as _
@@ -82,7 +83,8 @@ class Filter(AL_Node):
         The parameters returned have an added property 'filterkey'.
         """
         parameter_cache_key = PARAMETER_CACHE_KEY % str(self.id)
-        parameters = cache.get(parameter_cache_key)
+        fs_cache = get_cache('unblobbed_cache')
+        parameters = fs_cache.get(parameter_cache_key)
         if parameters is None or ignore_cache:
             parameters = []  # Start new one
             # Fetch all filter -> parameter combinations.
@@ -97,7 +99,7 @@ class Filter(AL_Node):
 
             # parameters = param_dict.values()
             parameters.sort(key=lambda p: p.name)
-            cache.set(parameter_cache_key, parameters, 8 * 60 * 60)
+            fs_cache.set(parameter_cache_key, parameters, 8 * 60 * 60)
 
         return parameters
 
@@ -160,7 +162,8 @@ class Filter(AL_Node):
         cache_key = RELATED_FILTERS_CACHE_KEY % str(node)
         cache_key = hashlib.sha256(cache_key).hexdigest()
         # ^^^ Make sure there are no spaces in the cache key.
-        related_filters = cache.get(cache_key)
+        fs_cache = get_cache('unblobbed_cache')
+        related_filters = fs_cache.get(cache_key)
         if related_filters is None or ignore_cache:
             related_filters = set([node.pk])
             #while node.parent != None:
@@ -171,7 +174,7 @@ class Filter(AL_Node):
             #    related_filters.add(node.pk)
             for childnode in node.get_descendants():
                 related_filters.add(childnode.pk)
-            cache.set(cache_key, related_filters, 8 * 60 * 60)
+            fs_cache.set(cache_key, related_filters, 8 * 60 * 60)
         return related_filters
 
 class ParameterGroup(models.Model):
@@ -395,14 +398,16 @@ class TimeSeriesKey(models.Model):
         dict. Handy when looping over great amounts of timeseries.
         """
         cache_key = TSK_HAS_DATA_CACHE_KEY
-        result = cache.get(cache_key)
+        fs_cache = get_cache('unblobbed_cache')
+        result = fs_cache.get(cache_key)
         if result is None or ignore_cache:
             logger.info('Populating TimeSeriesKey.has_data_dict...')
             tsd = TimeSeriesValuesAndFlag.objects.all().values('series').distinct()
             tsd_dict = {}
             for row in tsd:
                 tsd_dict[row['series']] = None  # Just make an entry
-            cache.set(cache_key, tsd_dict, 8 * 60 * 60)
+            logger.debug('... populating with %s items', len(tsd_dict))
+            fs_cache.set(cache_key, tsd_dict, 8 * 60 * 60)
             result = tsd_dict
         return result
 
