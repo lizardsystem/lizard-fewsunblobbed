@@ -1,6 +1,5 @@
 # (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.txt.
-# $Id$
-
+import hashlib
 import logging
 from functools import partial
 
@@ -159,6 +158,8 @@ class Filter(AL_Node):
     def get_related_filters_for(cls, filterkey, ignore_cache=False):
         node = cls.objects.get(pk=filterkey)
         cache_key = RELATED_FILTERS_CACHE_KEY % str(node)
+        cache_key = hashlib.sha256(cache_key).hexdigest()
+        # ^^^ Make sure there are no spaces in the cache key.
         related_filters = cache.get(cache_key)
         if related_filters is None or ignore_cache:
             related_filters = set([node.pk])
@@ -472,7 +473,7 @@ def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
             "TIMESERIESVALUESANDFLAGS"."DATETIME", "TIMESERIESVALUESANDFLAGS"."SCALARVALUE"
         FROM
             "TIMESERIESVALUESANDFLAGS"
-        WHERE 
+        WHERE
             "TIMESERIESVALUESANDFLAGS"."SERIESKEY" = %s
         AND
             "TIMESERIESVALUESANDFLAGS"."DATETIME" BETWEEN %s and %s
