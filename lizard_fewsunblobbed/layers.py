@@ -598,6 +598,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             for series_row in timeseriedata:
                 dates.append(series_row[0])
                 values.append(series_row[1])
+            if not values:
+                # No data, don't plot a thing.
+                continue
             graph.axes.plot(dates, values,
                             lw=1,
                             color=line_styles[str(identifier)]['color'],
