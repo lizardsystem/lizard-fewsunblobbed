@@ -29,7 +29,7 @@ from lizard_map.adapter import Graph, FlotGraph
 from lizard_map.models import ICON_ORIGINALS
 from lizard_map.models import WorkspaceItemError
 from lizard_map.symbol_manager import SymbolManager
-from lizard_map.mapnik_helper import add_datasource_point, add_datasource_point_mapnik2
+from lizard_map.mapnik_helper import add_datasource_point
 
 
 logger = logging.getLogger('lizard_fewsunblobbed.layers')  # pylint: disable=C0103, C0301
@@ -280,13 +280,10 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
         #fews_parameter = Parameter.objects.get(pk=parameterkey)
 
 
-        if mapnik.mapnik_version() < 800:
-            layer.datasource = mapnik.PointDatasource()
-            layer_nodata.datasource = mapnik.PointDatasource()
-        else:
-            layer.datasource = mapnik.MemoryDatasource()
-            layer_nodata.datasource = mapnik.MemoryDatasource()
-            context = mapnik.Context()
+        # layer.datasource = mapnik.PointDatasource()
+        # layer_nodata.datasource = mapnik.PointDatasource()
+        layer.datasource = mapnik.MemoryDatasource()
+        layer_nodata.datasource = mapnik.MemoryDatasource()
 
         fews_styles, fews_style_lookup = IconStyle._styles_lookup()
 
@@ -296,15 +293,9 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             dst_datasource = layer_nodata.datasource if not info['has_data'] else layer.datasource
 
             # Put style in point, filters work on these styles.
-            if mapnik.mapnik_version() < 800:
-                add_datasource_point(
-                    dst_datasource, info['longitude'],
-                    info['latitude'], 'Name', info['location_name'])
-            else:
-                add_datasource_point_mapnik2(
-                    dst_datasource, info['longitude'],
-                    info['latitude'], 'Name',
-                    info['location_name'], _id=i, context=context)
+            add_datasource_point(
+                dst_datasource, info['longitude'],
+                info['latitude'], 'Name', info['location_name'])
 
             point_style_name, point_style = fews_point_style(
                 None, None, None, nodata=False, styles=fews_styles,
