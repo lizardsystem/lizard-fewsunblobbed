@@ -6,6 +6,7 @@ import logging
 from django import db
 from django.conf import settings
 from django.core import serializers
+from django.core.cache import cache
 from django.core.cache import get_cache
 from django.db import models
 from lizard_map import coordinates
@@ -26,6 +27,7 @@ if hasattr(settings, 'FEWS_MANAGED'):
     FEWS_MANAGED = settings.FEWS_MANAGED
 
 Nullable64CharField = partial(models.CharField, max_length=64, null=True, blank=True)
+
 
 class Filter(AL_Node):
     """Fews filter object."""
@@ -449,9 +451,16 @@ class FilterTimeSeriesKey(models.Model):
 def query_distinct_parameters_for_filter(filter):
     return Parameter.objects.filter(timeserieskey__filtertimeserieskey__filter=filter).distinct()
 
+
 def query_parameters_exist_for_filter(filter):
-    #return Timeserie.objects.filter(filterkey=self.id).exists()
-    return FilterTimeSeriesKey.objects.filter(filter=filter).exists()
+    cache_key = 'unblobbed_filters_with_timeseriessssssss'
+    filters_with_timeseries = cache.get(cache_key)
+    if filters_with_timeseries is None:
+        filters_with_timeseries = FilterTimeSeriesKey.objects.all().values_list(
+            'filter', flat=True).distinct()
+        cache.set(cache_key, filters_with_timeseries, 8 * 60 * 60)
+    return filter.id in filters_with_timeseries
+
 
 def query_locations_for_filter(filterkey):
     #Location.objects.filter(timeserie__filterkey=self.filterkey)])
