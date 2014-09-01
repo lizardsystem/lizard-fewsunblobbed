@@ -83,4 +83,7 @@ class FewsBrowserView(AppView):
     def parameters(self):
         if self.filterkey is None:
             return
-        return self.found_filter.parameters()
+        try:
+            return self.found_filter.parameters()
+        except:  # Bare except
+            logger.exception("Grabbing parameters for FewsBrowserView failed")
