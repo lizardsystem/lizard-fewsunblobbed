@@ -341,7 +341,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             related_timeseries = query_timeseries_for_parameter(self.filterkey, self.parameterkey)
 
             # Fetch cached has_data dict for all timeseries.
-            timeseries_has_data = TimeSeriesKey.has_data_dict()
+            # timeseries_has_data = TimeSeriesKey.has_data_dict()
             for timeserie in related_timeseries:
                 location = timeserie.location
                 name = u'%s (%s): %s' % (parameter.name, parameter.group.unit,
@@ -365,7 +365,7 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
                     'workspace_item': self.workspace_item,
                     'identifier': {'locationkey': location.pk},
                     'google_coords': gc,
-                    'has_data': timeserie.pk in timeseries_has_data,
+                    'has_data': False,  # We don't care about colored icons.
                 })
             cache.set(cache_key, result, 8 * 60 * 60)
         else:

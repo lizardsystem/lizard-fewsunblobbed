@@ -388,27 +388,28 @@ class TimeSeriesKey(models.Model):
         """Return name for use in graph legends"""
         return u'%s' % (self.location.name)
 
-    @classmethod
-    def has_data_dict(cls, ignore_cache=False):
-        """
-        Return for each timeserie id if it has data.
+    # @classmethod
+    # def has_data_dict(cls, ignore_cache=False):
+    #     """
+    #     Return for each timeserie id if it has data.
 
-        If a timeserie has data, its id is listed in the returned
-        dict. Handy when looping over great amounts of timeseries.
-        """
-        cache_key = TSK_HAS_DATA_CACHE_KEY
-        fs_cache = get_cache('unblobbed_cache')
-        result = fs_cache.get(cache_key)
-        if result is None or ignore_cache:
-            logger.info('Populating TimeSeriesKey.has_data_dict...')
-            tsd = TimeSeriesValuesAndFlag.objects.all().values('series').distinct()
-            tsd_dict = {}
-            for row in tsd:
-                tsd_dict[row['series']] = None  # Just make an entry
-            logger.debug('... populating with %s items', len(tsd_dict))
-            fs_cache.set(cache_key, tsd_dict, 8 * 60 * 60)
-            result = tsd_dict
-        return result
+    #     If a timeserie has data, its id is listed in the returned
+    #     dict. Handy when looping over great amounts of timeseries.
+    #     """
+    #     cache_key = TSK_HAS_DATA_CACHE_KEY
+    #     fs_cache = get_cache('unblobbed_cache')
+    #     result = fs_cache.get(cache_key)
+    #     if result is None or ignore_cache:
+    #         logger.info('Populating TimeSeriesKey.has_data_dict...')
+    #         tsd = TimeSeriesValuesAndFlag.objects.all().values('series').distinct()
+    #         tsd_dict = {}
+    #         for row in tsd:
+    #             tsd_dict[row['series']] = None  # Just make an entry
+    #         logger.debug('... populating with %s items', len(tsd_dict))
+    #         fs_cache.set(cache_key, tsd_dict, 8 * 60 * 60)
+    #         result = tsd_dict
+    #     return result
+    # We don't care about colored icons anymore
 
 
 class TimeSeriesValuesAndFlag(models.Model):

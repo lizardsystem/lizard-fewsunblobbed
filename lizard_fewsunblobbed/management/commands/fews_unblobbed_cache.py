@@ -21,8 +21,8 @@ class Command(BaseCommand):
         logger.info('CACHES = %s', settings.CACHES)
         logger.info('Processing filter tree...')
         fews_filters(ignore_cache=True)
-        logger.info('Processing Timeserie.has_data_dict...')
-        TimeSeriesKey.has_data_dict(ignore_cache=True)
+        # logger.info('Processing Timeserie.has_data_dict...')
+        # TimeSeriesKey.has_data_dict(ignore_cache=True)
         logger.info('Processing filters...')
         for f in Filter.objects.all():
             f.parameters(ignore_cache=True)
