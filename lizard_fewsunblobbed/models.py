@@ -467,15 +467,18 @@ def query_locations_for_filter(filterkey):
     related_filters = Filter.get_related_filters_for(filterkey)
     return Location.objects.filter(timeserieskey__filtertimeserieskey__filter__in=related_filters)
 
+
 def query_timeseries_for_parameter(filterkey, parameterkey):
     #Timeserie.objects.filter(filterkey=self.filterkey, parameterkey=self.parameterkey)
     related_filters = Filter.get_related_filters_for(filterkey)
     return TimeSeriesKey.objects.filter(filtertimeserieskey__filter__in=related_filters, parameter=parameterkey)
 
+
 def query_timeseries_for_location(filterkey, parameterkey, locationkey):
     #Timeserie.objects.filter(filterkey=filterkey, locationkey=locationkey, parameterkey=parameterkey)
     related_filters = Filter.get_related_filters_for(filterkey)
     return TimeSeriesKey.objects.filter(filtertimeserieskey__filter__in=related_filters, parameter=parameterkey, location=locationkey)
+
 
 def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
     cursor = db.connections['fewsnorm'].cursor()
