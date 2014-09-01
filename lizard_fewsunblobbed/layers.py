@@ -199,12 +199,8 @@ def fews_point_style(
         settings.MEDIA_ROOT, 'generated_icons', output_filename)
 
     # use filename in mapnik pointsymbolizer
-    if mapnik.mapnik_version() < 800:
-        point_looks = mapnik.PointSymbolizer(
-            str(output_filename_abs), 'png', 16, 16)
-    else:
-        point_looks = mapnik.PointSymbolizer(
-            mapnik.PathExpression(str(output_filename_abs)))
+    point_looks = mapnik.PointSymbolizer(
+        mapnik.PathExpression(str(output_filename_abs)))
 
     point_looks.allow_overlap = True
     layout_rule = mapnik.Rule()
@@ -293,9 +289,12 @@ class WorkspaceItemAdapterFewsUnblobbed(workspace.WorkspaceItemAdapter):
             dst_datasource = layer_nodata.datasource if not info['has_data'] else layer.datasource
 
             # Put style in point, filters work on these styles.
-            add_datasource_point(
-                dst_datasource, info['longitude'],
-                info['latitude'], 'Name', info['location_name'])
+            if getattr(settings, 'SHOW_UNBLOBBED_ICONS', True):
+                # Hide them on staging/production
+                print(settings.SHOW_UNBLOBBED_ICONS)
+                add_datasource_point(
+                    dst_datasource, info['longitude'],
+                    info['latitude'], 'Name', info['location_name'])
 
             point_style_name, point_style = fews_point_style(
                 None, None, None, nodata=False, styles=fews_styles,
