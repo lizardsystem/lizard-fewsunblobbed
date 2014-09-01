@@ -3,12 +3,13 @@ import logging
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
+from django.utils.functional import cached_property
+from lizard_map.views import AppView
 
 from lizard_fewsunblobbed.models import Filter
 
-from lizard_map.views import AppView
 
-FILTER_CACHE_KEY = 'lizard_fewsunblobbed.views.filter_cache_key'
+FILTER_CACHE_KEY = 'lizard_fewsunblobbed.views.filter_cache_key2'
 logger = logging.getLogger(__name__)
 
 
@@ -61,16 +62,12 @@ class FewsBrowserView(AppView):
 
     template_name = 'lizard_fewsunblobbed/fews_browser.html'
 
-    def get(self, request, *args, **kwargs):
-        """Overriden to get self.filterkey from the GET parameters.
-           TODO: Do this in a nicer way."""
-
-        try:
-            self.filterkey = int(request.GET.get('filterkey', None))
-        except (TypeError, ValueError):
-            self.filterkey = None
-
-        return super(FewsBrowserView, self).get(request, *args, **kwargs)
+    @cached_property
+    def filterkey(self):
+        key = self.request.GET.get('filterkey')
+        if not key:
+            return
+        return int(key)
 
     def filters(self):
         if self.filterkey:
@@ -78,13 +75,15 @@ class FewsBrowserView(AppView):
         else:
             return fews_filters()
 
+    @cached_property
     def found_filter(self):
-        if self.filterkey:
+        if self.filterkey is not None:
             return get_object_or_404(Filter, pk=self.filterkey)
-        else:
-            return None
 
     def parameters(self):
-        filter = self.found_filter()
-        if filter:
-            return filter.parameters()
+        if self.filterkey is None:
+            return
+        try:
+            return self.found_filter.parameters()
+        except:  # Bare except
+            logger.exception("Grabbing parameters for FewsBrowserView failed")

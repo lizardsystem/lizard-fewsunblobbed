@@ -1,23 +1,21 @@
 # (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.txt.
+from functools import partial
 import hashlib
 import logging
-from functools import partial
 
+from django import db
 from django.conf import settings
 from django.core import serializers
 from django.core.cache import cache
 from django.core.cache import get_cache
 from django.db import models
-from django import db
-from django.utils.translation import ugettext as _
-
-from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
+from treebeard.al_tree import AL_Node
+import django.db.models.options as options
 
 logger = logging.getLogger(__name__)
 
 # allows a custom attribute in the model Meta class
-import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('is_fews_model',)
 
 TSK_HAS_DATA_CACHE_KEY = 'lizard_fewsunblobbed.models.timeserieskey_hasdata'
@@ -29,6 +27,7 @@ if hasattr(settings, 'FEWS_MANAGED'):
     FEWS_MANAGED = settings.FEWS_MANAGED
 
 Nullable64CharField = partial(models.CharField, max_length=64, null=True, blank=True)
+
 
 class Filter(AL_Node):
     """Fews filter object."""
@@ -67,7 +66,7 @@ class Filter(AL_Node):
     @property
     def issubfilter(self):
         if self.__issubfilter is None:
-            self.__issubfilter = self.parent == None
+            self.__issubfilter = self.parent is None
         return self.__issubfilter
 
     @property
@@ -389,27 +388,28 @@ class TimeSeriesKey(models.Model):
         """Return name for use in graph legends"""
         return u'%s' % (self.location.name)
 
-    @classmethod
-    def has_data_dict(cls, ignore_cache=False):
-        """
-        Return for each timeserie id if it has data.
+    # @classmethod
+    # def has_data_dict(cls, ignore_cache=False):
+    #     """
+    #     Return for each timeserie id if it has data.
 
-        If a timeserie has data, its id is listed in the returned
-        dict. Handy when looping over great amounts of timeseries.
-        """
-        cache_key = TSK_HAS_DATA_CACHE_KEY
-        fs_cache = get_cache('unblobbed_cache')
-        result = fs_cache.get(cache_key)
-        if result is None or ignore_cache:
-            logger.info('Populating TimeSeriesKey.has_data_dict...')
-            tsd = TimeSeriesValuesAndFlag.objects.all().values('series').distinct()
-            tsd_dict = {}
-            for row in tsd:
-                tsd_dict[row['series']] = None  # Just make an entry
-            logger.debug('... populating with %s items', len(tsd_dict))
-            fs_cache.set(cache_key, tsd_dict, 8 * 60 * 60)
-            result = tsd_dict
-        return result
+    #     If a timeserie has data, its id is listed in the returned
+    #     dict. Handy when looping over great amounts of timeseries.
+    #     """
+    #     cache_key = TSK_HAS_DATA_CACHE_KEY
+    #     fs_cache = get_cache('unblobbed_cache')
+    #     result = fs_cache.get(cache_key)
+    #     if result is None or ignore_cache:
+    #         logger.info('Populating TimeSeriesKey.has_data_dict...')
+    #         tsd = TimeSeriesValuesAndFlag.objects.all().values('series').distinct()
+    #         tsd_dict = {}
+    #         for row in tsd:
+    #             tsd_dict[row['series']] = None  # Just make an entry
+    #         logger.debug('... populating with %s items', len(tsd_dict))
+    #         fs_cache.set(cache_key, tsd_dict, 8 * 60 * 60)
+    #         result = tsd_dict
+    #     return result
+    # We don't care about colored icons anymore
 
 
 class TimeSeriesValuesAndFlag(models.Model):
@@ -452,24 +452,34 @@ class FilterTimeSeriesKey(models.Model):
 def query_distinct_parameters_for_filter(filter):
     return Parameter.objects.filter(timeserieskey__filtertimeserieskey__filter=filter).distinct()
 
+
 def query_parameters_exist_for_filter(filter):
-    #return Timeserie.objects.filter(filterkey=self.id).exists()
-    return FilterTimeSeriesKey.objects.filter(filter=filter).exists()
+    cache_key = 'unblobbed_filters_with_timeseriessssssss'
+    filters_with_timeseries = cache.get(cache_key)
+    if filters_with_timeseries is None:
+        filters_with_timeseries = FilterTimeSeriesKey.objects.all().values_list(
+            'filter', flat=True).distinct()
+        cache.set(cache_key, filters_with_timeseries, 8 * 60 * 60)
+    return filter.id in filters_with_timeseries
+
 
 def query_locations_for_filter(filterkey):
     #Location.objects.filter(timeserie__filterkey=self.filterkey)])
     related_filters = Filter.get_related_filters_for(filterkey)
     return Location.objects.filter(timeserieskey__filtertimeserieskey__filter__in=related_filters)
 
+
 def query_timeseries_for_parameter(filterkey, parameterkey):
     #Timeserie.objects.filter(filterkey=self.filterkey, parameterkey=self.parameterkey)
     related_filters = Filter.get_related_filters_for(filterkey)
     return TimeSeriesKey.objects.filter(filtertimeserieskey__filter__in=related_filters, parameter=parameterkey)
 
+
 def query_timeseries_for_location(filterkey, parameterkey, locationkey):
     #Timeserie.objects.filter(filterkey=filterkey, locationkey=locationkey, parameterkey=parameterkey)
     related_filters = Filter.get_related_filters_for(filterkey)
     return TimeSeriesKey.objects.filter(filtertimeserieskey__filter__in=related_filters, parameter=parameterkey, location=locationkey)
+
 
 def query_timeseriedata_for_timeserie(timeserie, start_date, end_date):
     cursor = db.connections['fewsnorm'].cursor()
