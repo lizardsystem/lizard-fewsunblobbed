@@ -1,23 +1,20 @@
 # (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.txt.
+from functools import partial
 import hashlib
 import logging
-from functools import partial
 
+from django import db
 from django.conf import settings
 from django.core import serializers
-from django.core.cache import cache
 from django.core.cache import get_cache
 from django.db import models
-from django import db
-from django.utils.translation import ugettext as _
-
-from treebeard.al_tree import AL_Node
 from lizard_map import coordinates
+from treebeard.al_tree import AL_Node
+import django.db.models.options as options
 
 logger = logging.getLogger(__name__)
 
 # allows a custom attribute in the model Meta class
-import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('is_fews_model',)
 
 TSK_HAS_DATA_CACHE_KEY = 'lizard_fewsunblobbed.models.timeserieskey_hasdata'
@@ -67,7 +64,7 @@ class Filter(AL_Node):
     @property
     def issubfilter(self):
         if self.__issubfilter is None:
-            self.__issubfilter = self.parent == None
+            self.__issubfilter = self.parent is None
         return self.__issubfilter
 
     @property
